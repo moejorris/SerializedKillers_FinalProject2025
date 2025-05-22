@@ -1,6 +1,7 @@
 using System;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -19,6 +20,8 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] float gravityAcceleration = -10f;
     [SerializeField] float maxFallSpeed = -30f;
     [SerializeField] float gravityOnGround = -2f;
+
+    [SerializeField] InputActionReference movementInput;
 
     //Ground Check
     RaycastHit groundInfo;
@@ -78,8 +81,9 @@ public class PlayerMovement : MonoBehaviour
         Vector3 camForward = Vector3.ProjectOnPlane(Camera.main.transform.forward, Vector3.up);
         Vector3 camRight = Vector3.ProjectOnPlane(Camera.main.transform.right, Vector3.up);
 
+        Vector2 moveInput = movementInput.action.ReadValue<Vector2>();
 
-        Vector3 moveDir = Input.GetAxis("Horizontal") * camRight.normalized + Input.GetAxis("Vertical") * camForward.normalized;
+        Vector3 moveDir = moveInput.x * camRight.normalized + moveInput.y * camForward.normalized;
 
         if (moveDir.magnitude > 1) moveDir.Normalize();
 
