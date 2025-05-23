@@ -19,6 +19,9 @@ public class PlayerCamRotate : MonoBehaviour
         xRot = transform.eulerAngles.x;
         yRot = transform.eulerAngles.y;
         camLocalPos = cameraTargetPosition.localPosition;
+
+        // Hi joe I added this because mouse go way off screen otherwise teehee sorry!
+        Cursor.lockState = CursorLockMode.Locked;
     }
 
     // Update is called once per frame
