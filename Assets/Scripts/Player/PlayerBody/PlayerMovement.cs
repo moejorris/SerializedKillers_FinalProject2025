@@ -22,6 +22,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] float gravityOnGround = -2f;
 
     [SerializeField] InputActionReference movementInput;
+    [SerializeField] InputActionReference jumpInput;
 
     //Ground Check
     RaycastHit groundInfo;
@@ -46,7 +47,7 @@ public class PlayerMovement : MonoBehaviour
     {
         //Raycast Method: Physics.Raycast(transform.position, Vector3.down, out groundInfo, 0.05f + charCon.height / 2f, ~0, QueryTriggerInteraction.Ignore)
         //Spherecast Method: Physics.SphereCast(transform.position, 0.15f, Vector3.down, out groundInfo, charCon.height * 0.5f, ~0, QueryTriggerInteraction.Ignore)
-        if(Physics.Raycast(transform.position, Vector3.down, out groundInfo, 0.15f + charCon.height / 2f, ~0, QueryTriggerInteraction.Ignore))
+        if(Physics.Raycast(transform.position, Vector3.down, out groundInfo, 0.15f + charCon.height / 2f, ~0, QueryTriggerInteraction.Ignore) && currentState != PlayerState.Jumping)
         {
             if (!isGrounded) velocity.y = 0;
 
@@ -67,6 +68,8 @@ public class PlayerMovement : MonoBehaviour
     {
         if (charCon)
         {
+            //draw motion vector
+            Gizmos.color = Color.blue;
             Gizmos.DrawSphere(groundInfo.point != Vector3.zero ? groundInfo.point : transform.position + Vector3.down * 0.5f * charCon.height, 0.15f);
             Gizmos.DrawRay(transform.position, velocity);
         }
@@ -93,7 +96,7 @@ public class PlayerMovement : MonoBehaviour
 
         if (isGrounded)
         {
-            if (Input.GetButtonDown("Jump"))
+            if (jumpInput.action.WasPressedThisFrame())
             {
                 velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravityAcceleration * jumpingGravityScale);
                 currentState = PlayerState.Jumping;
