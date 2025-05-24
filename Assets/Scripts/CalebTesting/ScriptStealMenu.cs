@@ -20,37 +20,38 @@ public class ScriptStealMenu : MonoBehaviour
 
     public CharacterController characterController;
 
-    private Image hud_combatSlotIcon;
-    private Image hud_movementSlotIcon;
-    private Image menu_combatSlotIcon;
-    private Image menu_movementSlotIcon;
-    private Image menu_replacementScriptSlotIcon;
+    //private Image hud_combatSlotIcon;
+    //private Image hud_movementSlotIcon;
+    private BehaviorSlot menu_combatSlotIcon;
+    private BehaviorSlot menu_movementSlotIcon;
+    public BehaviorSlot menu_heldBehaviorSlot;
 
-    public Sprite currentSelectedEnemySprite;
+    private BehaviorSlot selectedBehaviorSlot;
+
+    public Behavior targetedBehavior;
     [SerializeField] private Sprite emptySprite;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        hud_combatSlotIcon = transform.parent.Find("HUD/CombatSlot/Icon").GetComponent<Image>();
-        hud_movementSlotIcon = transform.parent.Find("HUD/MovementSlot/Icon").GetComponent<Image>();
-        menu_combatSlotIcon = transform.Find("BG/CombatSlot/Icon").GetComponent<Image>();
-        menu_movementSlotIcon = transform.Find("BG/MovementSlot/Icon").GetComponent<Image>();
-        menu_replacementScriptSlotIcon = transform.Find("BG/BottomMiddle/Icon").GetComponent<Image>();
+        menu_combatSlotIcon = transform.Find("BG/CombatSlot").GetComponent<BehaviorSlot>();
+        menu_movementSlotIcon = transform.Find("BG/MovementSlot").GetComponent<BehaviorSlot>();
+        menu_heldBehaviorSlot = transform.Find("BG/BottomMiddle").GetComponent<BehaviorSlot>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (northButton.action.ReadValue<float>() > 0)
+        if (northButton.action.ReadValue<float>() > 0) // holding Y
         {
             menuPanel.SetActive(true);
             menuOpen = true;
         }
-        else
+        else // let go of Y
         {
             menuPanel.SetActive(false);
             menuOpen = false;
+            ApplyBehaviorSelection();
         }
 
         if (menuOpen)
@@ -108,18 +109,72 @@ public class ScriptStealMenu : MonoBehaviour
         }
 
 
-        if (currentSelectedEnemySprite != null)
+        if (menuOpen)
         {
-            menu_replacementScriptSlotIcon.sprite = currentSelectedEnemySprite;
+            if (Vector2.Distance(arrow.transform.Find("Image").position, menu_movementSlotIcon.transform.position) < 50) // in range of movement slot
+            {
+                MovementSlotSelection();
+                menu_combatSlotIcon.UpdateSlot();
+            }
+            else if (Vector2.Distance(arrow.transform.Find("Image").position, menu_combatSlotIcon.transform.position) < 50) // in range of combat slot
+            {
+                CombatSlotSelection();
+                menu_movementSlotIcon.UpdateSlot();
+            }
+            else
+            {
+                menu_combatSlotIcon.UpdateSlot();
+                menu_movementSlotIcon.UpdateSlot();
+                selectedBehaviorSlot = null;
+            }
         }
         else
         {
-            menu_replacementScriptSlotIcon.sprite = emptySprite;
+            selectedBehaviorSlot = null;
         }
+    }
 
-        if (Vector2.Distance(arrow.transform.Find("Image").position, hud_movementSlotIcon.transform.position) > 1)
+    public void ApplyBehaviorSelection()
+    {
+        if (menu_heldBehaviorSlot.heldBehavior != null && selectedBehaviorSlot != null)
         {
-            Debug.Log("In Range");
+            if (selectedBehaviorSlot.heldBehavior != null)
+            {
+                selectedBehaviorSlot.RemoveBehavior(); // 
+                selectedBehaviorSlot.AddBehavior(menu_heldBehaviorSlot.heldBehavior);
+            }
+            else
+            {
+                selectedBehaviorSlot.AddBehavior(menu_heldBehaviorSlot.heldBehavior);
+            }
+        }
+    }
+
+    public void MovementSlotSelection()
+    {
+        if (menu_heldBehaviorSlot.heldBehavior != null)
+        {
+            menu_movementSlotIcon.transform.Find("Icon").GetComponent<Image>().sprite = menu_heldBehaviorSlot.heldBehavior.behavioricon;
+            selectedBehaviorSlot = menu_movementSlotIcon;
+        }
+        else
+        {
+            menu_movementSlotIcon.UpdateSlot();
+            selectedBehaviorSlot = null;
+        }
+    }
+
+    public void CombatSlotSelection()
+    {
+        if (menu_heldBehaviorSlot.heldBehavior != null)
+        {
+            menu_combatSlotIcon.transform.Find("Icon").GetComponent<Image>().sprite = menu_heldBehaviorSlot.heldBehavior.behavioricon;
+            selectedBehaviorSlot = menu_combatSlotIcon;
+        }
+        else
+        {
+            menu_combatSlotIcon.UpdateSlot();
+            selectedBehaviorSlot = null;
         }
     }
 
