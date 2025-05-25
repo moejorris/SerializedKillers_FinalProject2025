@@ -1,5 +1,6 @@
 using System;
 using UnityEditor;
+using UnityEditor.MPE;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -9,6 +10,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] bool isGrounded;
     CharacterController charCon;
     [SerializeField] float speed = 7f;
+    [SerializeField] float acceleration = 30f;
 
     [Header("Jumping")]
     [SerializeField] float jumpHeight = 2f;
@@ -23,6 +25,11 @@ public class PlayerMovement : MonoBehaviour
 
     [SerializeField] InputActionReference movementInput;
     [SerializeField] InputActionReference jumpInput;
+    [SerializeField] InputActionReference attackInput;
+
+    [SerializeField] Transform playerMesh;
+    Animator animator;
+
 
     //Ground Check
     RaycastHit groundInfo;
@@ -31,7 +38,8 @@ public class PlayerMovement : MonoBehaviour
     {
         Grounded,
         Jumping,
-        Falling
+        Falling,
+        Override
     }
 
     PlayerState currentState;
@@ -41,26 +49,37 @@ public class PlayerMovement : MonoBehaviour
     void Start()
     {
         charCon = GetComponent<CharacterController>();
+        animator = GetComponentInChildren<Animator>();
     }
 
     void GroundCheck()
     {
         //Raycast Method: Physics.Raycast(transform.position, Vector3.down, out groundInfo, 0.05f + charCon.height / 2f, ~0, QueryTriggerInteraction.Ignore)
         //Spherecast Method: Physics.SphereCast(transform.position, 0.15f, Vector3.down, out groundInfo, charCon.height * 0.5f, ~0, QueryTriggerInteraction.Ignore)
-        if(Physics.Raycast(transform.position, Vector3.down, out groundInfo, 0.15f + charCon.height / 2f, ~0, QueryTriggerInteraction.Ignore) && currentState != PlayerState.Jumping)
+        if (Physics.Raycast(transform.position, Vector3.down, out groundInfo, 0.15f + charCon.height / 2f, ~0, QueryTriggerInteraction.Ignore) && currentState != PlayerState.Jumping)
         {
-            if (!isGrounded) velocity.y = 0;
+            if (!isGrounded)
+            {
+                velocity.y = 0;
+                currentState = PlayerState.Grounded;
+            }
 
-            currentState = PlayerState.Grounded;
             isGrounded = true;
         }
         else
         {
-            if (isGrounded) velocity.y = gravityOnGround;
+            if (isGrounded)
+            {
+                if (currentState != PlayerState.Jumping)
+                {
+                    velocity.y = gravityOnGround;                    
+                }
+
+                currentState = PlayerState.Falling;
+            }
 
             isGrounded = false;
 
-            if (velocity.y < 1) currentState = PlayerState.Falling;
         }
     }
 
@@ -90,9 +109,11 @@ public class PlayerMovement : MonoBehaviour
 
         if (moveDir.magnitude > 1) moveDir.Normalize();
 
+
+
         Vector3 walkVel = Vector3.ProjectOnPlane(moveDir * speed, groundInfo.normal);
 
-        velocity = new Vector3(walkVel.x, isGrounded ? walkVel.y : velocity.y, walkVel.z);
+        // velocity = new Vector3(walkVel.x, isGrounded ? walkVel.y : velocity.y, walkVel.z);
 
         if (isGrounded)
         {
@@ -101,12 +122,62 @@ public class PlayerMovement : MonoBehaviour
                 velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravityAcceleration * jumpingGravityScale);
                 currentState = PlayerState.Jumping;
             }
+
+            if (velocity.magnitude < 0.01) velocity = Vector3.zero;
+
+            Debug.Log(velocity.magnitude);
         }
         else
         {
             velocity.y += gravityAcceleration * gravityScale * Time.deltaTime;
         }
 
+        if (currentState != PlayerState.Override)
+        {
+            velocity += Vector3.ProjectOnPlane(acceleration * moveDir * Time.deltaTime, groundInfo.normal);            
+        }
+
+        velocity -= velocity.normalized * Time.deltaTime * velocity.magnitude * 5;
+
         charCon.Move(velocity * Time.deltaTime);
+
+        if (GetWalkSpeed() > 0.1f)
+        {
+            Vector3 lookDir = velocity;
+            lookDir.y = 0;
+
+            playerMesh.forward = lookDir;
+        }
+
+        animator.SetFloat("NormalizedWalkSpeed", GetWalkSpeed() / speed);
+
+        if (attackInput.action.WasPressedThisFrame())
+        {
+            animator.SetTrigger("Attack");
+            OverrideVeloctiy(playerMesh.forward * 4f);
+            CancelInvoke("EnableMovement");
+            Invoke("EnableMovement", 0.3f);
+        }
+    }
+
+    float GetWalkSpeed()
+    {
+        return Vector3.ProjectOnPlane(velocity, groundInfo.normal).magnitude;
+    }
+
+    public void OverrideVeloctiy(Vector3 newVelocity)
+    {
+        velocity = newVelocity;
+        currentState = PlayerState.Override;
+    }
+
+    public void DisableMovement()
+    {
+        currentState = PlayerState.Override;
+    }
+
+    public void EnableMovement()
+    {
+        currentState = isGrounded ? PlayerState.Grounded : PlayerState.Falling;
     }
 }
