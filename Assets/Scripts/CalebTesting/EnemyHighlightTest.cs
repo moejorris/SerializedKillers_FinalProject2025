@@ -8,12 +8,12 @@ public class EnemyHighlightTest : MonoBehaviour
     private void OnMouseEnter()
     {
         transform.parent.gameObject.layer = 6;
-        UIStuff.menu_heldBehaviorSlot.AddBehavior(heldBehavior);
+        UIStuff.centerSlot.AddBehavior(heldBehavior);
     }
 
     private void OnMouseExit()
     {
         transform.parent.gameObject.layer = 0;
-        UIStuff.menu_heldBehaviorSlot.RemoveBehavior();
+        UIStuff.centerSlot.RemoveBehavior();
     }
 }
