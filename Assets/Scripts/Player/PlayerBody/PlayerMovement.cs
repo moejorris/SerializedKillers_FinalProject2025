@@ -125,11 +125,18 @@ public class PlayerMovement : MonoBehaviour
 
             if (velocity.magnitude < 0.01) velocity = Vector3.zero;
 
+            velocity -= velocity.normalized * Time.deltaTime * velocity.magnitude * 5; //random math to slow down/emulate friction
+
+
             Debug.Log(velocity.magnitude);
         }
         else
         {
             velocity.y += gravityAcceleration * gravityScale * Time.deltaTime;
+
+            Vector3 moveVel = velocity;
+            moveVel.y = 0;
+            velocity -= velocity.normalized * Time.deltaTime * velocity.magnitude * 2.5f;
         }
 
         if (currentState != PlayerState.Override)
@@ -137,7 +144,6 @@ public class PlayerMovement : MonoBehaviour
             velocity += Vector3.ProjectOnPlane(acceleration * moveDir * Time.deltaTime, groundInfo.normal);            
         }
 
-        velocity -= velocity.normalized * Time.deltaTime * velocity.magnitude * 5;
 
         charCon.Move(velocity * Time.deltaTime);
 
