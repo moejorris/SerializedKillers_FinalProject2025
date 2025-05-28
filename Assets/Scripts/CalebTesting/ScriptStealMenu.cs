@@ -4,8 +4,9 @@ using UnityEngine.UI;
 
 public class ScriptStealMenu : MonoBehaviour
 {
-    public InputActionReference northButton; // holding Y
+    public InputActionReference northButton; // Pressing Y
     public InputActionReference leftJoystick;
+    public InputActionReference southButton; // Pressing A
     public PlayerInput playerInput;
 
     //public InputAction action;
@@ -28,6 +29,10 @@ public class ScriptStealMenu : MonoBehaviour
     public BehaviorSlot centerSlot;
 
     private BehaviorSlot selectedBehaviorSlot;
+    public EnemyAI_Base selectedEnemy;
+
+
+    [SerializeField] private LayerMask enemyLayer;
 
     private Animator animator;
 
@@ -47,8 +52,26 @@ public class ScriptStealMenu : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (northButton.action.WasPressedThisFrame())
+        Debug.DrawLine(Camera.main.transform.position, Camera.main.ScreenPointToRay(Input.mousePosition).GetPoint(5), color: Color.red);
+        Ray cameraRay = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+        if (Physics.Raycast(cameraRay, out RaycastHit hit, 100, enemyLayer, queryTriggerInteraction: QueryTriggerInteraction.Collide))
         {
+            if (hit.transform.parent.GetComponent<EnemyAI_Base>() != null && hit.transform.parent.GetComponent<EnemyAI_Base>().behaviorActive)
+            {
+                hit.transform.parent.GetComponent<EnemyAI_Base>().SelectEnemy();
+            }
+        }
+        else if (selectedEnemy != null)
+        {
+            selectedEnemy.DeselectEnemy();
+        }
+
+
+
+        if (northButton.action.WasPressedThisFrame()) // Checks if the player has pressed Y and toggles menu
+        {
+            //Debug.Log("Y was pressed");
             if (menuOpen)
             {
                 menuPanel.SetActive(false);
@@ -61,7 +84,7 @@ public class ScriptStealMenu : MonoBehaviour
             }
         }
 
-        if (menuOpen)
+        if (menuOpen) // Updates UI when menu is open
         {
             if (leftJoystick.action.ReadValue<Vector2>().x > 0.4f) // being held right
             {
@@ -81,26 +104,26 @@ public class ScriptStealMenu : MonoBehaviour
                 movementSlot.UpdateSlot();
                 combatSlot.UpdateSlot();
             }
-        }
 
-        //if (northButton.action.ReadValue<float>() > 0) // holding Y
-        //{
-        //    menuPanel.SetActive(true);
-        //    menuOpen = true;
-        //}
-        //else // let go of Y
-        //{
-        //    menuPanel.SetActive(false);
-        //    menuOpen = false;
-        //    ApplyBehaviorSelection();
-        //}
+            // --------------------- CHECKING INPUTS -----------------
 
-        if (menuOpen)
-        {
+            if (southButton.action.WasPerformedThisFrame())
+            {
+                if (selectedBehaviorSlot != null)
+                {
+                    ApplyBehaviorSelection();
+                }
+                else
+                {
+                    // error button or something lol
+                }
+            }
+
+            // --------------------- SLOWING TIME --------------------
             slowTime -= Time.deltaTime * 2;
             if (slowTime < 0.1f)
             {
-                slowTime= 0.1f;
+                slowTime = 0.1f;
             }
 
             float mult = 10 - (slowTime * 10);
@@ -116,7 +139,7 @@ public class ScriptStealMenu : MonoBehaviour
             slowTime += (Time.deltaTime * 4);
             if (slowTime > 1)
             {
-                slowTime= 1;
+                slowTime = 1;
             }
 
             float mult = 100 - (slowTime * 100);
@@ -126,89 +149,45 @@ public class ScriptStealMenu : MonoBehaviour
         }
 
         Time.timeScale = slowTime;
-
-
-        //if (InputIsKeyboard())
-        //{
-        //    arrow.transform.rotation = Quaternion.Euler(0,0, (Mathf.Atan2(Input.mousePosition.y - arrow.transform.position.y, Input.mousePosition.x - arrow.transform.position.x) * Mathf.Rad2Deg) - 90);
-
-
-        //    Vector2 localPos = arrow.transform.Find("Image").transform.localPosition;
-        //    localPos.y = Vector2.Distance(arrow.transform.position, Input.mousePosition);
-            
-        //    if (localPos.y > 180)
-        //    {
-        //        localPos.y = 180;
-        //    }
-
-        //    arrow.transform.Find("Image").transform.localPosition = localPos;
-        //}
-        //else
-        //{
-        //    if (leftJoystick.action.ReadValue<Vector2>().x != 0 || leftJoystick.action.ReadValue<Vector2>().y != 0)
-        //    {
-        //        arrow.transform.eulerAngles = new Vector3(0, 0, (Mathf.Atan2(leftJoystick.action.ReadValue<Vector2>().y, leftJoystick.action.ReadValue<Vector2>().x) * Mathf.Rad2Deg) - 92);
-        //    }
-
-        //    Vector2 localPos = arrow.transform.Find("Image").transform.localPosition;
-        //    localPos.y = leftJoystick.action.ReadValue<Vector2>().magnitude * 180f;
-        //    arrow.transform.Find("Image").transform.localPosition = localPos;
-        //}
-
-
-        //if (menuOpen)
-        //{
-        //    if (Vector2.Distance(arrow.transform.Find("Image").position, movementSlot.transform.position) < 50) // in range of movement slot
-        //    {
-        //        MovementSlotSelection();
-        //        combatSlot.UpdateSlot();
-        //    }
-        //    else if (Vector2.Distance(arrow.transform.Find("Image").position, combatSlot.transform.position) < 50) // in range of combat slot
-        //    {
-        //        CombatSlotSelection();
-        //        movementSlot.UpdateSlot();
-        //    }
-        //    else
-        //    {
-        //        combatSlot.UpdateSlot();
-        //        movementSlot.UpdateSlot();
-        //        selectedBehaviorSlot = null;
-        //    }
-        //}
-        //else
-        //{
-        //    selectedBehaviorSlot = null;
-        //}
     }
 
     public void ApplyBehaviorSelection()
     {
         if (centerSlot.heldBehavior != null && selectedBehaviorSlot != null)
         {
+            Debug.Log("behavior is held. slot is selected.");
             if (selectedBehaviorSlot.heldBehavior != null)
             {
-                selectedBehaviorSlot.RemoveBehavior(); // 
+                Debug.Log("something was in slot, replaced.");
+                selectedBehaviorSlot.RemoveBehavior();
                 selectedBehaviorSlot.AddBehavior(centerSlot.heldBehavior);
             }
             else
             {
+                Debug.Log("thing added to slot");
                 selectedBehaviorSlot.AddBehavior(centerSlot.heldBehavior);
             }
+
+            centerSlot.RemoveBehavior();
+            selectedEnemy.behaviorActive = false;
+            selectedEnemy.DeselectEnemy();
+            Debug.Log("selectedEnemy.behaviorActive = false");
+            menuPanel.SetActive(false);
+            menuOpen = false;
         }
     }
 
     public void MovementSlotSelection()
     {
-        //combatSlot.UpdateSlot();
         if (centerSlot.heldBehavior != null)
         {
-            Debug.Log("Center slot held behavior != null");
+            //Debug.Log("Center slot held behavior != null");
             movementSlot.transform.Find("Icon").GetComponent<Image>().sprite = centerSlot.heldBehavior.behavioricon;
             selectedBehaviorSlot = movementSlot;
         }
         else
         {
-            Debug.Log("Center slot held behavior = null");
+            //Debug.Log("Center slot held behavior = null");
             movementSlot.UpdateSlot();
             selectedBehaviorSlot = null;
         }
@@ -216,7 +195,6 @@ public class ScriptStealMenu : MonoBehaviour
 
     public void CombatSlotSelection()
     {
-        //movementSlot.UpdateSlot();
         if (centerSlot.heldBehavior != null)
         {
             combatSlot.transform.Find("Icon").GetComponent<Image>().sprite = centerSlot.heldBehavior.behavioricon;
@@ -240,6 +218,4 @@ public class ScriptStealMenu : MonoBehaviour
             return false;
         }
     }
-
-    
 }
