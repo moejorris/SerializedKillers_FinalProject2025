@@ -31,7 +31,7 @@ public class ScriptStealMenu : MonoBehaviour
 
     private Animator animator;
 
-    public Behavior targetedBehavior;
+    //public Behavior targetedBehavior;
     [SerializeField] private Sprite emptySprite;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -41,6 +41,7 @@ public class ScriptStealMenu : MonoBehaviour
         movementSlot = transform.Find("BG/MovementSlot").GetComponent<BehaviorSlot>();
         centerSlot = transform.Find("BG/CenterSlot").GetComponent<BehaviorSlot>();
         animator = GetComponent<Animator>();
+        menuPanel.SetActive(menuOpen);
     }
 
     // Update is called once per frame
@@ -65,14 +66,20 @@ public class ScriptStealMenu : MonoBehaviour
             if (leftJoystick.action.ReadValue<Vector2>().x > 0.4f) // being held right
             {
                 animator.SetInteger("Slot", 1);
+                CombatSlotSelection();
+                movementSlot.UpdateSlot();
             }
             else if (leftJoystick.action.ReadValue<Vector2>().x < -0.4f) // being held left
             {
                 animator.SetInteger("Slot", -1);
+                MovementSlotSelection();
+                combatSlot.UpdateSlot();
             }
             else
             {
                 animator.SetInteger("Slot", 0);
+                movementSlot.UpdateSlot();
+                combatSlot.UpdateSlot();
             }
         }
 
@@ -192,13 +199,16 @@ public class ScriptStealMenu : MonoBehaviour
 
     public void MovementSlotSelection()
     {
+        //combatSlot.UpdateSlot();
         if (centerSlot.heldBehavior != null)
         {
+            Debug.Log("Center slot held behavior != null");
             movementSlot.transform.Find("Icon").GetComponent<Image>().sprite = centerSlot.heldBehavior.behavioricon;
             selectedBehaviorSlot = movementSlot;
         }
         else
         {
+            Debug.Log("Center slot held behavior = null");
             movementSlot.UpdateSlot();
             selectedBehaviorSlot = null;
         }
@@ -206,6 +216,7 @@ public class ScriptStealMenu : MonoBehaviour
 
     public void CombatSlotSelection()
     {
+        //movementSlot.UpdateSlot();
         if (centerSlot.heldBehavior != null)
         {
             combatSlot.transform.Find("Icon").GetComponent<Image>().sprite = centerSlot.heldBehavior.behavioricon;
