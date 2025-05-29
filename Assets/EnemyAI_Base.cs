@@ -5,11 +5,18 @@ using UnityEngine.AI;
 public class EnemyAI_Base : MonoBehaviour
 {
     [Header("Navigation")]
-    [SerializeField] private Transform target;
+    [SerializeField] private Transform playerTarget;
     [SerializeField] private float attackDistance;
     private NavMeshAgent navMeshAgent;
     //private Animator animator;
     [SerializeField] private float targetDistance;
+    [SerializeField] private float circlingRotationSpeed = 1;
+
+    public float radius = 10f;
+    public float angleSpeed = 1f; // Degrees per second
+    public Vector3 center = Vector3.zero;
+
+    private float currentAngle = 0f;
 
     [Header("Held Behavior")]
     public Behavior heldBehavior;
@@ -17,33 +24,61 @@ public class EnemyAI_Base : MonoBehaviour
     private bool delayedExit = false;
     [SerializeField] private ScriptStealMenu scriptStealMenu;
 
-
+    public bool circlePlayer = false;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         navMeshAgent = GetComponent<NavMeshAgent>();
-        if (target == null)
+        if (playerTarget == null)
         {
-            target = GameObject.FindGameObjectWithTag("Player").gameObject.transform;
+            playerTarget = GameObject.FindGameObjectWithTag("Player").transform.Find("PlayerController").gameObject.transform;
         }
         //animator = GetComponent<Animator>();
     }
 
+
+
     // Update is called once per frame
     void Update()
     {
-        targetDistance = Vector3.Distance(navMeshAgent.transform.position, target.position);
-        if (targetDistance < attackDistance)
+        currentAngle += angleSpeed * Time.deltaTime;
+        currentAngle %= 360; // Keep angle within 0-360 degrees
+
+        // Calculate the point on the circle
+        float x = Mathf.Cos(currentAngle * Mathf.Deg2Rad) * radius;
+        float z = Mathf.Sin(currentAngle * Mathf.Deg2Rad) * radius;
+        Vector3 position = new Vector3(x, 0, z);
+
+        // Move the object to the calculated position
+        //center + position;
+
+        if (circlePlayer)
         {
-            navMeshAgent.isStopped = true;
-            //animator.SetBool("Attack", true);
+            navMeshAgent.destination = playerTarget.position + position;
+            navMeshAgent.updateRotation = false;
+
+            Vector3 direction = playerTarget.position - transform.position;
+            Quaternion rotation = Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(direction), Time.deltaTime * circlingRotationSpeed);
+            transform.eulerAngles = new Vector3(0, rotation.eulerAngles.y, 0);
+
+            //transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(direction), Time.deltaTime * circlingRotationSpeed);
         }
         else
         {
-            navMeshAgent.isStopped = false;
-            //animator.SetBool("Attack", false);
-            navMeshAgent.destination = target.position;
+            navMeshAgent.updateRotation = true;
+            targetDistance = Vector3.Distance(navMeshAgent.transform.position, playerTarget.position);
+            if (targetDistance < attackDistance)
+            {
+                navMeshAgent.isStopped = true;
+                //animator.SetBool("Attack", true);
+            }
+            else
+            {
+                navMeshAgent.isStopped = false;
+                //animator.SetBool("Attack", false);
+                navMeshAgent.destination = playerTarget.position;
+            }
         }
 
         if (delayedExit && !scriptStealMenu.menuOpen)
