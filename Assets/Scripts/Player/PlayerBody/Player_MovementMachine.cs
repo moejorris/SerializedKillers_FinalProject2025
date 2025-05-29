@@ -21,6 +21,8 @@ public class Player_MovementMachine : MonoBehaviour
     //Functions
     void Awake() => controller = GetComponent<CharacterController>();
 
+    void Start() => _forwardDirection = transform.forward;
+
     void FixedUpdate() => UpdateMovement(TimeStep.FixedUpdate);
     void Update() => UpdateMovement(TimeStep.Update);
 

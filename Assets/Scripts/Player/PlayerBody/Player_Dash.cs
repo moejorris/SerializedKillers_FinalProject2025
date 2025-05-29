@@ -4,13 +4,19 @@ using UnityEngine.InputSystem;
 
 public class Player_Dash : MonoBehaviour, IPlayerMover
 {
+    CharacterController _controller;
     Player_MovementMachine _machine;
     Player_Walk walk;
     Player_Rotate rotate;
+    Player_Gravity gravity;
     [SerializeField] InputActionReference dashInput;
     [SerializeField] InputActionReference walkInput;
+    [Header("How far the dash should move the player (in Meters/Unity Units)")]
     [SerializeField] float _distance = 4f;
+    [Header("How long one dash should take (in Seconds)")]
     [SerializeField] float _travelTime = 0.25f;
+    [Header("Whether or not Gravity is applied while dashing")]
+    [SerializeField] bool _ignoresGravity = true;
     Vector3 _force;
     bool _isDashing = false;
 
@@ -19,6 +25,8 @@ public class Player_Dash : MonoBehaviour, IPlayerMover
         _machine = GetComponent<Player_MovementMachine>();
         walk = GetComponent<Player_Walk>();
         rotate = GetComponent<Player_Rotate>();
+        gravity = GetComponent<Player_Gravity>();
+        _controller = GetComponent<CharacterController>();
     }
     void OnEnable() => _machine.AddMover(this); //Add itself to the movement machine!
     void OnDisable() => _machine.RemoveMover(this); //remove itself from the movement machine when no longer active!
@@ -33,39 +41,56 @@ public class Player_Dash : MonoBehaviour, IPlayerMover
 
     public Vector3 UpdateForce()
     {
-        return _force;
+        return _force / _machine.DeltaTime;
+        // return Vector3.zero;
     }
 
     IEnumerator Dash() //Fix distance not being reflected accurately in game!!!
     {
         _isDashing = true;
 
-        _machine.SetForwardDirection(IntendedMoveDirection()); //Snaps player to the direction they are trying to dash in so they dash in the correct direction
+        EnableTrail();
 
-        Vector3 destination = transform.position + _machine.ForwardDirection.normalized * _distance;
+        _machine.SetForwardDirection(DashDirection()); //Snaps player to the direction they are trying to dash in so they dash in the correct direction
+
+        Vector3 destination = transform.position + (_machine.ForwardDirection.normalized * _distance);
         Vector3 startPosition = transform.position;
 
-        destination.y = 0;
-        startPosition.y = 0;
+        Debug.DrawLine(startPosition, destination + startPosition, Color.blue, _travelTime);
+
+        // destination.y = 0;
+        // startPosition.y = 0;
 
         UpdateOtherMoveComponents(); //disables walking and turning. TODO: Disable jumping once that's done
 
         float t = 0;
 
-        while (t <= _travelTime)
+        if (_travelTime < _machine.DeltaTime)
         {
-            _force = Vector3.Lerp(startPosition, destination, t / _travelTime) - startPosition; // - startPosition;
-
-            _force = Vector3.ProjectOnPlane(_force, _machine.GroundInformation.normal);
+            _controller.Move(destination - startPosition);
 
             yield return new WaitForSeconds(_machine.DeltaTime);
 
-            t += _machine.DeltaTime;
         }
+        else while (t < _travelTime)
+            {
+                destination.y = transform.position.y;
+                startPosition.y = transform.position.y;
+
+                _force = Vector3.Lerp(startPosition, destination, t / _travelTime) - transform.position;
+
+                _force = Vector3.ProjectOnPlane(_force, _machine.GroundInformation.normal);
+
+                yield return new WaitForSeconds(_machine.DeltaTime);
+
+                t = Mathf.Clamp(t + _machine.DeltaTime, 0, _travelTime);
+            }
 
         _force = Vector3.zero;
 
         _isDashing = false;
+
+        DisableTrail();
 
         UpdateOtherMoveComponents(); //re-enables walking and turning
     }
@@ -74,15 +99,38 @@ public class Player_Dash : MonoBehaviour, IPlayerMover
     {
         walk.enabled = !_isDashing;
         rotate.enabled = !_isDashing;
+        gravity.enabled = _ignoresGravity ? !_isDashing : true;
+        // GetComponent<CharacterController>().enabled = !_isDashing;
     }
 
-    Vector3 IntendedMoveDirection()
+    Vector3 DashDirection()
     {
+        Vector2 moveInput = walkInput.action.ReadValue<Vector2>();
+
+        if (moveInput.magnitude < 0.1f) return _machine.ForwardDirection; //if player is not inputting a direction, then the current forward direction will be used.
+
         Vector3 camForward = Vector3.ProjectOnPlane(Camera.main.transform.forward, Vector3.up);
         Vector3 camRight = Vector3.ProjectOnPlane(Camera.main.transform.right, Vector3.up);
 
-        Vector2 moveInput = walkInput.action.ReadValue<Vector2>();
         return moveInput.x * camRight.normalized + moveInput.y * camForward.normalized;
+    }
+
+    void EnableTrail()
+    {
+        TrailRenderer tr = GetComponent<TrailRenderer>();
+        if (!tr) return;
+
+        // tr.time = _travelTime;
+        tr.emitting = true;
+    }
+
+    void DisableTrail()
+    {
+        TrailRenderer tr = GetComponent<TrailRenderer>();
+
+        if (!tr) return;
+
+        tr.emitting = false;
     }
 
 }
