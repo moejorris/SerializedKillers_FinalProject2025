@@ -2237,7 +2237,12 @@ GameObject:
   - component: {fileID: 1977146356554255781}
   - component: {fileID: 2293987873429481564}
   - component: {fileID: 61596877822169427}
-  - component: {fileID: 375686974473027106}
+  - component: {fileID: 7034641171616900721}
+  - component: {fileID: 2948093019468258104}
+  - component: {fileID: 2878114390187377896}
+  - component: {fileID: 2293536385745531113}
+  - component: {fileID: 4682590827175842623}
+  - component: {fileID: 9151791091005987443}
   m_Layer: 3
   m_Name: PlayerController
   m_TagString: Untagged
@@ -2310,7 +2315,7 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &375686974473027106
+--- !u!114 &7034641171616900721
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2319,22 +2324,33 @@ MonoBehaviour:
   m_GameObject: {fileID: 6809807624353774444}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dbf9e0d9a3a847d419e44943906dc6fc, type: 3}
+  m_Script: {fileID: 11500000, guid: 33e04b20ca5f05d4ba9080fbf968493d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  velocity: {x: 0, y: 0, z: 0}
-  persistentVelocity: {x: 0, y: 0, z: 0}
-  walkVelocity: {x: 0, y: 0, z: 0}
-  isGrounded: 0
-  walkSpeed: 7
-  walkAcceleration: 10
-  walkDecceleration: 30
-  walkSpeedUpCurve:
+  timeStep: 1
+  controller: {fileID: 2293987873429481564}
+--- !u!114 &2948093019468258104
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6809807624353774444}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f92d5beb851f7a94f91d38b39a68b0b6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  walkInput: {fileID: -1680190386980627800, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  speed: 7
+  acceleration: 10
+  deccerlation: 30
+  speedUpCurve:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 0.1
+      value: 0
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -2344,8 +2360,8 @@ MonoBehaviour:
     - serializedVersion: 3
       time: 1
       value: 1
-      inSlope: 2
-      outSlope: 2
+      inSlope: 0
+      outSlope: 0
       tangentMode: 0
       weightedMode: 0
       inWeight: 0
@@ -2353,32 +2369,36 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  walkRotationBySpeedCurve:
+--- !u!114 &2878114390187377896
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6809807624353774444}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eef3c983525cf624c802ef0defe6eec5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  walkInput: {fileID: -1680190386980627800, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  rotationBySpeed:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
-      time: 0.0068130493
+      time: 0
       value: 0.8
-      inSlope: 0
-      outSlope: 0
+      inSlope: -0.3
+      outSlope: -0.3
       tangentMode: 34
       weightedMode: 0
       inWeight: 0
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.1
-      value: 0.8
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
       outWeight: 0.33333334
     - serializedVersion: 3
       time: 1
       value: 0.5
-      inSlope: -0.33333334
-      outSlope: -0.33333334
+      inSlope: -0.3
+      outSlope: -0.3
       tangentMode: 34
       weightedMode: 0
       inWeight: 0.33333334
@@ -2386,17 +2406,54 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  jumpHeight: 2
-  jumpingGravityScale: 1
-  fallingGravityScale: 3
+  rotationSpeed: 8
+--- !u!114 &2293536385745531113
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6809807624353774444}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 56ee699cb7c271048a63101022e12eac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerMeshTransform: {fileID: 2960414336343076673}
+  playerMeshAnimator: {fileID: 8823487989990755497}
+  machine: {fileID: 7034641171616900721}
+  walk: {fileID: 2948093019468258104}
+--- !u!114 &4682590827175842623
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6809807624353774444}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e866c2ba57db83049a2cc3f255ad58f1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  acceleration: -10
   gravityScale: 1
-  gravityAcceleration: -10
-  maxFallSpeed: -30
-  gravityOnGround: -2
-  movementInput: {fileID: -1680190386980627800, guid: 052faaac586de48259a63d0c4782560b, type: 3}
-  jumpInput: {fileID: -2099379676528639254, guid: 052faaac586de48259a63d0c4782560b, type: 3}
-  attackInput: {fileID: 1120369429361536294, guid: 052faaac586de48259a63d0c4782560b, type: 3}
-  playerMesh: {fileID: 2960414336343076673}
+  gravityOnGround: -5
+--- !u!114 &9151791091005987443
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6809807624353774444}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 124128ab658c72c478ee728681c38c68, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dashInput: {fileID: -2099379676528639254, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  walkInput: {fileID: -1680190386980627800, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  _distance: 60
+  _travelTime: 0.15
 --- !u!1 &6813288641574566132
 GameObject:
   m_ObjectHideFlags: 0
