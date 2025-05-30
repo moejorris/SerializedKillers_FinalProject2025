@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.UI;
 
 [RequireComponent(typeof(NavMeshAgent))]
 public class EnemyAI_Base : MonoBehaviour
@@ -17,6 +18,7 @@ public class EnemyAI_Base : MonoBehaviour
     public Vector3 center = Vector3.zero;
 
     private float currentAngle = 0f;
+    public bool circlePlayer = false;
 
     [Header("Held Behavior")]
     public Behavior heldBehavior;
@@ -24,16 +26,27 @@ public class EnemyAI_Base : MonoBehaviour
     private bool delayedExit = false;
     [SerializeField] private ScriptStealMenu scriptStealMenu;
 
-    public bool circlePlayer = false;
+    [Header("Health")]
+    private RectTransform healthBar;
+    public float maxHealth = 20f;
+    public float health = 20f;
+
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         navMeshAgent = GetComponent<NavMeshAgent>();
+        healthBar = transform.Find("Canvas/Bar").GetComponent<RectTransform>();
+
         if (playerTarget == null)
         {
             playerTarget = GameObject.FindGameObjectWithTag("Player").transform.Find("PlayerController").gameObject.transform;
         }
+
+        currentAngle = Random.Range(0f, 360f);
+
+        UpdateHealth();
+        transform.Find("Canvas/Image").GetComponent<Image>().sprite = heldBehavior.behavioricon;
         //animator = GetComponent<Animator>();
     }
 
@@ -59,6 +72,13 @@ public class EnemyAI_Base : MonoBehaviour
             Quaternion rotation = Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(direction), Time.deltaTime * circlingRotationSpeed);
             transform.eulerAngles = new Vector3(0, rotation.eulerAngles.y, 0);
 
+            //if (targetDistance > attackDistance)
+            //{
+            //    circlePlayer = false;
+            //    navMeshAgent.isStopped = true;
+            //    animator.SetBool("Attack", true);
+            //}
+
             //transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(direction), Time.deltaTime * circlingRotationSpeed);
         }
         else
@@ -67,6 +87,7 @@ public class EnemyAI_Base : MonoBehaviour
             targetDistance = Vector3.Distance(navMeshAgent.transform.position, playerTarget.position);
             if (targetDistance < attackDistance)
             {
+                //circlePlayer = true;
                 navMeshAgent.isStopped = true;
                 //animator.SetBool("Attack", true);
             }
@@ -92,6 +113,22 @@ public class EnemyAI_Base : MonoBehaviour
         }
     }
 
+    public void UpdateHealth()
+    {
+        Vector3 scale = healthBar.localScale;
+        scale.x = (health / maxHealth);
+        healthBar.localScale = scale;
+    }
+
+    public void TakeDamage(float amount)
+    {
+        health -= amount;
+        UpdateHealth();
+        if (health <= 0)
+        {
+            Destroy(gameObject);
+        }
+    }
 
     public void SelectEnemy()
     {

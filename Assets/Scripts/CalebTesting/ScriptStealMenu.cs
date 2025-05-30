@@ -42,6 +42,8 @@ public class ScriptStealMenu : MonoBehaviour
     //public Behavior targetedBehavior;
     [SerializeField] private Sprite emptySprite;
 
+    [SerializeField] private EnemyManager enemyManager;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -167,6 +169,9 @@ public class ScriptStealMenu : MonoBehaviour
             if (selectedBehaviorSlot.heldBehavior != null)
             {
                 Debug.Log("something was in slot, replaced.");
+
+                enemyManager.ActivateBehavior(selectedBehaviorSlot.heldBehavior); // ACTIVATES THE SCRIPT ABOUT TO BE REPLACED
+
                 selectedBehaviorSlot.RemoveBehavior();
                 selectedBehaviorSlot.AddBehavior(centerSlot.heldBehavior);
             }
@@ -176,10 +181,11 @@ public class ScriptStealMenu : MonoBehaviour
                 selectedBehaviorSlot.AddBehavior(centerSlot.heldBehavior);
             }
 
+            enemyManager.DeactivateBehavior(selectedBehaviorSlot.heldBehavior); // NOW DEACTIVATES THE NEW SLOT!!!!
+
             centerSlot.RemoveBehavior();
-            selectedEnemy.behaviorActive = false;
+            //selectedEnemy.behaviorActive = false;
             selectedEnemy.DeselectEnemy();
-            Debug.Log("selectedEnemy.behaviorActive = false");
             menuPanel.SetActive(false);
             menuOpen = false;
         }
