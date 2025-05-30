@@ -65,9 +65,19 @@ public class ScriptStealMenu : MonoBehaviour
 
         if (Physics.Raycast(cameraRay, out RaycastHit hit, 100, enemyLayer, queryTriggerInteraction: QueryTriggerInteraction.Collide))
         {
-            if (hit.transform.parent.GetComponent<EnemyAI_Base>() != null && hit.transform.parent.GetComponent<EnemyAI_Base>().behaviorActive)
+            if (hit.transform.gameObject.layer != 7) // temp issue due to rigidbody making parent take the collider stuff and not child?
             {
-                hit.transform.parent.GetComponent<EnemyAI_Base>().SelectEnemy();
+                if (hit.transform.GetComponent<EnemyAI_Base>() != null && hit.transform.GetComponent<EnemyAI_Base>().behaviorActive)
+                {
+                    hit.transform.GetComponent<EnemyAI_Base>().SelectEnemy();
+                }
+            }
+            else
+            {
+                if (hit.transform.parent.GetComponent<EnemyAI_Base>() != null && hit.transform.parent.GetComponent<EnemyAI_Base>().behaviorActive)
+                {
+                    hit.transform.parent.GetComponent<EnemyAI_Base>().SelectEnemy();
+                }
             }
         }
         else if (selectedEnemy != null)
