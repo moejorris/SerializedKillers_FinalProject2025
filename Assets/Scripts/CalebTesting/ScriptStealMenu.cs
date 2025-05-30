@@ -222,6 +222,20 @@ public class ScriptStealMenu : MonoBehaviour
         }
     }
 
+    public void UpdateCenterSlot()
+    {
+        if (selectedEnemy != null)
+        {
+            centerSlot.heldBehavior = selectedEnemy.heldBehavior;
+            centerSlot.UpdateSlot();
+        }
+        else
+        {
+            centerSlot.heldBehavior = null;
+            centerSlot.UpdateSlot();
+        }
+    }
+
     public bool InputIsKeyboard()
     {
         if (playerInput.currentControlScheme == "Keyboard&Mouse")

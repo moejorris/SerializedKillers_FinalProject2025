@@ -42,20 +42,17 @@ public class EnemyAI_Base : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        currentAngle += angleSpeed * Time.deltaTime;
-        currentAngle %= 360; // Keep angle within 0-360 degrees
-
-        // Calculate the point on the circle
-        float x = Mathf.Cos(currentAngle * Mathf.Deg2Rad) * radius;
-        float z = Mathf.Sin(currentAngle * Mathf.Deg2Rad) * radius;
-        Vector3 position = new Vector3(x, 0, z);
-
-        // Move the object to the calculated position
-        //center + position;
-
         if (circlePlayer)
         {
-            navMeshAgent.destination = playerTarget.position + position;
+            currentAngle += angleSpeed * Time.deltaTime;
+            currentAngle %= 360; // Keep angle within 0-360 degrees
+
+            // Calculate the point on the circle
+            float x = Mathf.Cos(currentAngle * Mathf.Deg2Rad) * radius;
+            float z = Mathf.Sin(currentAngle * Mathf.Deg2Rad) * radius;
+            Vector3 circlePos = new Vector3(x, 0, z);
+
+            navMeshAgent.destination = playerTarget.position + circlePos;
             navMeshAgent.updateRotation = false;
 
             Vector3 direction = playerTarget.position - transform.position;
@@ -88,6 +85,11 @@ public class EnemyAI_Base : MonoBehaviour
             scriptStealMenu.selectedEnemy = null;
             scriptStealMenu.centerSlot.RemoveBehavior();
         }
+
+        if (scriptStealMenu.selectedEnemy != this && transform.Find("Capsule").gameObject.layer == 6)
+        {
+            DeselectEnemy();
+        }
     }
 
 
@@ -95,13 +97,13 @@ public class EnemyAI_Base : MonoBehaviour
     {
         transform.Find("Capsule").gameObject.layer = 6;
         scriptStealMenu.selectedEnemy = this;
-        scriptStealMenu.centerSlot.AddBehavior(heldBehavior);
+        scriptStealMenu.UpdateCenterSlot();
     }
 
     public void DeselectEnemy()
     {
         scriptStealMenu.selectedEnemy = null;
-        scriptStealMenu.centerSlot.RemoveBehavior();
+        scriptStealMenu.UpdateCenterSlot();
         transform.Find("Capsule").gameObject.layer = 0;
     }
 
