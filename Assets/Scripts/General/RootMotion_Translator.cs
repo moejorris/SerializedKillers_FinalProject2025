@@ -11,8 +11,12 @@ public class RootMotion_Translator : MonoBehaviour
     Vector3 _moveForce;
     Quaternion _rotation;
 
+    void Awake() => animator = GetComponent<Animator>();
+
     void OnAnimatorMove()
     {
+        if (!animator) return; //this should never happen because this function will only be called if there is an animator on the object, but it never hurts to have a failsafe.
+
         _moveForce = animator.deltaPosition;
         _rotation = animator.deltaRotation;
     }
