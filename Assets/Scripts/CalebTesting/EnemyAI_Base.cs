@@ -7,7 +7,8 @@ public class EnemyAI_Base : MonoBehaviour
 {
     [Header("Navigation")]
     [SerializeField] private Transform playerTarget;
-    [SerializeField] private float attackDistance;
+    [SerializeField] private float attackRange;
+    [SerializeField] private float followRange;
     private NavMeshAgent navMeshAgent;
     //private Animator animator;
     [SerializeField] private float targetDistance;
@@ -125,7 +126,7 @@ public class EnemyAI_Base : MonoBehaviour
             {
                 navMeshAgent.updateRotation = true;
                 targetDistance = Vector3.Distance(navMeshAgent.transform.position, playerTarget.position);
-                if (targetDistance < attackDistance)
+                if (targetDistance < attackRange)
                 {
                     //circlePlayer = true;
                     navMeshAgent.isStopped = true;
@@ -135,7 +136,10 @@ public class EnemyAI_Base : MonoBehaviour
                 {
                     navMeshAgent.isStopped = false;
                     //animator.SetBool("Attack", false);
-                    navMeshAgent.destination = playerTarget.position;
+                    if (targetDistance < followRange) // if the player is within follow range, the entity will head to that positon. otherwise, the last known position.
+                    {
+                        navMeshAgent.destination = playerTarget.position;
+                    }
                 }
             }
 

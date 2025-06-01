@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 632009cdb70b77c4793fc0afec21e1ee, type: 3}
-  m_Name: Strength Behavior
+  m_Name: Water Behavior
   m_EditorClassIdentifier: 
   behavioricon: {fileID: 21300000, guid: 30c147bd98fd7444b89b0023c76c58e3, type: 3}
-  behaviorName: strength
+  behaviorName: water

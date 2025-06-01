@@ -60,31 +60,31 @@ public class ScriptStealMenu : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Debug.DrawLine(Camera.main.transform.position, Camera.main.ScreenPointToRay(Input.mousePosition).GetPoint(5), color: Color.red);
-        Ray cameraRay = Camera.main.ScreenPointToRay(Input.mousePosition);
-
-        if (Physics.Raycast(cameraRay, out RaycastHit hit, 100, enemyLayer, queryTriggerInteraction: QueryTriggerInteraction.Collide))
+        if (!menuOpen)
         {
-            if (hit.transform.gameObject.layer != 7) // temp issue due to rigidbody making parent take the collider stuff and not child?
+            Ray cameraRay = Camera.main.ScreenPointToRay(Input.mousePosition);
+            if (Physics.Raycast(cameraRay, out RaycastHit hit, 100, enemyLayer, queryTriggerInteraction: QueryTriggerInteraction.Collide))
             {
-                if (hit.transform.GetComponent<EnemyAI_Base>() != null && hit.transform.GetComponent<EnemyAI_Base>().behaviorActive)
+                if (hit.transform.gameObject.layer != 7) // temp issue due to rigidbody making parent take the collider stuff and not child?
                 {
-                    hit.transform.GetComponent<EnemyAI_Base>().SelectEnemy();
+                    if (hit.transform.GetComponent<EnemyAI_Base>() != null && hit.transform.GetComponent<EnemyAI_Base>().behaviorActive)
+                    {
+                        hit.transform.GetComponent<EnemyAI_Base>().SelectEnemy();
+                    }
+                }
+                else
+                {
+                    if (hit.transform.parent.GetComponent<EnemyAI_Base>() != null && hit.transform.parent.GetComponent<EnemyAI_Base>().behaviorActive)
+                    {
+                        hit.transform.parent.GetComponent<EnemyAI_Base>().SelectEnemy();
+                    }
                 }
             }
-            else
+            else if (selectedEnemy != null)
             {
-                if (hit.transform.parent.GetComponent<EnemyAI_Base>() != null && hit.transform.parent.GetComponent<EnemyAI_Base>().behaviorActive)
-                {
-                    hit.transform.parent.GetComponent<EnemyAI_Base>().SelectEnemy();
-                }
+                selectedEnemy.DeselectEnemy();
             }
         }
-        else if (selectedEnemy != null)
-        {
-            selectedEnemy.DeselectEnemy();
-        }
-
 
 
         if (northButton.action.WasPressedThisFrame()) // Checks if the player has pressed Y and toggles menu
@@ -104,13 +104,14 @@ public class ScriptStealMenu : MonoBehaviour
 
         if (menuOpen) // Updates UI when menu is open
         {
-            if (leftJoystick.action.ReadValue<Vector2>().x > 0.4f) // being held right
+            Debug.Log(Input.mousePosition);
+            if (leftJoystick.action.ReadValue<Vector2>().x > 0.4f || Input.mousePosition.x > (Screen.width / 3 * 2) - 50) // being held right
             {
                 animator.SetInteger("Slot", 1);
                 CombatSlotSelection();
                 movementSlot.UpdateSlot();
             }
-            else if (leftJoystick.action.ReadValue<Vector2>().x < -0.4f) // being held left
+            else if (leftJoystick.action.ReadValue<Vector2>().x < -0.4f || Input.mousePosition.x < Screen.width / 3 + 50) // being held left
             {
                 animator.SetInteger("Slot", -1);
                 MovementSlotSelection();
@@ -127,7 +128,7 @@ public class ScriptStealMenu : MonoBehaviour
 
             // --------------------- CHECKING INPUTS -----------------
 
-            if (southButton.action.WasPerformedThisFrame()) // A BUTTON
+            if (southButton.action.WasPerformedThisFrame() || Input.GetMouseButtonDown(0)) // A BUTTON
             {
                 if (selectedBehaviorSlot != null)
                 {
