@@ -4810,7 +4810,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerTarget: {fileID: 302317289}
-  attackRange: 4
+  attackRange: 6
   followRange: 8
   navMeshAgent: {fileID: 1434463132}
   heldBehavior: {fileID: 11400000, guid: 9e4df872e93e7984384719275cc16db8, type: 2}
@@ -4824,10 +4824,15 @@ MonoBehaviour:
   wanderDistance: 5
   randomWanderLocations: 3
   wanderTime: 15
-  attackState: screw
-  meleeAttackCooldown: 5
-  shockwaveAttackCooldown: 7
+  attackState: neutral
+  aggressionLevel: 0
+  canAttack: 0
+  meleeAttackCooldown: 7
+  shockwaveAttackCooldown: 8
   laserAttackCooldown: 9
+  meleeAttackMaxRange: 3
+  shockwaveAttackMaxRange: 5
+  laserAttackMaxRange: 5
   lightAnimator: {fileID: 0}
 --- !u!195 &1434463132
 NavMeshAgent:
@@ -4843,7 +4848,7 @@ NavMeshAgent:
   m_Acceleration: 8
   avoidancePriority: 50
   m_AngularSpeed: 120
-  m_StoppingDistance: 0
+  m_StoppingDistance: 3.5
   m_AutoTraverseOffMeshLink: 1
   m_AutoBraking: 1
   m_AutoRepath: 1

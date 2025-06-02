@@ -7,7 +7,7 @@ using UnityEngine.Splines.Interpolators;
 [RequireComponent(typeof(Light))]
 public class EnemyAI_SpiteBulb : EnemyAI_Base
 {
-    [Header("Bulb Specific")]
+    [Header("Bulb General")]
     public float idleActivateRange;
     [SerializeField] private string movementState = "idle";
     private bool healing = false;
@@ -15,19 +15,27 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
     [Header("Bulb Wandering")]
     [SerializeField] private float wanderDistance = 5;
     [SerializeField] private float randomWanderLocations = 3;
-    [SerializeField] private float wanderTime = 15;
     private bool wandering = false;
-    private bool searching = false;
+    private bool searchAnimationOccuring = false;
 
     [Header("Bulb Combat")]
-    [SerializeField] private string attackState = "melee";
+    [SerializeField] private string attackState = "neutral";
+    [SerializeField] private float aggressionLevel = 3;
+    [SerializeField] private bool canAttack = false;
     [SerializeField] private float meleeAttackCooldown = 5;
     [SerializeField] private float shockwaveAttackCooldown = 7;
     [SerializeField] private float laserAttackCooldown = 9;
+    [SerializeField] private float attackCooldownTimer = 0;
+
+    [SerializeField] private float meleeAttackMaxRange = 1;
+    [SerializeField] private float shockwaveAttackMaxRange = 2.5f;
+    [SerializeField] private float laserAttackMaxRange = 6;
+
 
     [Header("Lighting")]
-
     [SerializeField] private Animator lightAnimator;
+
+    public bool testBool = false;
     
 
 
@@ -51,6 +59,7 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
             if (PlayerInAwakeRange())
             {
                 healing = false;
+                AttackCooldown(1); // just so it doesn't immediately attack?
                 movementState = "pursue";
             }
         }
@@ -59,8 +68,9 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
             if (PlayerInFollowRange())
             {
                 movementState = "pursue";
-                StopCoroutine(WanderTimer());
-                searching = false; // may need to be removed? Also, animation could impact this bool.
+               // Debug.Log("Wander stopped!");
+                StopCoroutine("WanderTimer");
+                searchAnimationOccuring = false; // may need to be removed? Also, animation could impact this bool.
                 wandering = false;
             }
             else
@@ -68,13 +78,14 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
                 if (!wandering)
                 {
                     wandering = true;
-                    StartCoroutine(WanderTimer());
+                    //Debug.Log("Started wander timer");
+                    StartCoroutine("WanderTimer");
                 }
             }
         }
         else if (movementState == "pursue")
         {
-            if (PlayerInFollowRange())
+            if (PlayerInFollowRange() || attackState != "neutral") // if the enemy is attacking, for instance, it should still target player.
             {
                 navMeshAgent.destination = playerTarget.position;
             }
@@ -85,17 +96,107 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
 
             if (PlayerInAttackRange())
             {
-
+                if (attackState == "neutral" && canAttack)
+                {
+                    canAttack = false;
+                    PerformAttack();
+                }
             }
-
-
-
         }
     }
 
+    public void PerformAttack()
+    {
+        if (AttackRange() == "melee")
+        {
+            attackState = "melee";
+            StartCoroutine(MeleeAttack());
+        }
+        else if (AttackRange() == "shockwave")
+        {
+            attackState = "shockwave";
+            StartCoroutine(ShockwaveAttack());
+        }
+        else if (AttackRange() == "laser")
+        {
+            attackState = "laser";
+            StartCoroutine(LaserAttack());
+        }
+    }
+
+    public void AttackCooldown(float time)
+    {
+        canAttack = false;
+        StopCoroutine("AttackTimer");
+        attackCooldownTimer = time;
+        StartCoroutine("AttackTimer");
+    } // call directly, looks cleaner than stopping and starting.
+
+    IEnumerator MeleeAttack()
+    {
+        Debug.Log("Moving in to attack...");
+        navMeshAgent.stoppingDistance = 2;
+        yield return new WaitUntil(() => navMeshAgent.remainingDistance <= 2.3f); // EDIT LATER
+        navMeshAgent.isStopped = true;
+
+        Debug.Log("Performing Attack...");
+        yield return new WaitForSeconds(2);
+        Debug.Log("Attack Complete!");
+
+        navMeshAgent.stoppingDistance = 3.5f;
+        navMeshAgent.isStopped = false;
+        attackState = "neutral";
+
+        AttackCooldown(meleeAttackCooldown);
+    }
+
+    IEnumerator ShockwaveAttack()
+    {
+        navMeshAgent.isStopped = true;
+
+        Debug.Log("Stopping to charge...");
+        yield return new WaitForSeconds(5);
+        Debug.Log("KABOOM!");
+        yield return new WaitForSeconds(1);
+
+        navMeshAgent.isStopped = false;
+        attackState = "neutral";
+
+        AttackCooldown(shockwaveAttackCooldown);
+    }
+
+    IEnumerator LaserAttack()
+    {
+        navMeshAgent.isStopped = true;
+
+        Debug.Log("Charging Laser...");
+        yield return new WaitForSeconds(10);
+        Debug.Log("No longer turning head...");
+        yield return new WaitForSeconds(2);
+        Debug.Log("LASER FIRED BOOOOOM");
+        yield return new WaitForSeconds(1);
+
+        navMeshAgent.isStopped = false;
+        attackState = "neutral";
+
+        AttackCooldown(laserAttackCooldown);
+    }
+
+    IEnumerator AttackTimer()
+    {
+        Debug.Log("Attack timer started.");
+
+        yield return new WaitForSeconds(attackCooldownTimer);
+
+        canAttack = true;
+
+        Debug.Log("Attack timer completed.");
+    } // called by the AttackCooldown function.
+
     IEnumerator WanderTimer()
     {
-        Debug.Log("wander timer started");
+        Debug.Log("Wander time started from beginning!");
+
         yield return new WaitForSeconds(2); // wait to make sure they get to the last known position
         Vector3 home = navMeshAgent.destination;
 
@@ -103,26 +204,28 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
         {
             navMeshAgent.destination = new Vector3(home.x + Random.Range(-wanderDistance, wanderDistance), home.y, home.z + Random.Range(-wanderDistance, wanderDistance)); // picks spot to walk to
             Debug.Log("New destination is: " + navMeshAgent.destination);
-            yield return new WaitUntil(() => navMeshAgent.remainingDistance < 0.2f); // wait until they get close
+            yield return new WaitUntil(() => navMeshAgent.remainingDistance < navMeshAgent.stoppingDistance + 0.5f); // wait until they get close
             BeginSpotSearch(); // head look animation
             //yield return new WaitForSeconds(0.3f); // buffer in case needed?
-            yield return new WaitUntil(() => !searching); // waits until animation is complete
+            yield return new WaitUntil(() => !searchAnimationOccuring); // waits until animation is complete
         }
 
         yield return new WaitForSeconds(1); // little buffer at the end
+
+        Debug.Log("Wander time finished");
 
         movementState = "idle"; // returns to idle
     }
 
     public void BeginSpotSearch()
     {
-        searching = true;
+        searchAnimationOccuring = true;
         Invoke("FinishSpotSearch", 3); // TEMPPPP!!
     }
 
     public void FinishSpotSearch()
     {
-        searching = false;
+        searchAnimationOccuring = false;
     }
 
     IEnumerator HealTimer()
@@ -130,7 +233,7 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
         while (healing)
         {
             yield return new WaitForSeconds(2);
-            Debug.Log("Player healing");
+            //Debug.Log("Player healing");
             GainHealth(5);
         }
     }
@@ -168,6 +271,26 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
         else
         {
             return false;
+        }
+    }
+
+    public string AttackRange()
+    {
+        if (Vector3.Distance(playerTarget.position, transform.position) > laserAttackMaxRange)
+        {
+            return "null";
+        }
+        else if (Vector3.Distance(playerTarget.position, transform.position) > shockwaveAttackMaxRange)
+        {
+            return "laser";
+        }
+        else if (Vector3.Distance(playerTarget.position, transform.position) > meleeAttackMaxRange)
+        {
+            return "shockwave";
+        }
+        else
+        {
+            return "melee";
         }
     }
 
