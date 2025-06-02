@@ -595,6 +595,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "Temp_Attack",
+                    "type": "Button",
+                    "id": "43a00466-c130-41fc-8f81-bd93194ef6b2",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -1068,6 +1077,28 @@
                     "processors": "",
                     "groups": "",
                     "action": "MenuSelect",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "8d1b2ead-5424-487a-a4f4-ae832151f089",
+                    "path": "<Gamepad>/buttonWest",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Temp_Attack",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "4fc356b2-6bb6-4763-b86e-f791377ba819",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Temp_Attack",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

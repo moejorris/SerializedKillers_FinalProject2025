@@ -7,7 +7,11 @@ public class ScriptStealMenu : MonoBehaviour
     public InputActionReference northButton; // Pressing Y
     public InputActionReference leftJoystick;
     public InputActionReference southButton; // Pressing A
+    public InputActionReference westButton; // Pressing X
     public PlayerInput playerInput;
+
+    public GameObject player;
+    public float attackDistance;
 
     //public InputAction action;
 
@@ -157,6 +161,30 @@ public class ScriptStealMenu : MonoBehaviour
         }
         else
         {
+            if (westButton.action.WasPerformedThisFrame())
+            {
+                
+                RaycastHit[] hits = Physics.RaycastAll(player.transform.parent.position, player.transform.forward, attackDistance);
+                foreach (RaycastHit hit in hits)
+                {
+                    if (hit.transform.gameObject.layer != 7) // temp issue due to rigidbody making parent take the collider stuff and not child?
+                    {
+                        if (hit.transform.GetComponent<EnemyAI_Base>() != null)
+                        {
+                            hit.transform.GetComponent<EnemyAI_Base>().TakeDamage(5);
+                        }
+                    }
+                    else
+                    {
+                        if (hit.transform.parent.GetComponent<EnemyAI_Base>() != null)
+                        {
+                            hit.transform.parent.GetComponent<EnemyAI_Base>().TakeDamage(5);
+                        }
+                    }
+                } 
+            }
+
+
             slowTime += (Time.deltaTime * 4);
             if (slowTime > 1)
             {

@@ -648,7 +648,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!54 &311357588
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1540,6 +1540,14 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5776156979653151090, guid: 72e4cf6cdf6216746ae74c750d6cad75, type: 3}
+      propertyPath: attackRange
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5776156979653151090, guid: 72e4cf6cdf6216746ae74c750d6cad75, type: 3}
+      propertyPath: followRange
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 5776156979653151090, guid: 72e4cf6cdf6216746ae74c750d6cad75, type: 3}
       propertyPath: circlePlayer
       value: 0
       objectReference: {fileID: 0}
@@ -1885,7 +1893,10 @@ MonoBehaviour:
   northButton: {fileID: 1072171099282455138, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   leftJoystick: {fileID: 2355594910186225193, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   southButton: {fileID: 4203994777342683730, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  westButton: {fileID: 8556611276559068693, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   playerInput: {fileID: 604068974}
+  player: {fileID: 1561503605}
+  attackDistance: 2
   menuPanel: {fileID: 600445941}
   arrow: {fileID: 0}
   menuOpen: 0
@@ -4200,6 +4211,14 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5776156979653151090, guid: 72e4cf6cdf6216746ae74c750d6cad75, type: 3}
+      propertyPath: attackRange
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5776156979653151090, guid: 72e4cf6cdf6216746ae74c750d6cad75, type: 3}
+      propertyPath: followRange
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 5776156979653151090, guid: 72e4cf6cdf6216746ae74c750d6cad75, type: 3}
       propertyPath: circlePlayer
       value: 0
       objectReference: {fileID: 0}
@@ -4497,6 +4516,14 @@ PrefabInstance:
     - target: {fileID: 2470803490314795343, guid: 72e4cf6cdf6216746ae74c750d6cad75, type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5776156979653151090, guid: 72e4cf6cdf6216746ae74c750d6cad75, type: 3}
+      propertyPath: attackRange
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5776156979653151090, guid: 72e4cf6cdf6216746ae74c750d6cad75, type: 3}
+      propertyPath: followRange
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 5776156979653151090, guid: 72e4cf6cdf6216746ae74c750d6cad75, type: 3}
       propertyPath: circlePlayer
@@ -4905,6 +4932,14 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5776156979653151090, guid: 72e4cf6cdf6216746ae74c750d6cad75, type: 3}
+      propertyPath: attackRange
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5776156979653151090, guid: 72e4cf6cdf6216746ae74c750d6cad75, type: 3}
+      propertyPath: followRange
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 5776156979653151090, guid: 72e4cf6cdf6216746ae74c750d6cad75, type: 3}
       propertyPath: circlePlayer
       value: 0
       objectReference: {fileID: 0}
@@ -5053,6 +5088,11 @@ MonoBehaviour:
   slotIcon: {fileID: 0}
   heldBehavior: {fileID: 0}
   emptySlot: {fileID: 21300000, guid: b574f3cfa060084479405e3cd26d0c94, type: 3}
+--- !u!1 &1561503605 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5113188894568079859, guid: 221ee92e73c803a42b396c5083667049, type: 3}
+  m_PrefabInstance: {fileID: 1332442330}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1631810571
 GameObject:
   m_ObjectHideFlags: 0
@@ -5359,6 +5399,14 @@ PrefabInstance:
     - target: {fileID: 2470803490314795343, guid: 72e4cf6cdf6216746ae74c750d6cad75, type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5776156979653151090, guid: 72e4cf6cdf6216746ae74c750d6cad75, type: 3}
+      propertyPath: attackRange
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5776156979653151090, guid: 72e4cf6cdf6216746ae74c750d6cad75, type: 3}
+      propertyPath: followRange
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 5776156979653151090, guid: 72e4cf6cdf6216746ae74c750d6cad75, type: 3}
       propertyPath: circlePlayer
@@ -6046,7 +6094,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!54 &1967074137
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -6379,7 +6427,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!54 &2047600618
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -6677,6 +6725,14 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5776156979653151090, guid: 72e4cf6cdf6216746ae74c750d6cad75, type: 3}
+      propertyPath: attackRange
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5776156979653151090, guid: 72e4cf6cdf6216746ae74c750d6cad75, type: 3}
+      propertyPath: followRange
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 5776156979653151090, guid: 72e4cf6cdf6216746ae74c750d6cad75, type: 3}
       propertyPath: circlePlayer
       value: 0
       objectReference: {fileID: 0}
@@ -6748,6 +6804,14 @@ PrefabInstance:
     - target: {fileID: 2470803490314795343, guid: 72e4cf6cdf6216746ae74c750d6cad75, type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5776156979653151090, guid: 72e4cf6cdf6216746ae74c750d6cad75, type: 3}
+      propertyPath: attackRange
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5776156979653151090, guid: 72e4cf6cdf6216746ae74c750d6cad75, type: 3}
+      propertyPath: followRange
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 5776156979653151090, guid: 72e4cf6cdf6216746ae74c750d6cad75, type: 3}
       propertyPath: circlePlayer
@@ -6915,6 +6979,14 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5776156979653151090, guid: 72e4cf6cdf6216746ae74c750d6cad75, type: 3}
+      propertyPath: attackRange
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5776156979653151090, guid: 72e4cf6cdf6216746ae74c750d6cad75, type: 3}
+      propertyPath: followRange
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 5776156979653151090, guid: 72e4cf6cdf6216746ae74c750d6cad75, type: 3}
       propertyPath: circlePlayer
       value: 0
       objectReference: {fileID: 0}
@@ -6988,7 +7060,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!54 &2122173306
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -7176,6 +7248,14 @@ PrefabInstance:
     - target: {fileID: 2470803490314795343, guid: 72e4cf6cdf6216746ae74c750d6cad75, type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5776156979653151090, guid: 72e4cf6cdf6216746ae74c750d6cad75, type: 3}
+      propertyPath: attackRange
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5776156979653151090, guid: 72e4cf6cdf6216746ae74c750d6cad75, type: 3}
+      propertyPath: followRange
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 5776156979653151090, guid: 72e4cf6cdf6216746ae74c750d6cad75, type: 3}
       propertyPath: circlePlayer
