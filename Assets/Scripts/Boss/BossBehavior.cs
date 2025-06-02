@@ -78,7 +78,7 @@ public class BossBehavior : MonoBehaviour
         }
     }
 
-    void TeleportBoss()
+    public void TeleportBoss()
     {
         if (teleportPositions.Length > 0)
         {

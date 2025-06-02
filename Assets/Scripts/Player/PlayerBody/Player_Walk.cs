@@ -12,7 +12,12 @@ public class Player_Walk : MonoBehaviour, IPlayerMover
     Vector3 _walkVelocity;
 
     void Awake() => _machine = GetComponent<Player_MovementMachine>(); //Get reference to the player movement machine!
-    void OnEnable() => _machine.AddMover(this); //Add itself to the movement machine!
+    void OnEnable()
+    {
+        _machine.AddMover(this); //Add itself to the movement machine!
+        _walkVelocity = Vector3.zero;
+    }
+
     void OnDisable() => _machine.RemoveMover(this); //remove itself from the movement machine when no longer active!
 
     public Vector3 UpdateForce()

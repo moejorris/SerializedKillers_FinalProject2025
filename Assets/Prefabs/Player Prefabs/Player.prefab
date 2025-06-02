@@ -46,15 +46,19 @@ Animator:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 197204389485468037}
   m_Enabled: 1
-  m_Avatar: {fileID: 0}
+  m_Avatar: {fileID: 9000000, guid: ba019a80705907d4cbdf9807c34516fe, type: 2}
   m_Controller: {fileID: 9100000, guid: 0c6bafda5b9c31e48af350657d2ba5ea, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
-  m_ApplyRootMotion: 0
+  m_ApplyRootMotion: 1
   m_LinearVelocityBlending: 0
   m_StabilizeFeet: 0
   m_AnimatePhysics: 0
-  m_WarningMessage: 
+  m_WarningMessage: "\nBinding warning: Some generic clip(s) animate transforms that
+    are already bound by a Humanoid avatar. These transforms can only be changed
+    by Humanoid clips.\n\tTransform 'mixamorig:LeftUpLeg'\n\tTransform 'mixamorig:Hips'\n\tTransform
+    'mixamorig:RightUpLeg'\n\tTransform 'mixamorig:Spine'\n\tFrom animation clip
+    'New Animation'"
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
@@ -2245,6 +2249,7 @@ GameObject:
   - component: {fileID: 9151791091005987443}
   - component: {fileID: 1459295906252677131}
   - component: {fileID: 3610208228449994613}
+  - component: {fileID: 593785187446799533}
   m_Layer: 3
   m_Name: PlayerController
   m_TagString: Untagged
@@ -2577,6 +2582,20 @@ TrailRenderer:
   m_Autodestruct: 0
   m_Emitting: 0
   m_ApplyActiveColorSpace: 1
+--- !u!114 &593785187446799533
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6809807624353774444}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 852469305ba83b94ab58d8e71ff04782, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  groundedAttacks:
+  - {fileID: 11400000, guid: cbdc6c00d93d6b14e94a2ea665cc5a07, type: 2}
 --- !u!1 &6813288641574566132
 GameObject:
   m_ObjectHideFlags: 0

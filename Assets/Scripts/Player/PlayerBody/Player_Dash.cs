@@ -6,9 +6,9 @@ public class Player_Dash : MonoBehaviour, IPlayerMover
 {
     CharacterController _controller;
     Player_MovementMachine _machine;
-    Player_Walk walk;
     Player_Rotate rotate;
     Player_Gravity gravity;
+    Player_Animation animate;
     [SerializeField] InputActionReference dashInput;
     [SerializeField] InputActionReference walkInput;
     [Header("How far the dash should move the player (in Meters/Unity Units)")]
@@ -23,8 +23,8 @@ public class Player_Dash : MonoBehaviour, IPlayerMover
     void Awake()
     {
         _machine = GetComponent<Player_MovementMachine>();
-        walk = GetComponent<Player_Walk>();
         rotate = GetComponent<Player_Rotate>();
+        animate = GetComponent<Player_Animation>();
         gravity = GetComponent<Player_Gravity>();
         _controller = GetComponent<CharacterController>();
     }
@@ -62,6 +62,7 @@ public class Player_Dash : MonoBehaviour, IPlayerMover
         // startPosition.y = 0;
 
         UpdateOtherMoveComponents(); //disables walking and turning. TODO: Disable jumping once that's done
+        animate?.PlayDashAnimation();
 
         float t = 0;
 
@@ -97,10 +98,17 @@ public class Player_Dash : MonoBehaviour, IPlayerMover
 
     void UpdateOtherMoveComponents()
     {
-        walk.enabled = !_isDashing;
         rotate.enabled = !_isDashing;
         gravity.enabled = _ignoresGravity ? !_isDashing : true;
-        // GetComponent<CharacterController>().enabled = !_isDashing;
+
+        if (_isDashing)
+        {
+            _machine.DisableAllMovers(this, gravity);
+        }
+        else
+        {
+            _machine.EnableAllMovers();
+        }
     }
 
     Vector3 DashDirection()

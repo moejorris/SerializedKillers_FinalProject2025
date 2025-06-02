@@ -19,5 +19,6 @@ public class RootMotion_Translator : MonoBehaviour
 
         _moveForce = animator.deltaPosition;
         _rotation = animator.deltaRotation;
+
     }
 }

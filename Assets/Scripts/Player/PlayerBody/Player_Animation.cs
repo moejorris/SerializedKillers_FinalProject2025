@@ -20,7 +20,13 @@ public class Player_Animation : MonoBehaviour
     {
         playerMeshAnimator.SetFloat("NormalizedWalkSpeed", walk.GetNormalizedSpeed());
 
-        if(machine.ForwardDirection != Vector3.zero)
-            playerMeshTransform.forward = machine.ForwardDirection;      
+
+        if (machine.ForwardDirection != Vector3.zero)
+            playerMeshTransform.forward = machine.ForwardDirection;
+    }
+
+    public void PlayDashAnimation()
+    {
+        playerMeshAnimator.SetTrigger("Dash");
     }
 }

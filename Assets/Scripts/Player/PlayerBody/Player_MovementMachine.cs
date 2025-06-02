@@ -9,7 +9,6 @@ public class Player_MovementMachine : MonoBehaviour
     Vector3 _forwardDirection;
     RaycastHit _groundInfo;
     bool _grounded;
-
     enum TimeStep { Update, FixedUpdate }
 
     //Public Getters
@@ -38,7 +37,10 @@ public class Player_MovementMachine : MonoBehaviour
         {
             foreach (IPlayerMover mover in activeMovers)
             {
-                movementToMake += mover.UpdateForce();
+                if (((MonoBehaviour)mover).enabled)
+                {
+                    movementToMake += mover.UpdateForce();                
+                }
             }
         }
         else return;
@@ -52,17 +54,38 @@ public class Player_MovementMachine : MonoBehaviour
     //External Functions
     public void AddMover(IPlayerMover mover)
     {
+        if(activeMovers.Contains(mover)) return;
         activeMovers.Add(mover);
     }
 
     public void RemoveMover(IPlayerMover mover)
     {
-        activeMovers.Remove(mover);
+        // activeMovers.Remove(mover);
     }
 
     public void SetForwardDirection(Vector3 dir)
     {
         _forwardDirection = dir;
+    }
+
+    public void DisableAllMovers(IPlayerMover mover1 = null, IPlayerMover mover2 = null, IPlayerMover mover3 = null) //optional parameter to exclude up to 3 movers from being disabled.
+    {
+        foreach (IPlayerMover playerMover in activeMovers)
+        {
+            if (playerMover != mover1 && playerMover != mover2 && playerMover != mover3)
+            {
+                ((MonoBehaviour)playerMover).enabled = false;
+            }
+        }
+    }
+
+    public void EnableAllMovers()
+    {
+        IPlayerMover[] allMovers = GetComponents<IPlayerMover>();
+        foreach (IPlayerMover playerMover in allMovers)
+        {
+            ((MonoBehaviour)playerMover).enabled = true;
+        }
     }
 
     //Private Getters
