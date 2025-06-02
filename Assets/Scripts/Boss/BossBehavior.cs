@@ -10,6 +10,8 @@ public class BossBehavior : MonoBehaviour
     [SerializeField] private GameObject projectilePrefab; // Prefab for the projectile
     [Tooltip("Teleport positions for the boss to use during the fight.")]
     [SerializeField] private Transform[] teleportPositions; // Array of teleport positions for the boss
+    [Tooltip("Test String to test functionality")]
+    [SerializeField] private string testString;
     private Transform currentTeleportPosition; // Current teleport position for the boss
     [Tooltip("Check to enable testing boss behavior.")]
     [SerializeField] private bool isTesting = false; // Flag to enable testing mode
@@ -94,6 +96,11 @@ public class BossBehavior : MonoBehaviour
         }
     }
 
+    void TeleportBossDefault()
+    {
+        transform.position = currentTeleportPosition.position;
+    }
+
     #endregion
 
     #region Coroutine Methods
@@ -126,7 +133,8 @@ public class BossBehavior : MonoBehaviour
 
     void SaySomething()
     {
-        Debug.Log("Boss says something!"); // Log a message when the boss says something
+        Debug.Log(testString); // Log a message when the boss says something
+        transform.position = new Vector3 (0, 0, 0);
     }
     #endregion
 }
