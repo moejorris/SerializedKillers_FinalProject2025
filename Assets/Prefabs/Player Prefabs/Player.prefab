@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7706892574158176782}
   - component: {fileID: 8823487989990755497}
+  - component: {fileID: 3015603119675108761}
   m_Layer: 0
   m_Name: Paladin WProp J Nordstrom
   m_TagString: Untagged
@@ -49,20 +50,28 @@ Animator:
   m_Avatar: {fileID: 9000000, guid: ba019a80705907d4cbdf9807c34516fe, type: 2}
   m_Controller: {fileID: 9100000, guid: 0c6bafda5b9c31e48af350657d2ba5ea, type: 2}
   m_CullingMode: 0
-  m_UpdateMode: 0
+  m_UpdateMode: 1
   m_ApplyRootMotion: 1
   m_LinearVelocityBlending: 0
   m_StabilizeFeet: 0
   m_AnimatePhysics: 0
-  m_WarningMessage: "\nBinding warning: Some generic clip(s) animate transforms that
-    are already bound by a Humanoid avatar. These transforms can only be changed
-    by Humanoid clips.\n\tTransform 'mixamorig:LeftUpLeg'\n\tTransform 'mixamorig:Hips'\n\tTransform
-    'mixamorig:RightUpLeg'\n\tTransform 'mixamorig:Spine'\n\tFrom animation clip
-    'New Animation'"
+  m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &3015603119675108761
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 197204389485468037}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e4edf0afa0c7d9148b42cf62b73e1403, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &216781602785899742
 GameObject:
   m_ObjectHideFlags: 0
@@ -2250,6 +2259,7 @@ GameObject:
   - component: {fileID: 1459295906252677131}
   - component: {fileID: 3610208228449994613}
   - component: {fileID: 593785187446799533}
+  - component: {fileID: 2845844426926673644}
   m_Layer: 3
   m_Name: PlayerController
   m_TagString: Untagged
@@ -2594,8 +2604,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 852469305ba83b94ab58d8e71ff04782, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  animatorOverride: {fileID: 22100000, guid: 74ebae68897a6f54d9a1bc577e0735be, type: 2}
+  animator: {fileID: 8823487989990755497}
   groundedAttacks:
   - {fileID: 11400000, guid: cbdc6c00d93d6b14e94a2ea665cc5a07, type: 2}
+  - {fileID: 11400000, guid: 2be2c6169645b5245adee85e476b0181, type: 2}
+  - {fileID: 11400000, guid: 5cb75370edd05a34d85cf269204297f8, type: 2}
+--- !u!114 &2845844426926673644
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6809807624353774444}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 174136b90df379d48b7a7b150a9d561e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rootMotion: {fileID: 3015603119675108761}
 --- !u!1 &6813288641574566132
 GameObject:
   m_ObjectHideFlags: 0
