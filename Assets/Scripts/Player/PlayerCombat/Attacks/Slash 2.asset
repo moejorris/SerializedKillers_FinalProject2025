@@ -10,8 +10,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c29efdff780292b4388065abec8f5750, type: 3}
-  m_Name: Jump Attack
+  m_Name: Slash 2
   m_EditorClassIdentifier: 
-  damage: 15
-  animation: {fileID: -203655887218126122, guid: 9e03300d6215ac345b633cc53fbecdb2, type: 3}
+  damage: 12
+  animation: {fileID: 7400000, guid: 2d6efdc531b4f1a4bbe46e019843c90a, type: 2}
   usesRootMotion: 1

@@ -840,6 +840,22 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 593785187446799533, guid: 221ee92e73c803a42b396c5083667049, type: 3}
+      propertyPath: defaultAttacks.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 593785187446799533, guid: 221ee92e73c803a42b396c5083667049, type: 3}
+      propertyPath: 'defaultAttacks.Array.data[0]'
+      value: 
+      objectReference: {fileID: 11400000, guid: cbdc6c00d93d6b14e94a2ea665cc5a07, type: 2}
+    - target: {fileID: 593785187446799533, guid: 221ee92e73c803a42b396c5083667049, type: 3}
+      propertyPath: 'defaultAttacks.Array.data[1]'
+      value: 
+      objectReference: {fileID: 11400000, guid: a027612c7a2a8bd4eb96c833ebcc301a, type: 2}
+    - target: {fileID: 593785187446799533, guid: 221ee92e73c803a42b396c5083667049, type: 3}
+      propertyPath: 'defaultAttacks.Array.data[2]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 2be2c6169645b5245adee85e476b0181, type: 2}
     - target: {fileID: 6913679290908290532, guid: 221ee92e73c803a42b396c5083667049, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
