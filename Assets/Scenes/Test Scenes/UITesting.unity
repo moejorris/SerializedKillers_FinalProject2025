@@ -4879,8 +4879,12 @@ MonoBehaviour:
   - {fileID: 6407982156621840691}
   idleActivateRange: 5
   movementState: idle
-  wanderDistance: 5
-  randomWanderLocations: 3
+  headCanTurn: 0
+  timeBeforeLosingTarget: 1
+  wanderDistance: 6
+  randomWanderLocations: 5
+  wander_headTurning: 0
+  wanderLookDirection: {x: 0, y: 0, z: 0}
   attackState: neutral
   aggressionLevel: 0
   canAttack: 0

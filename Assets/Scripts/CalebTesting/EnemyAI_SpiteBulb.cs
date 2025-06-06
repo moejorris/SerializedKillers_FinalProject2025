@@ -12,16 +12,18 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
     [SerializeField] private string movementState = "idle";
     private bool healing = false;
     private GameObject bulbHead;
-    private bool headCanTurn = false;
+    [SerializeField] private bool headCanTurn = false;
+    public float timeBeforeLosingTarget = 3;
+    private float followTimer = 0;
 
     [Header("Bulb Wandering")]
     [SerializeField] private float wanderDistance = 5;
     [SerializeField] private float randomWanderLocations = 3;
     private bool wandering = false;
-    private bool wander_headTurning = false;
+    [SerializeField] private bool wander_headTurning = false;
     private bool searchAnimationOccuring = false;
     private Vector3 wanderHome;
-    private Vector3 wanderLookDirection;
+    [SerializeField] private Vector3 wanderLookDirection;
 
     [Header("Bulb Combat")]
     [SerializeField] private string attackState = "neutral";
@@ -104,26 +106,35 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
                     //Debug.Log("Started wander timer");
                     StartCoroutine("WanderTimer");
                 }
-                else if (wander_headTurning)
+                else
                 {
-                    //Quaternion rotation = Quaternion.Lerp(bulbHead.transform.rotation, wanderLookDirection, Time.deltaTime * 7);
-                    //bulbHead.transform.eulerAngles = new Vector3(0, rotation.eulerAngles.y, 0);
-                    SetHeadTarget(wanderLookDirection, 7);
-                }
-                else // rotates where it's going?
-                {
-                    SetHeadTarget(navMeshAgent.destination - bulbHead.transform.position, 15);
-                    //Vector3 direction = navMeshAgent.destination - bulbHead.transform.position;
-                    //Quaternion rotation = Quaternion.Lerp(bulbHead.transform.rotation, Quaternion.LookRotation(direction), Time.deltaTime * 15);
-                    //bulbHead.transform.eulerAngles = new Vector3(0, rotation.eulerAngles.y, 0);
+                    if (wander_headTurning)
+                    {
+                        //Quaternion rotation = Quaternion.Lerp(bulbHead.transform.rotation, wanderLookDirection, Time.deltaTime * 7);
+                        //bulbHead.transform.eulerAngles = new Vector3(0, rotation.eulerAngles.y, 0);
+                        SetHeadTarget(wanderLookDirection - bulbHead.transform.position, 7);
+                    }
+                    else
+                    {
+                        SetHeadTarget(navMeshAgent.destination - bulbHead.transform.position, 15);
+                        //Vector3 direction = navMeshAgent.destination - bulbHead.transform.position;
+                        //Quaternion rotation = Quaternion.Lerp(bulbHead.transform.rotation, Quaternion.LookRotation(direction), Time.deltaTime * 15);
+                        //bulbHead.transform.eulerAngles = new Vector3(0, rotation.eulerAngles.y, 0);
+                    }
                 }
             }
         }
         else if (movementState == "pursue")
         {
-            if (PlayerInFollowRange() || attackState != "neutral") // if the enemy is attacking, for instance, it should still target player.
+            if (PlayerInFollowRange()) // if the enemy is attacking, for instance, it should still target player.
             {
                 navMeshAgent.destination = playerTarget.position;
+                followTimer = 0;
+            }
+            else if (followTimer < timeBeforeLosingTarget)
+            {
+                navMeshAgent.destination = playerTarget.position;
+                followTimer += Time.deltaTime;
             }
             else
             {
@@ -280,27 +291,45 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
 
         for (int i = 0; i < randomWanderLocations; i++)
         {
-            navMeshAgent.destination = new Vector3(wanderHome.x + Random.Range(-wanderDistance, wanderDistance), wanderHome.y, wanderHome.z + Random.Range(-wanderDistance, wanderDistance)); // picks spot to walk to
+            Vector3 potentialLocation = Vector3.zero;
+            bool walkable = false;
 
+            while(!walkable)
+            {
+                potentialLocation = new Vector3(wanderHome.x + Random.Range(-wanderDistance, wanderDistance), wanderHome.y, wanderHome.z + Random.Range(-wanderDistance, wanderDistance));
+                NavMeshPath path = new NavMeshPath();
+                navMeshAgent.CalculatePath(potentialLocation, path);
+                if(path.status == NavMeshPathStatus.PathComplete) // cycles through this to check if the location is actually viable
+                {
+                    //Debug.Log("New path made. It's location is: " + potentialLocation + " and it can path there :)");
+                    walkable = true;
+                }
+                else
+                {
+                    //Debug.Log("New path made. It's location is: " + potentialLocation + " and it cannot path there :(");
+                }
+            }
+
+            navMeshAgent.isStopped = false;
+            navMeshAgent.destination = potentialLocation; // picks spot to walk to
+
+            float stopDistance = navMeshAgent.stoppingDistance;
+            navMeshAgent.stoppingDistance = 0.1f;
             yield return new WaitUntil(() => navMeshAgent.remainingDistance < navMeshAgent.stoppingDistance + 0.1f); // wait until they get close
+            navMeshAgent.stoppingDistance = stopDistance;
 
 
             wander_headTurning = true; // causes the actual rotation of the head to begin (found in update)
 
-            float yDir = Random.Range(0, 360);
-            float yChange = Random.Range(45, 90);
-            for (int _i = 0; _i < 3; _i++) // does head turn thingy 3 times :)
+            for (int _i = 0; _i < 5; _i++) // does head turn thingy 3 times :)
             {
-                yChange += Random.Range(10, 15);
-                yChange *= -1;
-                wanderLookDirection = new Vector3(0, yDir + yChange, 0);
+                Vector3 lookLocation = new Vector3(wanderHome.x + Random.Range(-wanderDistance, wanderDistance), wanderHome.y, wanderHome.z + Random.Range(-wanderDistance, wanderDistance));
+                wanderLookDirection = lookLocation;
                 yield return new WaitForSeconds(1);
             }
 
             wander_headTurning = false;
         }
-
-
 
         yield return new WaitForSeconds(1); // little buffer at the end
 
@@ -388,7 +417,8 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
     {
         if (headCanTurn)
         {
-            Quaternion rotation = Quaternion.Lerp(bulbHead.transform.rotation, Quaternion.LookRotation(pos), Time.deltaTime * speed);
+            Quaternion rotation = Quaternion.Lerp(bulbHead.transform.rotation, Quaternion.LookRotation(pos, Vector3.up), Time.deltaTime * speed);
+            //Debug.Log("rotating towards: " + rotation);
             bulbHead.transform.eulerAngles = new Vector3(0, rotation.eulerAngles.y, 0);
         }
     }
