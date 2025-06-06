@@ -12,15 +12,16 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
     [SerializeField] private string movementState = "idle";
     private bool healing = false;
     private GameObject bulbHead;
+    private bool headCanTurn = false;
 
     [Header("Bulb Wandering")]
     [SerializeField] private float wanderDistance = 5;
     [SerializeField] private float randomWanderLocations = 3;
     private bool wandering = false;
-    private bool headTurning = false;
+    private bool wander_headTurning = false;
     private bool searchAnimationOccuring = false;
     private Vector3 wanderHome;
-    private Quaternion wanderLookDirection;
+    private Vector3 wanderLookDirection;
 
     [Header("Bulb Combat")]
     [SerializeField] private string attackState = "neutral";
@@ -36,15 +37,18 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
     [SerializeField] private float laserAttackMaxRange = 6;
 
     [Header("Bulb Laser Attack")]
-    private bool laserLockOn = false;
+    private bool laser_inProgress = false;
+    [SerializeField] private Transform laser_firePosition;
     [SerializeField] private GameObject laserRedsight;
+    [SerializeField] private LayerMask laser_targetLayers;
+    public float laserFollowSpeed = 10;
 
 
     [Header("Lighting")]
     [SerializeField] private Animator lightAnimator;
 
     public bool testBool = false;
-    
+
 
 
 
@@ -53,7 +57,8 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
     {
         base.Start();
         bulbHead = transform.Find("Head").gameObject;
-    }   
+        laser_firePosition = transform.Find("Head/LaserFirePosition");
+    }
     // Update is called once per frame
     void Update()
     {
@@ -70,22 +75,26 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
                 healing = false;
                 AttackCooldown(1); // just so it doesn't immediately attack?
                 movementState = "pursue";
+                headCanTurn = true;
             }
 
-            Vector3 direction = transform.forward;
-            Quaternion rotation = Quaternion.Lerp(bulbHead.transform.rotation, Quaternion.LookRotation(direction), Time.deltaTime * 5);
-            bulbHead.transform.eulerAngles = new Vector3(0, rotation.eulerAngles.y, 0);
+            SetHeadTarget(transform.forward, 5);
+
+            //Vector3 direction = transform.forward;
+            //Quaternion rotation = Quaternion.Lerp(bulbHead.transform.rotation, Quaternion.LookRotation(direction), Time.deltaTime * 5);
+            //bulbHead.transform.eulerAngles = new Vector3(0, rotation.eulerAngles.y, 0);
         }
         else if (movementState == "wandering")
         {
             if (PlayerInFollowRange())
             {
                 movementState = "pursue";
-               // Debug.Log("Wander stopped!");
+                // Debug.Log("Wander stopped!");
                 StopCoroutine("WanderTimer");
                 searchAnimationOccuring = false; // may need to be removed? Also, animation could impact this bool.
                 wandering = false;
-                headTurning = false;
+                wander_headTurning = false;
+                headCanTurn = true;
             }
             else
             {
@@ -95,17 +104,18 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
                     //Debug.Log("Started wander timer");
                     StartCoroutine("WanderTimer");
                 }
-                else if (headTurning)
+                else if (wander_headTurning)
                 {
-                    //Vector3 direction = wanderHome - bulbHead.transform.position;
-                    Quaternion rotation = Quaternion.Lerp(bulbHead.transform.rotation, wanderLookDirection, Time.deltaTime * 7);
-                    bulbHead.transform.eulerAngles = new Vector3(0, rotation.eulerAngles.y, 0);
+                    //Quaternion rotation = Quaternion.Lerp(bulbHead.transform.rotation, wanderLookDirection, Time.deltaTime * 7);
+                    //bulbHead.transform.eulerAngles = new Vector3(0, rotation.eulerAngles.y, 0);
+                    SetHeadTarget(wanderLookDirection, 7);
                 }
                 else // rotates where it's going?
                 {
-                    Vector3 direction = navMeshAgent.destination - bulbHead.transform.position;
-                    Quaternion rotation = Quaternion.Lerp(bulbHead.transform.rotation, Quaternion.LookRotation(direction), Time.deltaTime * 15);
-                    bulbHead.transform.eulerAngles = new Vector3(0, rotation.eulerAngles.y, 0);
+                    SetHeadTarget(navMeshAgent.destination - bulbHead.transform.position, 15);
+                    //Vector3 direction = navMeshAgent.destination - bulbHead.transform.position;
+                    //Quaternion rotation = Quaternion.Lerp(bulbHead.transform.rotation, Quaternion.LookRotation(direction), Time.deltaTime * 15);
+                    //bulbHead.transform.eulerAngles = new Vector3(0, rotation.eulerAngles.y, 0);
                 }
             }
         }
@@ -118,6 +128,7 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
             else
             {
                 movementState = "wandering";
+                headCanTurn = true;
             }
 
             if (PlayerInAttackRange())
@@ -129,15 +140,12 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
                 }
             }
 
-            if (attackState == "laser")
-            {
-                laserRedsight.GetComponent<LineRenderer>().SetPosition(0, transform.position);
-                laserRedsight.GetComponent<LineRenderer>().SetPosition(1, playerTarget.position);
-            }
+            SetHeadTarget(playerTarget.position - bulbHead.transform.position, 15);
+        }
 
-            Vector3 direction = playerTarget.position - bulbHead.transform.position;
-            Quaternion rotation = Quaternion.Lerp(bulbHead.transform.rotation, Quaternion.LookRotation(direction), Time.deltaTime * 15);
-            bulbHead.transform.eulerAngles = new Vector3(0, rotation.eulerAngles.y, 0);
+        if (laser_inProgress)
+        {
+            UpdateLaserPosition();
         }
     }
 
@@ -159,6 +167,28 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
             attackState = "laser";
             StartCoroutine(LaserAttack());
         }
+    }
+
+    public void UpdateLaserPosition()
+    {
+        Vector3 currentPosition = laserRedsight.GetComponent<LineRenderer>().GetPosition(1);
+
+        laserRedsight.GetComponent<LineRenderer>().SetPosition(0, laser_firePosition.position);
+
+        Vector3 nextPosition = laser_firePosition.transform.forward * 10;
+
+        if (Physics.Raycast(laser_firePosition.position, laser_firePosition.forward, out RaycastHit hit, 100f, laser_targetLayers))
+        {
+
+            nextPosition = hit.point;
+        }
+        else
+        {
+            nextPosition = laser_firePosition.forward * 10;
+            nextPosition.y = laser_firePosition.position.y;
+        }
+
+        laserRedsight.GetComponent<LineRenderer>().SetPosition(1, Vector3.Lerp(currentPosition, nextPosition, laserFollowSpeed));
     }
 
     public void AttackCooldown(float time)
@@ -206,18 +236,23 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
     {
         navMeshAgent.isStopped = true;
 
-        laserRedsight.SetActive(true);
-
         Debug.Log("Charging Laser...");
-        yield return new WaitForSeconds(10);
+        laserRedsight.SetActive(true);
+        laser_inProgress = true;
+        yield return new WaitForSeconds(5);
+
         Debug.Log("No longer turning head...");
+        laser_inProgress = false;
+        headCanTurn = false;
         yield return new WaitForSeconds(2);
 
-        laserRedsight.SetActive(false);
-
         Debug.Log("LASER FIRED BOOOOOM");
-        yield return new WaitForSeconds(1);
+        laserRedsight.SetActive(false);
+        transform.Find("Head/Capsule").gameObject.SetActive(true);
+        yield return new WaitForSeconds(1f);
+        transform.Find("Head/Capsule").gameObject.SetActive(false);
 
+        headCanTurn = true;
         navMeshAgent.isStopped = false;
         attackState = "neutral";
 
@@ -246,11 +281,11 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
         for (int i = 0; i < randomWanderLocations; i++)
         {
             navMeshAgent.destination = new Vector3(wanderHome.x + Random.Range(-wanderDistance, wanderDistance), wanderHome.y, wanderHome.z + Random.Range(-wanderDistance, wanderDistance)); // picks spot to walk to
-            
+
             yield return new WaitUntil(() => navMeshAgent.remainingDistance < navMeshAgent.stoppingDistance + 0.1f); // wait until they get close
 
 
-            headTurning = true; // causes the actual rotation of the head to begin (found in update)
+            wander_headTurning = true; // causes the actual rotation of the head to begin (found in update)
 
             float yDir = Random.Range(0, 360);
             float yChange = Random.Range(45, 90);
@@ -258,14 +293,14 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
             {
                 yChange += Random.Range(10, 15);
                 yChange *= -1;
-                wanderLookDirection = Quaternion.Euler(0, yDir + yChange, 0);
+                wanderLookDirection = new Vector3(0, yDir + yChange, 0);
                 yield return new WaitForSeconds(1);
             }
 
-            headTurning = false;
+            wander_headTurning = false;
         }
 
-        
+
 
         yield return new WaitForSeconds(1); // little buffer at the end
 
@@ -292,7 +327,7 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
             GainHealth(5);
         }
     }
-    
+
     public bool PlayerInAwakeRange()
     {
         if (Vector3.Distance(playerTarget.position, transform.position) < idleActivateRange)
@@ -349,4 +384,12 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
         }
     }
 
+    public void SetHeadTarget(Vector3 pos, float speed = 5)
+    {
+        if (headCanTurn)
+        {
+            Quaternion rotation = Quaternion.Lerp(bulbHead.transform.rotation, Quaternion.LookRotation(pos), Time.deltaTime * speed);
+            bulbHead.transform.eulerAngles = new Vector3(0, rotation.eulerAngles.y, 0);
+        }
+    }
 }
