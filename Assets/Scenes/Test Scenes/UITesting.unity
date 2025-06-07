@@ -4888,9 +4888,9 @@ MonoBehaviour:
   attackState: neutral
   aggressionLevel: 0
   canAttack: 0
-  meleeAttackCooldown: 7
-  shockwaveAttackCooldown: 8
-  laserAttackCooldown: 9
+  meleeAttackCooldown: 2
+  shockwaveAttackCooldown: 2
+  laserAttackCooldown: 2
   attackCooldownTimer: 0
   meleeAttackMaxRange: 3
   shockwaveAttackMaxRange: 5

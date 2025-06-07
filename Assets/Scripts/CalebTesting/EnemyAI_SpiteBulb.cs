@@ -176,13 +176,12 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
 
     public void PerformAttack()
     {
-        bool attackLaser = true;
-        if (AttackRange() == "melee" && !attackLaser)
+        if (AttackRange() == "melee")
         {
             attackState = "melee";
             StartCoroutine(MeleeAttack());
         }
-        else if (AttackRange() == "shockwave" && !attackLaser)
+        else if (AttackRange() == "shockwave")
         {
             attackState = "shockwave";
             StartCoroutine(ShockwaveAttack());
@@ -266,18 +265,18 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
         laser_endSphere.SetActive(true);
         laser_inProgress = true;
         headCanTurn = true;
-        yield return new WaitForSeconds(5);
+        yield return new WaitForSeconds(7);
 
         Debug.Log("No longer turning head...");
         laser_inProgress = false;
         headCanTurn = false;
         laser_lineRenderer.gameObject.SetActive(false);
         laser_endSphere.SetActive(false);
-        yield return new WaitForSeconds(2);
+        yield return new WaitForSeconds(0.6f);
 
         Debug.Log("LASER FIRED BOOOOOM");
         transform.Find("Head/Capsule").gameObject.SetActive(true);
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(0.5f);
         transform.Find("Head/Capsule").gameObject.SetActive(false);
 
         headCanTurn = true;
