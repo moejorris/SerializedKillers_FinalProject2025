@@ -39,12 +39,15 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
     [SerializeField] private float laserAttackMaxRange = 6;
 
     [Header("Bulb Laser Attack")]
-
     private bool laser_inProgress = false;
     [SerializeField] private Transform laser_firePosition;
     [SerializeField] private LayerMask laser_targetLayers;
     [SerializeField] private LineRenderer laser_lineRenderer;
     [SerializeField] private GameObject laser_endSphere;
+
+    [Header("Bulb Shockwave Attack")]
+    private bool shockwave_inProgress = false;
+    [SerializeField] private Animator shockwaveAnimator => transform.Find("ShockwaveAttack").GetComponent<Animator>();
 
 
     [Header("Lighting")]
@@ -244,13 +247,13 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
     IEnumerator ShockwaveAttack()
     {
         navMeshAgent.isStopped = true;
+        headCanTurn = false;
 
-        Debug.Log("Stopping to charge...");
-        yield return new WaitForSeconds(5);
-        Debug.Log("KABOOM!");
-        yield return new WaitForSeconds(1);
+        shockwaveAnimator.Play("ShockwaveTest");
+        yield return new WaitForSeconds(3.5f);
 
         navMeshAgent.isStopped = false;
+        headCanTurn = true;
         attackState = "neutral";
 
         AttackCooldown(shockwaveAttackCooldown);
