@@ -17,6 +17,8 @@ public class Player_MovementMachine : MonoBehaviour
     public float DeltaTime { get => currentDeltaTime(); }
     public bool isGrounded { get => _grounded; }
 
+    public Vector3 CurrentMotion;
+
     //Functions
     void Awake() => controller = GetComponent<CharacterController>();
 
@@ -39,22 +41,26 @@ public class Player_MovementMachine : MonoBehaviour
             {
                 if (((MonoBehaviour)mover).enabled)
                 {
-                    movementToMake += mover.UpdateForce();                
+                    movementToMake += mover.UpdateForce();
                 }
             }
         }
         else return;
 
         controller.Move(movementToMake * currentDeltaTime());
+        CurrentMotion = movementToMake;        
     }
 
-
+    void OnGUI()
+    {
+        GUI.Label(new Rect(25, 25, 100, 20), CurrentMotion.ToString());
+    }
 
 
     //External Functions
     public void AddMover(IPlayerMover mover)
     {
-        if(activeMovers.Contains(mover)) return;
+        if (activeMovers.Contains(mover)) return;
         activeMovers.Add(mover);
     }
 

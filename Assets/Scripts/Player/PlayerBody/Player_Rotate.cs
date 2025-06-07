@@ -20,9 +20,11 @@ public class Player_Rotate : MonoBehaviour
         //Walk Rotation
         Vector3 newDir = machine.ForwardDirection;
         Vector3 desiredDir = IntendedMoveDirection();
-        float rotLerpValue = Mathf.Clamp(rotationBySpeed.Evaluate(walk.GetNormalizedSpeed()), 0, 0.8f);
+        float rotLerpValue = Mathf.Clamp(rotationBySpeed.Evaluate(walk.GetNormalizedSpeed()), 0, 1f);
 
         newDir = Vector3.Slerp(newDir, desiredDir, rotLerpValue * machine.DeltaTime * rotationSpeed);
+
+        // Debug.Log("Lerp Value: " + rotLerpValue * machine.DeltaTime * rotationSpeed + " & Delta Time: " + machine.DeltaTime);
 
         if (newDir.magnitude > 0.1f)
             machine.SetForwardDirection(newDir);

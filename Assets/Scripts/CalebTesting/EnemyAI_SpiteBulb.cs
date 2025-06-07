@@ -39,11 +39,12 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
     [SerializeField] private float laserAttackMaxRange = 6;
 
     [Header("Bulb Laser Attack")]
+
     private bool laser_inProgress = false;
     [SerializeField] private Transform laser_firePosition;
-    [SerializeField] private GameObject laserRedsight;
     [SerializeField] private LayerMask laser_targetLayers;
-    public float laserFollowSpeed = 10;
+    [SerializeField] private LineRenderer laser_lineRenderer;
+    [SerializeField] private GameObject laser_endSphere;
 
 
     [Header("Lighting")]
@@ -60,6 +61,8 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
         base.Start();
         bulbHead = transform.Find("Head").gameObject;
         laser_firePosition = transform.Find("Head/LaserFirePosition");
+        laser_lineRenderer = transform.Find("Head/LaserRenderer").GetComponent<LineRenderer>();
+        laser_endSphere = transform.Find("Head/LaserEndPosSphere").gameObject;
     }
     // Update is called once per frame
     void Update()
@@ -126,7 +129,7 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
         }
         else if (movementState == "pursue")
         {
-            if (PlayerInFollowRange()) // if the enemy is attacking, for instance, it should still target player.
+            if (PlayerInFollowRange() || attackState == "laser") // if the enemy is attacking, for instance, it should still target player.
             {
                 navMeshAgent.destination = playerTarget.position;
                 followTimer = 0;
@@ -153,7 +156,18 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
 
             SetHeadTarget(playerTarget.position - bulbHead.transform.position, 15);
         }
+        else if (movementState == "testing")
+        {
+            headCanTurn = true;
+            laser_lineRenderer.gameObject.SetActive(true);
+            laser_endSphere.SetActive(true);
+            //UpdateLaserPosition();
+            SetHeadTarget(playerTarget.position - bulbHead.transform.position, 15);
+        }
+    }
 
+    private void FixedUpdate()
+    {
         if (laser_inProgress)
         {
             UpdateLaserPosition();
@@ -162,13 +176,12 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
 
     public void PerformAttack()
     {
-        bool attackLaser = true;
-        if (AttackRange() == "melee" && !attackLaser)
+        if (AttackRange() == "melee")
         {
             attackState = "melee";
             StartCoroutine(MeleeAttack());
         }
-        else if (AttackRange() == "shockwave" && !attackLaser)
+        else if (AttackRange() == "shockwave")
         {
             attackState = "shockwave";
             StartCoroutine(ShockwaveAttack());
@@ -182,24 +195,24 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
 
     public void UpdateLaserPosition()
     {
-        Vector3 currentPosition = laserRedsight.GetComponent<LineRenderer>().GetPosition(1);
+        laser_lineRenderer.SetPosition(0, laser_firePosition.position);
 
-        laserRedsight.GetComponent<LineRenderer>().SetPosition(0, laser_firePosition.position);
-
-        Vector3 nextPosition = laser_firePosition.transform.forward * 10;
+        Vector3 endPosition = laser_firePosition.position + (laser_firePosition.forward * 100);
 
         if (Physics.Raycast(laser_firePosition.position, laser_firePosition.forward, out RaycastHit hit, 100f, laser_targetLayers))
         {
-
-            nextPosition = hit.point;
+            if (hit.transform.GetComponent<Player_Walk>() != null)
+            {
+                endPosition = hit.point + laser_firePosition.forward * 0.15f;
+            }
+            else
+            {
+                endPosition = hit.point;
+            }
         }
-        else
-        {
-            nextPosition = laser_firePosition.forward * 10;
-            nextPosition.y = laser_firePosition.position.y;
-        }
 
-        laserRedsight.GetComponent<LineRenderer>().SetPosition(1, Vector3.Lerp(currentPosition, nextPosition, laserFollowSpeed));
+        laser_lineRenderer.SetPosition(1, endPosition);
+        laser_endSphere.transform.position = laser_lineRenderer.GetPosition(1);
     }
 
     public void AttackCooldown(float time)
@@ -248,19 +261,22 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
         navMeshAgent.isStopped = true;
 
         Debug.Log("Charging Laser...");
-        laserRedsight.SetActive(true);
+        laser_lineRenderer.gameObject.SetActive(true);
+        laser_endSphere.SetActive(true);
         laser_inProgress = true;
-        yield return new WaitForSeconds(5);
+        headCanTurn = true;
+        yield return new WaitForSeconds(7);
 
         Debug.Log("No longer turning head...");
         laser_inProgress = false;
         headCanTurn = false;
-        yield return new WaitForSeconds(2);
+        laser_lineRenderer.gameObject.SetActive(false);
+        laser_endSphere.SetActive(false);
+        yield return new WaitForSeconds(0.6f);
 
         Debug.Log("LASER FIRED BOOOOOM");
-        laserRedsight.SetActive(false);
         transform.Find("Head/Capsule").gameObject.SetActive(true);
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(0.5f);
         transform.Find("Head/Capsule").gameObject.SetActive(false);
 
         headCanTurn = true;

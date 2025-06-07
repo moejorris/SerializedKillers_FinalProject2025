@@ -9,7 +9,7 @@ public class Player_Walk : MonoBehaviour, IPlayerMover
     [SerializeField] float deccerlation = 30f;
     [SerializeField] AnimationCurve speedUpCurve;
     Player_MovementMachine _machine;
-    Vector3 _walkVelocity;
+    [SerializeField] Vector3 _walkVelocity;
 
     void Awake() => _machine = GetComponent<Player_MovementMachine>(); //Get reference to the player movement machine!
     void OnEnable()
@@ -38,7 +38,7 @@ public class Player_Walk : MonoBehaviour, IPlayerMover
         if (enabled)
         {
             //Speed Change
-            float walkLerpValue = Mathf.Clamp(speedUpCurve.Evaluate(GetNormalizedSpeed()), 0.1f, 1f);
+            float walkLerpValue = Mathf.Clamp(speedUpCurve.Evaluate(GetNormalizedSpeed()), 0.2f, 1f);
             newWalkSpeed = Vector3.Slerp(currentWalkVector, moveDir * speed, walkLerpValue * _machine.DeltaTime * lerpSpeed).magnitude;
             if (newWalkSpeed < 0.1f) newWalkSpeed = 0;
         }
