@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 //Joe Morris
 //SGD FP '25
@@ -7,18 +8,22 @@ using UnityEngine;
 public class Player_CombatMachine : MonoBehaviour
 {
     [SerializeField] AnimatorOverrideController animatorOverride;
+    int currentAnim = 1;
+
     [SerializeField] Animator animator;
     [SerializeField] List<PlayerAttackSO> defaultAttacks = new List<PlayerAttackSO>();
 
     [SerializeField] float comboResetTime = 0.3f;
     [SerializeField] int currentComboID = 0;
 
+    [SerializeField] InputActionReference attackInput;
+
     bool isAttacking = false;
     bool attackQueued = false;
 
     void Update()
     {
-        if (Input.GetButtonDown("Fire1"))
+        if (attackInput.action.WasPressedThisFrame())
         {
             if (isAttacking)
             {
@@ -44,15 +49,23 @@ public class Player_CombatMachine : MonoBehaviour
 
         PlayerAttackSO attack = defaultAttacks[currentComboID];
 
-        animatorOverride["AttackPlaceholder"] = attack.animation;
+        //AnimatorOverrideController override = GetCurrentState.Tag == 1 ? animatorOverride1 : animatorOverride2;
+        //use override for new controller
+        //override.animation = attack.animation
+
+
+        animatorOverride["AttackPlaceholder" + currentAnim] = attack.animation;
         animator.runtimeAnimatorController = animatorOverride;
-        animator.Play("Attack", 0);
+
+
+        // animator.SetTrigger("Attack");
+        animator.CrossFade("Attack"+currentAnim, 0.1f);
 
         if (attack.usesRootMotion)
         {
             GetComponent<Player_MovementMachine>().DisableAllMovers(GetComponent<Player_RootMotion>());
             CancelInvoke("ReEnableMovers");
-            Invoke("ReEnableMovers", attack.animation.length * 0.9f);
+            Invoke("ReEnableMovers", attack.animation.length * (currentComboID == defaultAttacks.Count -1 ? 0.9f :0.7f));
         }
 
         CancelInvoke("ResetCombo");
@@ -64,7 +77,6 @@ public class Player_CombatMachine : MonoBehaviour
     void ReEnableMovers()
     {
         GetComponent<Player_MovementMachine>().EnableAllMovers();
-        animator.Play("Default");
         isAttacking = false;
     }
 
@@ -76,17 +88,20 @@ public class Player_CombatMachine : MonoBehaviour
         }
         else ResetCombo();
 
+        currentAnim = currentAnim == 1 ? 2 : 1;
+
         // currentComboID = Mathf.Clamp(currentComboID, 0, defaultAttacks.Count); //Don't clamp to Count - 1 because then the combo would never reset
     }
 
     void ResetCombo()
     {
         currentComboID = 0;
+        currentAnim = 1;
     }
 
     bool OutOfRangeCheck()
     {
-        Debug.Log(currentComboID);
+        // Debug.Log(currentComboID);
 
         if (currentComboID < 0) return true;
         if (currentComboID >= defaultAttacks.Count) return true;
