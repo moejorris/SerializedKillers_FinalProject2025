@@ -1121,17 +1121,6 @@
                     "action": "Temp_Attack",
                     "isComposite": false,
                     "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "4fc356b2-6bb6-4763-b86e-f791377ba819",
-                    "path": "<Mouse>/leftButton",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Temp_Attack",
-                    "isComposite": false,
-                    "isPartOfComposite": false
                 }
             ]
         }

@@ -8,7 +8,7 @@ public class EnemyAI_Base : MonoBehaviour
     [Header("Navigation")]
     public Transform playerTarget;
     public float attackRange;
-    public float followRange;
+    //public float followRange;
     public NavMeshAgent navMeshAgent;
     //private Animator animator;
     //[SerializeField] private float targetDistance;

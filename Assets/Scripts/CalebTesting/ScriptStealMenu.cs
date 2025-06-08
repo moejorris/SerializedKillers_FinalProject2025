@@ -144,7 +144,7 @@ public class ScriptStealMenu : MonoBehaviour
                 }
             }
 
-            if (westButton.action.WasPerformedThisFrame() || Input.GetKeyDown(KeyCode.Q))
+            if (westButton.action.WasPerformedThisFrame() || Input.GetMouseButtonDown(1))
             {
                 Debug.Log("Button X pressed");
                 if (selectedBehaviorSlot != null)

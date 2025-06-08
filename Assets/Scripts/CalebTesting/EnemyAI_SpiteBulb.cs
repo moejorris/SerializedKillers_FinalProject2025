@@ -8,17 +8,24 @@ using UnityEngine.Splines.Interpolators;
 public class EnemyAI_SpiteBulb : EnemyAI_Base
 {
     [Header("Bulb General")]
-    public float idleActivateRange;
-    [SerializeField] float scaredFollowRange = 12;
+    //public float idleActivateRange;
     [SerializeField] private string movementState = "idle";
     private bool healing = false;
     private GameObject bulbHead;
     [SerializeField] private bool headCanTurn = false;
-    public float timeBeforeLosingTarget = 3;
+    public float followGracePeriod = 1;
     private float followTimer = 0;
 
     [SerializeField] private Material litBulbColor;
     [SerializeField] private Material unlitBulbColor;
+
+    [Header("Bulb Vision")]
+    [SerializeField] private float idleAlertRange;
+    [SerializeField] private float blindFollowRange;
+    [SerializeField] private float visionConeLength;
+    [SerializeField] private float visionConeWidth;
+    [SerializeField] private LayerMask playerLayer;
+    [SerializeField] private LayerMask obstacleLayer;
 
     [Header("Bulb Wandering")]
     [SerializeField] private float wanderDistance = 5;
@@ -30,17 +37,22 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
     [SerializeField] private Vector3 wanderLookDirection;
 
     [Header("Bulb Combat")]
+    [SerializeField] private bool preparingAttack = false;
+    [SerializeField] private bool attackOccuring = false;
     [SerializeField] private string attackState = "neutral";
-    [SerializeField] private float aggressionLevel = 3;
+    //[SerializeField] private float aggressionLevel = 3;
     [SerializeField] private bool canAttack = false;
     [SerializeField] private float meleeAttackCooldown = 5;
     [SerializeField] private float shockwaveAttackCooldown = 7;
-    [SerializeField] private float laserAttackCooldown = 9;
+    
     [SerializeField] private float attackCooldownTimer = 0;
+    [SerializeField] private float longRangeAttackDis = 10;
 
-    [SerializeField] private float meleeAttackMaxRange = 1;
-    [SerializeField] private float shockwaveAttackMaxRange = 2.5f;
-    [SerializeField] private float laserAttackMaxRange = 6;
+    [Range(0f, 100f)]
+    [SerializeField] private float shockwaveAttackChance;
+
+    [Header("Bulb Attack Melee")]
+    private float gapCloseTimer = 2.3f;
 
     [Header("Bulb Laser Attack")]
     [SerializeField] private Transform laser_firePosition;
@@ -48,6 +60,19 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
     [SerializeField] private LayerMask laser_targetLayers;
     [SerializeField] private LineRenderer laser_lineRenderer;
     [SerializeField] private GameObject laser_endSphere;
+    [SerializeField] private float laserAttackCooldown = 9;
+
+    [Header("Bulb Scared Behavior")]
+    [SerializeField] private float scaredFollowRange = 15f;
+    [SerializeField] private float scaredAttackTimer = 2f;
+
+    [Header("Bulb Circling")]
+    [SerializeField] private float circleSpeed = 10;
+    [SerializeField] private float circleRadius = 5;
+    [SerializeField] private float circlingRange = 8;
+    [SerializeField] private bool circlingPlayer = false;
+    private float currentAngle = 0;
+
 
     [Header("Bulb Shockwave Attack")]
     //private bool shockwave_inProgress = false;
@@ -72,102 +97,219 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
     // Update is called once per frame
     void Update()
     {
-        if (movementState == "idle")
+        if (!preparingAttack)
         {
-            if (!healing)
+            if (movementState == "idle")
             {
-                healing = true;
-                StartCoroutine(HealTimer());
-            }
-
-            if (PlayerInAwakeRange())
-            {
-                healing = false;
-                AttackCooldown(1); // just so it doesn't immediately attack?
-                movementState = "pursue";
-                headCanTurn = true;
-            }
-
-            SetHeadTarget(transform.forward, 5);
-
-            //Vector3 direction = transform.forward;
-            //Quaternion rotation = Quaternion.Lerp(bulbHead.transform.rotation, Quaternion.LookRotation(direction), Time.deltaTime * 5);
-            //bulbHead.transform.eulerAngles = new Vector3(0, rotation.eulerAngles.y, 0);
-        }
-        else if (movementState == "wandering")
-        {
-            if (PlayerInFollowRange())
-            {
-                movementState = "pursue";
-                // Debug.Log("Wander stopped!");
-                StopCoroutine("WanderTimer");
-                searchAnimationOccuring = false; // may need to be removed? Also, animation could impact this bool.
-                wandering = false;
-                wander_headTurning = false;
-                headCanTurn = true;
-            }
-            else
-            {
-                if (!wandering)
+                if (!healing)
                 {
-                    wandering = true;
-                    //Debug.Log("Started wander timer");
-                    StartCoroutine("WanderTimer");
+                    healing = true;
+                    StartCoroutine("HealTimer");
+                }
+
+                if (PlayerInAwakeRange() || !behaviorActive)
+                {
+                    headCanTurn = true;
+                    healing = false;
+                    StopCoroutine("HealTimer");
+                    movementState = "pursue";
+                }
+
+                SetHeadTarget(transform.forward, 5);
+            }
+            else if (movementState == "wandering")
+            {
+                if (PlayerVisible()) // either the player gets into range
+                {
+                    movementState = "pursue";
+                    StopCoroutine("WanderTimer");
+                    searchAnimationOccuring = false;
+                    wandering = false;
+                    wander_headTurning = false;
+                    headCanTurn = true;
                 }
                 else
                 {
-                    if (wander_headTurning)
+                    if (!wandering) // hasn't started the wander timer coroutine
                     {
-                        //Quaternion rotation = Quaternion.Lerp(bulbHead.transform.rotation, wanderLookDirection, Time.deltaTime * 7);
-                        //bulbHead.transform.eulerAngles = new Vector3(0, rotation.eulerAngles.y, 0);
-                        SetHeadTarget(wanderLookDirection - bulbHead.transform.position, 7);
+                        wandering = true;
+                        StartCoroutine("WanderTimer");
                     }
                     else
                     {
-                        SetHeadTarget(navMeshAgent.destination - bulbHead.transform.position, 15);
-                        //Vector3 direction = navMeshAgent.destination - bulbHead.transform.position;
-                        //Quaternion rotation = Quaternion.Lerp(bulbHead.transform.rotation, Quaternion.LookRotation(direction), Time.deltaTime * 15);
-                        //bulbHead.transform.eulerAngles = new Vector3(0, rotation.eulerAngles.y, 0);
+                        if (wander_headTurning) // wandering is occuring already, so head turns to the look direction from wander coroutine
+                        {
+                            SetHeadTarget(wanderLookDirection - bulbHead.transform.position, 7);
+                        }
+                        else // in between looking around, looks towards it's destination (the new spot it will walk)
+                        {
+                            SetHeadTarget(navMeshAgent.destination - bulbHead.transform.position, 15);
+                        }
                     }
                 }
             }
-        }
-        else if (movementState == "pursue")
-        {
-            if (PlayerInFollowRange() || attackState == "laser" || attackState == "shockwave") // if the enemy is attacking, for instance, it should still target player.
+            else if (movementState == "pursue")
             {
-                navMeshAgent.destination = playerTarget.position;
-                followTimer = 0;
-            }
-            else if (followTimer < timeBeforeLosingTarget)
-            {
-                navMeshAgent.destination = playerTarget.position;
-                followTimer += Time.deltaTime;
-            }
-            else
-            {
-                movementState = "wandering";
-                headCanTurn = true;
-            }
-
-            if (PlayerInAttackRange())
-            {
-                if (attackState == "neutral" && canAttack)
+                if (PlayerVisible())
                 {
-                    canAttack = false;
-                    PerformAttack();
+                    if (behaviorActive)
+                    {
+                        navMeshAgent.destination = playerTarget.position;
+                    }
+                    else // backs awway when scared
+                    {
+                        if (Vector3.Distance(playerTarget.position, transform.position) < scaredFollowRange) // way too close!!! gets away
+                        {
+                            Vector3 newPos = transform.position + ((transform.position - playerTarget.position).normalized * (scaredFollowRange - Vector3.Distance(playerTarget.position, transform.position)));
+                            navMeshAgent.destination = newPos;
+                        }
+                        else if (Vector3.Distance(playerTarget.position, transform.position) > scaredFollowRange + 5f) // too far !!! follows closer.
+                        {
+                            navMeshAgent.destination = playerTarget.position;
+                        }
+                    }
+
+                    if ((PlayerInAttackRange() && attackCooldownTimer <= 0 && behaviorActive) || (attackCooldownTimer <= 0 && scaredAttackTimer <= 0))
+                    {
+                        PerformAttack();
+                    }
+
+                    followTimer = 0;
+
+                    if (!behaviorActive && Vector3.Distance(playerTarget.position, transform.position) < 3.5f) // if player gets close too long!
+                    {
+                        Debug.Log("PLAYER IN SCARED RANGE !!!");
+                        scaredAttackTimer -= Time.deltaTime;
+                    }
+                    else
+                    {
+                        scaredAttackTimer = 2;
+                    }
+
+                    SetHeadTarget(playerTarget.position - bulbHead.transform.position, 15);
+                }
+                else if (followTimer < followGracePeriod)
+                {
+                    navMeshAgent.destination = playerTarget.position;
+                    followTimer += Time.deltaTime;
+
+                    SetHeadTarget(playerTarget.position - bulbHead.transform.position, 15);
+                }
+                else
+                {
+                    movementState = "wandering";
+                }
+            }
+        }
+        else
+        {
+            if (attackState == "melee") // basically, makes the guy run to the player for a few seconds
+            {
+                if (PlayerVisible())
+                {
+                    navMeshAgent.destination = playerTarget.position;
+                    SetHeadTarget(playerTarget.position - bulbHead.transform.position, 15);
+                }
+
+                if (!attackOccuring)
+                {
+                    if (gapCloseTimer <= 0 || navMeshAgent.remainingDistance < 0.6f) // attacks if in range or after a few seconds of running if not
+                    {
+                        StopCoroutine("MeleeAttack");
+                        StartCoroutine("MeleeAttack");
+                    }
+                    else
+                    {
+                        gapCloseTimer -= Time.deltaTime;
+                    }
+                }
+            }
+            else if (attackState == "shockwave")
+            {
+                if (PlayerVisible())
+                {
+                    navMeshAgent.destination = playerTarget.position;
+                    SetHeadTarget(playerTarget.position - bulbHead.transform.position, 15);
+                }
+
+                if (!attackOccuring)
+                {
+                    if (gapCloseTimer <= 0 || navMeshAgent.remainingDistance < 0.6f) // attacks if in range or after a few seconds of running if not
+                    {
+                        StopCoroutine("ShockwaveAttack");
+                        StartCoroutine("ShockwaveAttack");
+                    }
+                    else
+                    {
+                        gapCloseTimer -= Time.deltaTime;
+                    }
+                }
+            }
+            else if (attackState == "laser")
+            {
+                if (attackOccuring)
+                {
+                    if (laser_inProgress)
+                    {
+                        SetHeadTarget(playerTarget.position - bulbHead.transform.position, 15);
+                    }
+                }
+                else
+                {
+                    if (PlayerVisible())
+                    {
+                        if (Vector3.Distance(playerTarget.position, transform.position) < longRangeAttackDis) // way too close!!! gets away
+                        {
+                            Vector3 newPos = transform.position + ((transform.position - playerTarget.position).normalized * (longRangeAttackDis - Vector3.Distance(playerTarget.position, transform.position)));
+                            navMeshAgent.destination = newPos;
+                        }
+                        else if (Vector3.Distance(playerTarget.position, transform.position) > longRangeAttackDis + 5f) // too far !!! follows closer.
+                        {
+                            navMeshAgent.destination = playerTarget.position;
+                        }
+                    }
+
+                    if (gapCloseTimer <= 0 || navMeshAgent.remainingDistance < 0.3f) // attacks if in range or after a few seconds of running if not
+                    {
+                        StopCoroutine("LaserAttack");
+                        StartCoroutine("LaserAttack");
+                    }
+                    else
+                    {
+                        gapCloseTimer -= Time.deltaTime;
+                    }
                 }
             }
 
-            SetHeadTarget(playerTarget.position - bulbHead.transform.position, 15);
+            if (!PlayerVisible()) // in case the player runs away while an attack was occuring
+            {
+
+            }
         }
-        else if (movementState == "testing")
+
+        if (testBool)
         {
-            headCanTurn = true;
-            laser_lineRenderer.gameObject.SetActive(true);
-            laser_endSphere.SetActive(true);
-            //UpdateLaserPosition();
-            SetHeadTarget(playerTarget.position - bulbHead.transform.position, 15);
+            //if (Vector3.Distance(transform.position, playerTarget.position) < circlingRange)
+            //{
+            //    if (!circlingPlayer)
+            //    {
+            //        circlingPlayer = true;
+            //        currentAngle = Random.Range(0f, 360f);
+            //        navMeshAgent.speed = 1;
+            //        navMeshAgent.stoppingDistance = 0;
+            //    }
+            //    else
+            //    {
+            //        CirclePlayer();
+            //    }
+            //}
+            //else
+            //{
+            //    circlingPlayer = false;
+            //    navMeshAgent.speed = 3.5f;
+            //    navMeshAgent.stoppingDistance = 3.5f;
+            //    navMeshAgent.destination = playerTarget.position;
+            //}
         }
     }
 
@@ -179,26 +321,173 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
         }
     }
 
+    public void CirclePlayer()
+    {
+        currentAngle += circleSpeed * Time.deltaTime;
+        currentAngle %= 360; // Keep angle within 0-360 degrees
+
+        // Calculate the point on the circle
+        float x = Mathf.Cos(currentAngle * Mathf.Deg2Rad) * circleRadius;
+        float z = Mathf.Sin(currentAngle * Mathf.Deg2Rad) * circleRadius;
+        Vector3 circlePos = new Vector3(x, 0, z);
+
+        navMeshAgent.destination = playerTarget.position + circlePos;
+        //navMeshAgent.updateRotation = false;
+
+        //Vector3 direction = playerTarget.position - transform.position;
+        //Quaternion rotation = Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(direction), Time.deltaTime * circlingRotationSpeed);
+        //transform.eulerAngles = new Vector3(0, rotation.eulerAngles.y, 0);
+
+        //if (targetDistance > attackDistance)
+        //{
+        //    circlePlayer = false;
+        //    navMeshAgent.isStopped = true;
+        //    animator.SetBool("Attack", true);
+        //}
+
+        //transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(direction), Time.deltaTime * circlingRotationSpeed);
+    }
+
     public void PerformAttack()
     {
-        if (AttackRange() == "melee")
+        preparingAttack = true;
+        if (Vector3.Distance(playerTarget.position, transform.position) > longRangeAttackDis && behaviorActive)
         {
-            attackState = "melee";
-            StopCoroutine("MeleeAttack");
-            StartCoroutine("MeleeAttack");
+            EnterLaserAttack();
         }
-        else if (AttackRange() == "shockwave")
+        else
         {
-            attackState = "shockwave";
-            StopCoroutine("ShockwaveAttack");
-            StartCoroutine("ShockwaveAttack");
+            float ran = Random.Range(0.1f, 99.9f);
+            if (behaviorActive && ran < shockwaveAttackChance)
+            {
+                EnterShockwaveAttack();
+            }
+            else
+            {
+                EnterMeleeAttack();
+            }
         }
-        else// if (AttackRange() == "laser")
-        {
-            attackState = "laser";
-            StopCoroutine("LaserAttack");
-            StartCoroutine("LaserAttack");
-        }
+    }
+
+    public void AttackCooldown(float time)
+    {
+        //canAttack = false;
+        StopCoroutine("AttackTimer");
+        attackCooldownTimer = time;
+        StartCoroutine("AttackTimer");
+    } // call directly, looks cleaner than stopping and starting.
+
+    public void EnterMeleeAttack()
+    {
+        gapCloseTimer = 3;
+        attackState = "melee";
+        navMeshAgent.stoppingDistance = 1.3f;
+        navMeshAgent.speed = 6f;
+    }
+
+    public void ExitMeleeAttack()
+    {
+        AttackCooldown(meleeAttackCooldown);
+        navMeshAgent.stoppingDistance = 3.5f;
+        navMeshAgent.isStopped = false;
+        attackState = "neutral";
+        navMeshAgent.speed = 3;
+        preparingAttack = false;
+        attackOccuring = false;
+    }
+
+    IEnumerator MeleeAttack()
+    {
+        attackOccuring = true;
+        navMeshAgent.isStopped = true;
+
+        yield return new WaitForSeconds(2);
+
+        Debug.Log("IMAGINE A MELEE ANIMATION!");
+
+        ExitMeleeAttack();
+    }
+
+    public void EnterShockwaveAttack()
+    {
+        gapCloseTimer = 1.3f;
+        attackState = "shockwave";
+        navMeshAgent.stoppingDistance = 1.3f;
+        navMeshAgent.speed = 6f;
+    }
+
+    public void ExitShockwaveAttack()
+    {
+        AttackCooldown(shockwaveAttackCooldown);
+        navMeshAgent.isStopped = false;
+        headCanTurn = true;
+        attackState = "neutral";
+        shockwaveAnimator.Play("Inactive"); // delete maybe?
+        navMeshAgent.speed = 3;
+        navMeshAgent.stoppingDistance = 3.5f;
+        preparingAttack = false;
+        attackOccuring = false;
+    }
+
+    IEnumerator ShockwaveAttack()
+    {
+        attackOccuring = true;
+        navMeshAgent.isStopped = true;
+        headCanTurn = false;
+
+        shockwaveAnimator.Play("ShockwaveTest");
+        yield return new WaitForSeconds(4f);
+
+        ExitShockwaveAttack();
+    }
+
+    public void EnterLaserAttack()
+    {
+        gapCloseTimer = 1.5f;
+        attackState = "laser";
+        navMeshAgent.speed = 4f;
+    }
+
+    public void ExitLaserAttack()
+    {
+        AttackCooldown(laserAttackCooldown);
+        headCanTurn = true;
+        navMeshAgent.isStopped = false;
+        attackState = "neutral";
+        laser_inProgress = false;
+        preparingAttack = false;
+        attackOccuring = false;
+
+        laser_lineRenderer.gameObject.SetActive(false);
+        laser_endSphere.SetActive(false);
+        transform.Find("Head/Capsule").gameObject.SetActive(false);
+    }
+
+    IEnumerator LaserAttack()
+    {
+        attackOccuring = true;
+        navMeshAgent.isStopped = true;
+
+        Debug.Log("Charging Laser...");
+        laser_lineRenderer.gameObject.SetActive(true);
+        laser_endSphere.SetActive(true);
+        laser_inProgress = true;
+        headCanTurn = true;
+        yield return new WaitForSeconds(7);
+
+        Debug.Log("No longer turning head...");
+        laser_inProgress = false;
+        headCanTurn = false;
+        laser_lineRenderer.gameObject.SetActive(false);
+        laser_endSphere.SetActive(false);
+        yield return new WaitForSeconds(0.6f);
+
+        Debug.Log("LASER FIRED BOOOOOM");
+        transform.Find("Head/Capsule").gameObject.SetActive(true);
+        yield return new WaitForSeconds(0.5f);
+        transform.Find("Head/Capsule").gameObject.SetActive(false);
+
+        ExitLaserAttack();
     }
 
     public void UpdateLaserPosition()
@@ -223,84 +512,14 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
         laser_endSphere.transform.position = laser_lineRenderer.GetPosition(1);
     }
 
-    public void AttackCooldown(float time)
-    {
-        canAttack = false;
-        StopCoroutine("AttackTimer");
-        attackCooldownTimer = time;
-        StartCoroutine("AttackTimer");
-    } // call directly, looks cleaner than stopping and starting.
-
-    IEnumerator MeleeAttack()
-    {
-        Debug.Log("Moving in to attack...");
-        navMeshAgent.stoppingDistance = 2;
-        yield return new WaitUntil(() => navMeshAgent.remainingDistance <= 2.3f); // EDIT LATER
-        navMeshAgent.isStopped = true;
-
-        Debug.Log("Performing Attack...");
-        yield return new WaitForSeconds(2);
-        Debug.Log("Attack Complete!");
-
-        navMeshAgent.stoppingDistance = 3.5f;
-        navMeshAgent.isStopped = false;
-        attackState = "neutral";
-
-        AttackCooldown(meleeAttackCooldown);
-    }
-
-    IEnumerator ShockwaveAttack()
-    {
-        navMeshAgent.isStopped = true;
-        headCanTurn = false;
-
-        shockwaveAnimator.Play("ShockwaveTest");
-        yield return new WaitForSeconds(5f);
-
-        navMeshAgent.isStopped = false;
-        headCanTurn = true;
-        attackState = "neutral";
-
-        AttackCooldown(shockwaveAttackCooldown);
-    }
-
-    IEnumerator LaserAttack()
-    {
-        navMeshAgent.isStopped = true;
-
-        Debug.Log("Charging Laser...");
-        laser_lineRenderer.gameObject.SetActive(true);
-        laser_endSphere.SetActive(true);
-        laser_inProgress = true;
-        headCanTurn = true;
-        yield return new WaitForSeconds(7);
-
-        Debug.Log("No longer turning head...");
-        laser_inProgress = false;
-        headCanTurn = false;
-        laser_lineRenderer.gameObject.SetActive(false);
-        laser_endSphere.SetActive(false);
-        yield return new WaitForSeconds(0.6f);
-
-        Debug.Log("LASER FIRED BOOOOOM");
-        transform.Find("Head/Capsule").gameObject.SetActive(true);
-        yield return new WaitForSeconds(0.5f);
-        transform.Find("Head/Capsule").gameObject.SetActive(false);
-
-        headCanTurn = true;
-        navMeshAgent.isStopped = false;
-        attackState = "neutral";
-
-        AttackCooldown(laserAttackCooldown);
-    }
-
     IEnumerator AttackTimer()
     {
         Debug.Log("Attack timer started.");
 
         yield return new WaitForSeconds(attackCooldownTimer);
 
-        canAttack = true;
+        //canAttack = true;
+        attackCooldownTimer = 0;
 
         Debug.Log("Attack timer completed.");
     } // called by the AttackCooldown function.
@@ -318,12 +537,12 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
             Vector3 potentialLocation = Vector3.zero;
             bool walkable = false;
 
-            while(!walkable)
+            while (!walkable)
             {
                 potentialLocation = new Vector3(wanderHome.x + Random.Range(-wanderDistance, wanderDistance), wanderHome.y, wanderHome.z + Random.Range(-wanderDistance, wanderDistance));
                 NavMeshPath path = new NavMeshPath();
                 navMeshAgent.CalculatePath(potentialLocation, path);
-                if(path.status == NavMeshPathStatus.PathComplete) // cycles through this to check if the location is actually viable
+                if (path.status == NavMeshPathStatus.PathComplete) // cycles through this to check if the location is actually viable
                 {
                     //Debug.Log("New path made. It's location is: " + potentialLocation + " and it can path there :)");
                     walkable = true;
@@ -383,7 +602,7 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
 
     public bool PlayerInAwakeRange()
     {
-        if (Vector3.Distance(playerTarget.position, transform.position) < idleActivateRange)
+        if (Vector3.Distance(playerTarget.position, transform.position) < idleAlertRange)
         {
             return true;
         }
@@ -393,13 +612,37 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
         }
     }
 
-    public bool PlayerInFollowRange()
+    public bool PlayerVisible()
     {
-        if (Vector3.Distance(playerTarget.position, transform.position) < followRange || (Vector3.Distance(playerTarget.position, transform.position) < scaredFollowRange && !behaviorActive))
+        if (Vector3.Distance(playerTarget.position, transform.position) <= blindFollowRange) // within the "listen range"
         {
             return true;
         }
-        else
+        else if (Vector3.Distance(playerTarget.position, transform.position) <= visionConeLength) // at least within sight range
+        {
+            Debug.Log("Player in cone length");
+
+            if (Physics.Raycast(transform.position, transform.position - playerTarget.transform.position, out RaycastHit rayHit, (Vector3.Distance(playerTarget.position, transform.position) - 3), obstacleLayer)) // checks if player behind things?
+            {
+                Debug.Log("Ray hit a thing");
+                return false;
+            }
+            else
+            {
+                Vector3 directionToTarget = (playerTarget.position - transform.position).normalized;
+                Debug.Log(Vector3.Angle(bulbHead.transform.forward, directionToTarget));
+                if (Vector3.Angle(bulbHead.transform.forward, directionToTarget) < visionConeWidth / 2)
+                {
+                    Debug.Log("PLAYER SEEN");
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+        }
+        else // in neither
         {
             return false;
         }
@@ -417,26 +660,6 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
         }
     }
 
-    public string AttackRange()
-    {
-        if (Vector3.Distance(playerTarget.position, transform.position) > laserAttackMaxRange)
-        {
-            return "null";
-        }
-        else if (Vector3.Distance(playerTarget.position, transform.position) > shockwaveAttackMaxRange)
-        {
-            return "laser";
-        }
-        else if (Vector3.Distance(playerTarget.position, transform.position) > meleeAttackMaxRange)
-        {
-            return "shockwave";
-        }
-        else
-        {
-            return "melee";
-        }
-    }
-
     public void SetHeadTarget(Vector3 pos, float speed = 5)
     {
         if (headCanTurn)
@@ -449,6 +672,8 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
 
     public override void ActivateBehavior()
     {
+        ExitLaserAttack();
+        ExitShockwaveAttack();
         base.ActivateBehavior();
         Material[] newMats = bulbHead.GetComponent<MeshRenderer>().materials;
         newMats[0] = litBulbColor;

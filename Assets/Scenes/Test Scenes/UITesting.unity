@@ -690,7 +690,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerTarget: {fileID: 0}
   attackRange: 0
-  followRange: 0
   navMeshAgent: {fileID: 0}
   heldBehavior: {fileID: 11400000, guid: 5121a43f96def934084246ff74dd77e3, type: 2}
   behaviorActive: 1
@@ -4841,7 +4840,7 @@ GameObject:
   - component: {fileID: 1434463131}
   - component: {fileID: 1434463130}
   - component: {fileID: 1434463129}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: SpiteBulbEnemyTest
   m_TagString: Enemy
   m_Icon: {fileID: 0}
@@ -4949,8 +4948,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerTarget: {fileID: 623103179}
-  attackRange: 6
-  followRange: 8
+  attackRange: 16
   navMeshAgent: {fileID: 1434463132}
   heldBehavior: {fileID: 11400000, guid: 9e4df872e93e7984384719275cc16db8, type: 2}
   behaviorActive: 1
@@ -4960,32 +4958,47 @@ MonoBehaviour:
   highlightableMeshes:
   - {fileID: 6122450833255235782}
   - {fileID: 6407982156621840691}
-  idleActivateRange: 5
   movementState: idle
   headCanTurn: 0
-  timeBeforeLosingTarget: 1
+  followGracePeriod: 3
   litBulbColor: {fileID: 2100000, guid: 4be1fb88bf36e44449c02d1d08568494, type: 2}
   unlitBulbColor: {fileID: 2100000, guid: 617021ae713a8214593229571cc2fa4a, type: 2}
-  wanderDistance: 6
-  randomWanderLocations: 5
+  idleAlertRange: 4
+  blindFollowRange: 8
+  visionConeLength: 26
+  visionConeWidth: 60
+  playerLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  obstacleLayer:
+    serializedVersion: 2
+    m_Bits: 1
+  wanderDistance: 10
+  randomWanderLocations: 4
   wander_headTurning: 0
   wanderLookDirection: {x: 0, y: 0, z: 0}
+  preparingAttack: 0
+  attackOccuring: 0
   attackState: neutral
-  aggressionLevel: 0
   canAttack: 0
-  meleeAttackCooldown: 2
-  shockwaveAttackCooldown: 2
-  laserAttackCooldown: 2
+  meleeAttackCooldown: 5
+  shockwaveAttackCooldown: 8
   attackCooldownTimer: 0
-  meleeAttackMaxRange: 0
-  shockwaveAttackMaxRange: 25
-  laserAttackMaxRange: 100
+  longRangeAttackDis: 7
+  shockwaveAttackChance: 73.1
   laser_firePosition: {fileID: 0}
   laser_targetLayers:
     serializedVersion: 2
     m_Bits: 9
   laser_lineRenderer: {fileID: 0}
   laser_endSphere: {fileID: 0}
+  laserAttackCooldown: 12
+  scaredFollowRange: 14
+  scaredAttackTimer: 5
+  circleSpeed: 40
+  circleRadius: 7
+  circlingRange: 8
+  circlingPlayer: 0
   lightAnimator: {fileID: 0}
   testBool: 0
 --- !u!195 &1434463132
@@ -6067,7 +6080,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerTarget: {fileID: 0}
   attackRange: 0
-  followRange: 0
   navMeshAgent: {fileID: 0}
   heldBehavior: {fileID: 0}
   behaviorActive: 1
@@ -7246,7 +7258,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerTarget: {fileID: 0}
   attackRange: 0
-  followRange: 0
   navMeshAgent: {fileID: 0}
   heldBehavior: {fileID: 11400000, guid: 5121a43f96def934084246ff74dd77e3, type: 2}
   behaviorActive: 1
@@ -12479,7 +12490,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerTarget: {fileID: 0}
   attackRange: 0
-  followRange: 0
   navMeshAgent: {fileID: 0}
   heldBehavior: {fileID: 11400000, guid: 5121a43f96def934084246ff74dd77e3, type: 2}
   behaviorActive: 1
@@ -13104,7 +13114,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerTarget: {fileID: 0}
   attackRange: 0
-  followRange: 0
   navMeshAgent: {fileID: 0}
   heldBehavior: {fileID: 11400000, guid: 5121a43f96def934084246ff74dd77e3, type: 2}
   behaviorActive: 1
