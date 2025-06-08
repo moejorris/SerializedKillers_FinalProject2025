@@ -192,7 +192,17 @@ public class EnemyAI_Base : MonoBehaviour
         UpdateHealth();
     }
 
-    public void SelectEnemy()
+    public virtual void ActivateBehavior()
+    {
+        behaviorActive = true;
+    }
+
+    public virtual void DeactivateBehavior()
+    {
+        behaviorActive = false;
+    }
+
+    public virtual void SelectEnemy()
     {
         foreach (GameObject highlightPiece in highlightableMeshes) // highlights the pieces in the array
         {
@@ -203,7 +213,7 @@ public class EnemyAI_Base : MonoBehaviour
         scriptStealMenu.UpdateCenterSlot();
     }
 
-    public void DeselectEnemy()
+    public virtual void DeselectEnemy()
     {
         foreach (GameObject highlightPiece in highlightableMeshes) // unhighlights the pieces in the array
         {

@@ -38,8 +38,8 @@ public class EnemyManager : MonoBehaviour
         {
             if (enemyScript.heldBehavior == behavior)
             {
-                enemyScript.behaviorActive = true;
-                enemyScript.transform.Find("Canvas/Image").GetComponent<Image>().color = Color.white;
+                enemyScript.ActivateBehavior();
+                //enemyScript.transform.Find("Canvas/Image").GetComponent<Image>().color = Color.white;
             }
         }
     }
@@ -51,8 +51,8 @@ public class EnemyManager : MonoBehaviour
         {
             if (enemyScript.heldBehavior == behavior)
             {
-                enemyScript.behaviorActive = false;
-                enemyScript.transform.Find("Canvas/Image").GetComponent<Image>().color = Color.red;
+                enemyScript.DeactivateBehavior();
+                //enemyScript.transform.Find("Canvas/Image").GetComponent<Image>().color = Color.red;
             }
         }
     }

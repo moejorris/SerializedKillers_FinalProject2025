@@ -9,12 +9,16 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
 {
     [Header("Bulb General")]
     public float idleActivateRange;
+    [SerializeField] float scaredFollowRange = 12;
     [SerializeField] private string movementState = "idle";
     private bool healing = false;
     private GameObject bulbHead;
     [SerializeField] private bool headCanTurn = false;
     public float timeBeforeLosingTarget = 3;
     private float followTimer = 0;
+
+    [SerializeField] private Material litBulbColor;
+    [SerializeField] private Material unlitBulbColor;
 
     [Header("Bulb Wandering")]
     [SerializeField] private float wanderDistance = 5;
@@ -39,14 +43,14 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
     [SerializeField] private float laserAttackMaxRange = 6;
 
     [Header("Bulb Laser Attack")]
-    private bool laser_inProgress = false;
     [SerializeField] private Transform laser_firePosition;
+    private bool laser_inProgress = false;
     [SerializeField] private LayerMask laser_targetLayers;
     [SerializeField] private LineRenderer laser_lineRenderer;
     [SerializeField] private GameObject laser_endSphere;
 
     [Header("Bulb Shockwave Attack")]
-    private bool shockwave_inProgress = false;
+    //private bool shockwave_inProgress = false;
     [SerializeField] private Animator shockwaveAnimator => transform.Find("ShockwaveAttack").GetComponent<Animator>();
 
 
@@ -54,8 +58,6 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
     [SerializeField] private Animator lightAnimator;
 
     public bool testBool = false;
-
-
 
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -132,7 +134,7 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
         }
         else if (movementState == "pursue")
         {
-            if (PlayerInFollowRange() || attackState == "laser") // if the enemy is attacking, for instance, it should still target player.
+            if (PlayerInFollowRange() || attackState == "laser" || attackState == "shockwave") // if the enemy is attacking, for instance, it should still target player.
             {
                 navMeshAgent.destination = playerTarget.position;
                 followTimer = 0;
@@ -182,17 +184,20 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
         if (AttackRange() == "melee")
         {
             attackState = "melee";
-            StartCoroutine(MeleeAttack());
+            StopCoroutine("MeleeAttack");
+            StartCoroutine("MeleeAttack");
         }
         else if (AttackRange() == "shockwave")
         {
             attackState = "shockwave";
-            StartCoroutine(ShockwaveAttack());
+            StopCoroutine("ShockwaveAttack");
+            StartCoroutine("ShockwaveAttack");
         }
         else// if (AttackRange() == "laser")
         {
             attackState = "laser";
-            StartCoroutine(LaserAttack());
+            StopCoroutine("LaserAttack");
+            StartCoroutine("LaserAttack");
         }
     }
 
@@ -250,7 +255,7 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
         headCanTurn = false;
 
         shockwaveAnimator.Play("ShockwaveTest");
-        yield return new WaitForSeconds(3.5f);
+        yield return new WaitForSeconds(5f);
 
         navMeshAgent.isStopped = false;
         headCanTurn = true;
@@ -390,7 +395,7 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
 
     public bool PlayerInFollowRange()
     {
-        if (Vector3.Distance(playerTarget.position, transform.position) < followRange)
+        if (Vector3.Distance(playerTarget.position, transform.position) < followRange || (Vector3.Distance(playerTarget.position, transform.position) < scaredFollowRange && !behaviorActive))
         {
             return true;
         }
@@ -440,5 +445,21 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
             //Debug.Log("rotating towards: " + rotation);
             bulbHead.transform.eulerAngles = new Vector3(0, rotation.eulerAngles.y, 0);
         }
+    }
+
+    public override void ActivateBehavior()
+    {
+        base.ActivateBehavior();
+        Material[] newMats = bulbHead.GetComponent<MeshRenderer>().materials;
+        newMats[0] = litBulbColor;
+        bulbHead.GetComponent<MeshRenderer>().materials = newMats;
+    }
+
+    public override void DeactivateBehavior()
+    {
+        base.DeactivateBehavior();
+        Material[] newMats = bulbHead.GetComponent<MeshRenderer>().materials;
+        newMats[0] = unlitBulbColor;
+        bulbHead.GetComponent<MeshRenderer>().materials = newMats;
     }
 }

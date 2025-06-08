@@ -108,7 +108,7 @@ public class ScriptStealMenu : MonoBehaviour
 
         if (menuOpen) // Updates UI when menu is open
         {
-            Debug.Log(Input.mousePosition);
+            //Debug.Log(Input.mousePosition);
             if (leftJoystick.action.ReadValue<Vector2>().x > 0.4f || Input.mousePosition.x > (Screen.width / 3 * 2) - 50) // being held right
             {
                 animator.SetInteger("Slot", 1);
@@ -137,6 +137,20 @@ public class ScriptStealMenu : MonoBehaviour
                 if (selectedBehaviorSlot != null)
                 {
                     ApplyBehaviorSelection();
+                }
+                else
+                {
+                    // error button or something lol
+                }
+            }
+
+            if (westButton.action.WasPerformedThisFrame() || Input.GetKeyDown(KeyCode.Q))
+            {
+                Debug.Log("Button X pressed");
+                if (selectedBehaviorSlot != null)
+                {
+                    Debug.Log("Thing in slot");
+                    RemoveBehaviorSelection();
                 }
                 else
                 {
@@ -200,6 +214,23 @@ public class ScriptStealMenu : MonoBehaviour
         Time.timeScale = slowTime;
     }
 
+    public void RemoveBehaviorSelection()
+    {
+        Debug.Log("RemoveBehaviorSelection called");
+        if (selectedBehaviorSlot.heldBehavior != null)
+        {
+            Debug.Log("Removed Behavior");
+            enemyManager.ActivateBehavior(selectedBehaviorSlot.heldBehavior);
+
+            selectedBehaviorSlot.RemoveBehavior();
+
+            hud_combatSlot.heldBehavior = combatSlot.heldBehavior;
+            hud_combatSlot.UpdateSlot();
+            hud_movementSlot.heldBehavior = movementSlot.heldBehavior;
+            hud_movementSlot.UpdateSlot();
+        }
+    }
+
     public void ApplyBehaviorSelection()
     {
         if (centerSlot.heldBehavior != null && selectedBehaviorSlot != null)
@@ -248,7 +279,8 @@ public class ScriptStealMenu : MonoBehaviour
         {
             //Debug.Log("Center slot held behavior = null");
             movementSlot.UpdateSlot();
-            selectedBehaviorSlot = null;
+            selectedBehaviorSlot = movementSlot; // ADDED TEMP
+            //selectedBehaviorSlot = null;
         }
     }
 
@@ -263,7 +295,8 @@ public class ScriptStealMenu : MonoBehaviour
         else
         {
             combatSlot.UpdateSlot();
-            selectedBehaviorSlot = null;
+            selectedBehaviorSlot = combatSlot;
+            //selectedBehaviorSlot = null;
         }
     }
 
