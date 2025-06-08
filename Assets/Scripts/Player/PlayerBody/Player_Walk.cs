@@ -18,7 +18,11 @@ public class Player_Walk : MonoBehaviour, IPlayerMover
         _walkVelocity = Vector3.zero;
     }
 
-    void OnDisable() => _machine.RemoveMover(this); //remove itself from the movement machine when no longer active!
+    void OnDisable() 
+    {
+        _machine.RemoveMover(this); //remove itself from the movement machine when no longer active!
+        _walkVelocity = Vector3.zero;
+    }
 
     public Vector3 UpdateForce()
     {
@@ -38,9 +42,9 @@ public class Player_Walk : MonoBehaviour, IPlayerMover
         if (enabled)
         {
             //Speed Change
-            float walkLerpValue = Mathf.Clamp(speedUpCurve.Evaluate(GetNormalizedSpeed()), 0.2f, 1f);
-            newWalkSpeed = Vector3.Slerp(currentWalkVector, moveDir * speed, walkLerpValue * _machine.DeltaTime * lerpSpeed).magnitude;
-            if (newWalkSpeed < 0.1f) newWalkSpeed = 0;
+            float walkCurveValue = Mathf.Clamp(speedUpCurve.Evaluate(GetNormalizedSpeed()), 0.1f, 1f);
+            newWalkSpeed = Vector3.Slerp(currentWalkVector, moveDir * speed, walkCurveValue * _machine.DeltaTime * lerpSpeed).magnitude;
+            if (newWalkSpeed < 0.05f) newWalkSpeed = 0;
         }
 
         //Velocity Vector Change
