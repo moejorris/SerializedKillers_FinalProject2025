@@ -51,7 +51,6 @@ public class Player_ForceHandler : MonoBehaviour, IPlayerMover
     public Vector3 UpdateForce()
     {
         float useDrag = _machine.isGrounded ? groundedDrag : airDrag;
-        Debug.Log("Updating Force");
         if (forceCurrent.magnitude > 0.05f) forceCurrent = Vector3.Lerp(forceCurrent, Vector3.zero, useDrag * _machine.DeltaTime);
         else forceCurrent = Vector3.zero;
 
