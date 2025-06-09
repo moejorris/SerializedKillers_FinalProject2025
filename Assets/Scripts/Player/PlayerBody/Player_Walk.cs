@@ -44,7 +44,8 @@ public class Player_Walk : MonoBehaviour, IPlayerMover
             //Speed Change
             float walkCurveValue = Mathf.Clamp(speedUpCurve.Evaluate(GetNormalizedSpeed()), 0.1f, 1f);
             newWalkSpeed = Vector3.Slerp(currentWalkVector, moveDir * speed, walkCurveValue * _machine.DeltaTime * lerpSpeed).magnitude;
-            if (newWalkSpeed < 0.05f) newWalkSpeed = 0;
+            if (newWalkSpeed < 0.1f) return Vector3.zero;
+
         }
 
         //Velocity Vector Change

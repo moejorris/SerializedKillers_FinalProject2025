@@ -1,4 +1,6 @@
+using System;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class Player_Gravity : MonoBehaviour, IPlayerMover
 {
@@ -11,6 +13,14 @@ public class Player_Gravity : MonoBehaviour, IPlayerMover
     bool _groundedPreviousFrame; //if the character controller was grounded in the previous frame relative to this script;
 
     public float GravityAcceleration { get => acceleration * gravityScale; }
+
+    public Action PlayerJustLanded;
+
+    void Awake()
+    {
+
+    }
+
     void OnEnable()
     {
         _machine.AddMover(this); //Add itself to the movement machine!
@@ -23,6 +33,7 @@ public class Player_Gravity : MonoBehaviour, IPlayerMover
         if (JustLanded()) //if the player just landed
         {
             Debug.Log("JustLanded");
+            PlayerJustLanded();
             _currentGravity = gravityOnGround;
         }
         else if (JustLeftGround()) //if the player just left the ground
@@ -42,8 +53,11 @@ public class Player_Gravity : MonoBehaviour, IPlayerMover
 
     //Better Named Shortcuts
     //Consider making these public for animator use?
-    bool JustLanded() => _machine.isGrounded && !_groundedPreviousFrame;
-    bool JustLeftGround() => !_machine.isGrounded && _groundedPreviousFrame;
+    public bool JustLanded()
+    {
+        return _machine.isGrounded && !_groundedPreviousFrame;
+    } 
+    public bool JustLeftGround() => !_machine.isGrounded && _groundedPreviousFrame;
 
     //External Function Calls
     public void AddVerticalForce(float y)
