@@ -49,27 +49,22 @@ public class Player_CombatMachine : MonoBehaviour
 
         PlayerAttackSO attack = defaultAttacks[currentComboID];
 
-        //AnimatorOverrideController override = GetCurrentState.Tag == 1 ? animatorOverride1 : animatorOverride2;
-        //use override for new controller
-        //override.animation = attack.animation
-
-
         animatorOverride["AttackPlaceholder" + currentAnim] = attack.animation;
         animator.runtimeAnimatorController = animatorOverride;
 
-
-        // animator.SetTrigger("Attack");
         animator.CrossFade("Attack"+currentAnim, 0.1f);
+
+        float animationLength = attack.animation.length; // find a way to get the speed of the state and divide the length by that...
 
         if (attack.usesRootMotion)
         {
             GetComponent<Player_MovementMachine>().DisableAllMovers(GetComponent<Player_RootMotion>());
             CancelInvoke("ReEnableMovers");
-            Invoke("ReEnableMovers", attack.animation.length * (currentComboID == defaultAttacks.Count -1 ? 0.9f :0.7f));
+            Invoke("ReEnableMovers", animationLength * 0.9f);
         }
 
         CancelInvoke("ResetCombo");
-        Invoke("ResetCombo", comboResetTime + attack.animation.length);
+        Invoke("ResetCombo", comboResetTime + animationLength);
 
         GetNextAttack();
     }
