@@ -48,6 +48,11 @@ public class ScriptStealMenu : MonoBehaviour
 
     [SerializeField] private EnemyManager enemyManager;
 
+    public Material swordMaterial;
+    public Material electricMaterial;
+    public MeshRenderer sword;
+    public GameObject particles;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -175,10 +180,10 @@ public class ScriptStealMenu : MonoBehaviour
         }
         else
         {
-            if (westButton.action.WasPerformedThisFrame())
+            if (westButton.action.WasPerformedThisFrame() || Input.GetMouseButtonDown(0))
             {
                 
-                RaycastHit[] hits = Physics.RaycastAll(player.transform.parent.position, player.transform.forward, attackDistance);
+                RaycastHit[] hits = Physics.RaycastAll(player.transform.position, player.transform.forward, attackDistance);
                 foreach (RaycastHit hit in hits)
                 {
                     if (hit.transform.gameObject.layer != 7) // temp issue due to rigidbody making parent take the collider stuff and not child?
@@ -229,6 +234,24 @@ public class ScriptStealMenu : MonoBehaviour
             hud_movementSlot.heldBehavior = movementSlot.heldBehavior;
             hud_movementSlot.UpdateSlot();
         }
+
+        if (combatSlot.heldBehavior != null)
+        {
+            sword.material = electricMaterial;
+        }
+        else
+        {
+            sword.material = swordMaterial;
+        }
+
+        if (movementSlot.heldBehavior != null)
+        {
+            particles.SetActive(true);
+        }
+        else
+        {
+            particles.SetActive(false);
+        }
     }
 
     public void ApplyBehaviorSelection()
@@ -258,6 +281,24 @@ public class ScriptStealMenu : MonoBehaviour
             selectedEnemy.DeselectEnemy();
             menuPanel.SetActive(false);
             menuOpen = false;
+        }
+
+        if (combatSlot.heldBehavior != null)
+        {
+            sword.material = electricMaterial;
+        }
+        else
+        {
+            sword.material = swordMaterial;
+        }
+
+        if (movementSlot.heldBehavior != null)
+        {
+            particles.SetActive(true);
+        }
+        else
+        {
+            particles.SetActive(false);
         }
 
         hud_combatSlot.heldBehavior = combatSlot.heldBehavior;

@@ -422,11 +422,12 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
         navMeshAgent.isStopped = false;
         headCanTurn = true;
         attackState = "neutral";
-        shockwaveAnimator.Play("Inactive"); // delete maybe?
+        shockwaveAnimator.Play("ShockwaveTest2"); // delete maybe?
         navMeshAgent.speed = 3;
         navMeshAgent.stoppingDistance = 3.5f;
         preparingAttack = false;
         attackOccuring = false;
+        StopCoroutine("ShockwaveAttack");
     }
 
     IEnumerator ShockwaveAttack()
@@ -461,6 +462,7 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
         laser_lineRenderer.gameObject.SetActive(false);
         laser_endSphere.SetActive(false);
         transform.Find("Head/Capsule").gameObject.SetActive(false);
+        StopCoroutine("LaserAttack");
     }
 
     IEnumerator LaserAttack()
@@ -672,8 +674,6 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
 
     public override void ActivateBehavior()
     {
-        ExitLaserAttack();
-        ExitShockwaveAttack();
         base.ActivateBehavior();
         Material[] newMats = bulbHead.GetComponent<MeshRenderer>().materials;
         newMats[0] = litBulbColor;
@@ -682,6 +682,8 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
 
     public override void DeactivateBehavior()
     {
+        ExitLaserAttack();
+        ExitShockwaveAttack();
         base.DeactivateBehavior();
         Material[] newMats = bulbHead.GetComponent<MeshRenderer>().materials;
         newMats[0] = unlitBulbColor;
