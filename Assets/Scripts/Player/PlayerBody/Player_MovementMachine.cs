@@ -3,9 +3,15 @@ using UnityEngine;
 
 public class Player_MovementMachine : MonoBehaviour
 {
+
+    [Header("Parameters")]
+    CharacterController controller => GetComponent<CharacterController>();
     [SerializeField] TimeStep timeStep = TimeStep.Update;
-    [SerializeField] List<IPlayerMover> activeMovers = new List<IPlayerMover>();
-    [SerializeField] CharacterController controller;
+
+    enum GroundCheckMethod { Raycast, CapsuleCast, SphereCast}
+    [SerializeField] GroundCheckMethod groundCheckMethod = GroundCheckMethod.Raycast;
+
+    List<IPlayerMover> activeMovers = new List<IPlayerMover>();
     Vector3 _forwardDirection;
     RaycastHit _groundInfo;
     bool _grounded;
@@ -20,7 +26,6 @@ public class Player_MovementMachine : MonoBehaviour
     public Vector3 CurrentMotion;
 
     //Functions
-    void Awake() => controller = GetComponent<CharacterController>();
 
     void Start() => _forwardDirection = transform.forward;
 
@@ -41,21 +46,21 @@ public class Player_MovementMachine : MonoBehaviour
             {
                 if (((MonoBehaviour)mover).enabled)
                 {
-                    movementToMake += mover.UpdateForce();
+                    Vector3 forceToAdd = mover.UpdateForce();
+
+                    if (forceToAdd.magnitude > 0.05f)
+                    {
+                        movementToMake += forceToAdd;                        
+
+                    }
                 }
             }
         }
         else return;
 
         controller.Move(movementToMake * currentDeltaTime());
-        CurrentMotion = movementToMake;        
+        CurrentMotion = movementToMake;
     }
-
-    void OnGUI()
-    {
-        GUI.Label(new Rect(25, 25, 100, 20), CurrentMotion.ToString());
-    }
-
 
     //External Functions
     public void AddMover(IPlayerMover mover)
@@ -103,6 +108,54 @@ public class Player_MovementMachine : MonoBehaviour
     //Private Functions
     void GroundCheck()
     {
-        _grounded = Physics.Raycast(transform.position, Vector3.down, out _groundInfo, 0.15f + controller.height / 2f, ~0, QueryTriggerInteraction.Ignore);
+        switch (groundCheckMethod)
+        {
+            case GroundCheckMethod.Raycast:
+                _grounded = Physics.Raycast(transform.position, Vector3.down, out _groundInfo, 0.15f + controller.height / 2f, ~0, QueryTriggerInteraction.Ignore);
+                break;
+
+            case GroundCheckMethod.CapsuleCast:
+
+                Vector3 heightDiff = Vector3.up * controller.height / 2f;
+                Vector3 mod = controller.height * 0.95f * Vector3.up;
+
+                _grounded = Physics.CapsuleCast
+                (
+                    transform.position - heightDiff + mod,
+                    transform.position + heightDiff + mod,
+                    controller.radius,
+                    -Vector3.up,
+                    out _groundInfo,
+                    controller.height,
+                    ~0,
+                    QueryTriggerInteraction.Ignore
+                );
+
+                break;
+
+            case GroundCheckMethod.SphereCast:
+
+                _grounded = Physics.SphereCast(transform.position, controller.radius, Vector3.down, out _groundInfo, controller.height / 2f, ~0, QueryTriggerInteraction.Ignore);
+
+                break;
+
+        }
+    }
+
+    void OnDrawGizmos()
+    {
+        if(groundCheckMethod == GroundCheckMethod.SphereCast)
+        {
+            if (_groundInfo.point != Vector3.zero)
+            {
+                Gizmos.color = Color.red;
+                Gizmos.DrawWireSphere(_groundInfo.point, controller.radius);
+            }
+            else
+            {
+                Gizmos.color = (Color.red + Color.white) / 2f;
+                Gizmos.DrawWireSphere(transform.position - Vector3.up * controller.height / 2f, controller.radius);
+            }
+        }
     }
 }
