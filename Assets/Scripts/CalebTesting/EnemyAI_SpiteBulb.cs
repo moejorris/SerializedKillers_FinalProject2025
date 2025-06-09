@@ -1,4 +1,5 @@
 using System.Collections;
+using Unity.AI.Navigation;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.Splines.Interpolators;
@@ -65,6 +66,11 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
     [Header("Bulb Scared Behavior")]
     [SerializeField] private float scaredFollowRange = 15f;
     [SerializeField] private float scaredAttackTimer = 2f;
+    [SerializeField] private float teleportTimer = 8f;
+    [SerializeField] private float teleportRange = 10f;
+    [SerializeField] private float teleportExplosionDamage = 3f;
+    [SerializeField] private GameObject teleportExplosion;
+    [SerializeField] private GameObject teleportLocationIndicator;
 
     [Header("Bulb Circling")]
     [SerializeField] private float circleSpeed = 10;
@@ -112,7 +118,7 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
                     headCanTurn = true;
                     healing = false;
                     StopCoroutine("HealTimer");
-                    movementState = "pursue";
+                    movementState = "wandering";
                 }
 
                 SetHeadTarget(transform.forward, 5);
@@ -133,6 +139,7 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
                     if (!wandering) // hasn't started the wander timer coroutine
                     {
                         wandering = true;
+                        StopCoroutine("WanderTimer");
                         StartCoroutine("WanderTimer");
                     }
                     else
@@ -198,6 +205,16 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
                 else
                 {
                     movementState = "wandering";
+                }
+            }
+
+            if (!behaviorActive)
+            {
+                teleportTimer -= Time.deltaTime;
+                if (teleportTimer <= 0)
+                {
+                    teleportTimer = Random.Range(8f, 16f);
+                    StartCoroutine("RandomTeleport");
                 }
             }
         }
@@ -321,6 +338,39 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
         }
     }
 
+    IEnumerator RandomTeleport()
+    {
+        bool teleportSpotFound = false;
+        Vector3 teleportPosition = transform.position;
+        int failureAttempts = 0;
+        while (!teleportSpotFound)
+        {
+            failureAttempts++;
+            Debug.Log("Attempt Number " + failureAttempts + "!");
+            teleportPosition = new Vector3(Random.Range(-teleportRange, teleportRange), Random.Range(-teleportRange, teleportRange), Random.Range(-teleportRange, teleportRange));
+            NavMeshHit hit;
+            if (NavMesh.FindClosestEdge(teleportPosition, out hit, NavMesh.AllAreas))
+            {
+                Debug.Log("HIT FOUND!");
+                teleportPosition = hit.position;
+                teleportSpotFound = true;
+            }
+            if (failureAttempts == 10)
+            {
+                Debug.Log("FAILURE!");
+                teleportSpotFound = true;
+            }
+        }
+
+        Instantiate(teleportLocationIndicator, teleportPosition, Quaternion.identity);
+        yield return new WaitForSeconds(3);
+
+        //navMeshAgent.updatePosition = false;
+        transform.position = teleportPosition;
+        //navMeshAgent.updatePosition = true;
+        teleportExplosion.SetActive(true);
+    }
+
     public void CirclePlayer()
     {
         currentAngle += circleSpeed * Time.deltaTime;
@@ -381,7 +431,7 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
     {
         gapCloseTimer = 3;
         attackState = "melee";
-        navMeshAgent.stoppingDistance = 1.3f;
+        navMeshAgent.stoppingDistance = 2f;
         navMeshAgent.speed = 6f;
     }
 
@@ -412,7 +462,7 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
     {
         gapCloseTimer = 1.3f;
         attackState = "shockwave";
-        navMeshAgent.stoppingDistance = 1.3f;
+        navMeshAgent.stoppingDistance = 2f;
         navMeshAgent.speed = 6f;
     }
 
@@ -534,49 +584,96 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
 
         randomWanderLocations = Random.Range(2, 4);
 
-        for (int i = 0; i < randomWanderLocations; i++)
+        if (behaviorActive)
         {
-            Vector3 potentialLocation = Vector3.zero;
-            bool walkable = false;
-
-            while (!walkable)
+            for (int i = 0; i < randomWanderLocations; i++)
             {
-                potentialLocation = new Vector3(wanderHome.x + Random.Range(-wanderDistance, wanderDistance), wanderHome.y, wanderHome.z + Random.Range(-wanderDistance, wanderDistance));
-                NavMeshPath path = new NavMeshPath();
-                navMeshAgent.CalculatePath(potentialLocation, path);
-                if (path.status == NavMeshPathStatus.PathComplete) // cycles through this to check if the location is actually viable
+                Vector3 potentialLocation = Vector3.zero;
+                bool walkable = false;
+
+                while (!walkable)
                 {
-                    //Debug.Log("New path made. It's location is: " + potentialLocation + " and it can path there :)");
-                    walkable = true;
+                    potentialLocation = new Vector3(wanderHome.x + Random.Range(-wanderDistance, wanderDistance), wanderHome.y, wanderHome.z + Random.Range(-wanderDistance, wanderDistance));
+                    NavMeshPath path = new NavMeshPath();
+                    navMeshAgent.CalculatePath(potentialLocation, path);
+                    if (path.status == NavMeshPathStatus.PathComplete) // cycles through this to check if the location is actually viable
+                    {
+                        //Debug.Log("New path made. It's location is: " + potentialLocation + " and it can path there :)");
+                        walkable = true;
+                    }
+                    else
+                    {
+                        //Debug.Log("New path made. It's location is: " + potentialLocation + " and it cannot path there :(");
+                    }
                 }
-                else
+
+                navMeshAgent.isStopped = false;
+                navMeshAgent.destination = potentialLocation; // picks spot to walk to
+
+                float stopDistance = navMeshAgent.stoppingDistance;
+                navMeshAgent.stoppingDistance = 0.1f;
+                yield return new WaitUntil(() => navMeshAgent.remainingDistance < navMeshAgent.stoppingDistance + 0.1f); // wait until they get close
+                navMeshAgent.stoppingDistance = stopDistance;
+
+
+                wander_headTurning = true; // causes the actual rotation of the head to begin (found in update)
+
+                for (int _i = 0; _i < 5; _i++) // does head turn thingy 3 times :)
                 {
-                    //Debug.Log("New path made. It's location is: " + potentialLocation + " and it cannot path there :(");
+                    Vector3 lookLocation = new Vector3(transform.position.x + Random.Range(-wanderDistance, wanderDistance), transform.position.y, transform.position.z + Random.Range(-wanderDistance, wanderDistance));
+                    wanderLookDirection = lookLocation;
+                    yield return new WaitForSeconds(1);
                 }
+
+                wander_headTurning = false;
             }
-
-            navMeshAgent.isStopped = false;
-            navMeshAgent.destination = potentialLocation; // picks spot to walk to
-
-            float stopDistance = navMeshAgent.stoppingDistance;
-            navMeshAgent.stoppingDistance = 0.1f;
-            yield return new WaitUntil(() => navMeshAgent.remainingDistance < navMeshAgent.stoppingDistance + 0.1f); // wait until they get close
-            navMeshAgent.stoppingDistance = stopDistance;
-
-
-            wander_headTurning = true; // causes the actual rotation of the head to begin (found in update)
-
-            for (int _i = 0; _i < 5; _i++) // does head turn thingy 3 times :)
+        }
+        else
+        {
+            while(!behaviorActive)
             {
-                Vector3 lookLocation = new Vector3(wanderHome.x + Random.Range(-wanderDistance, wanderDistance), wanderHome.y, wanderHome.z + Random.Range(-wanderDistance, wanderDistance));
-                wanderLookDirection = lookLocation;
-                yield return new WaitForSeconds(1);
-            }
+                Vector3 potentialLocation = Vector3.zero;
+                bool walkable = false;
 
-            wander_headTurning = false;
+                while (!walkable)
+                {
+                    potentialLocation = new Vector3(transform.position.x + Random.Range(-wanderDistance*2, wanderDistance*2), transform.position.y, transform.position.z + Random.Range(-wanderDistance*2, wanderDistance*2));
+                    NavMeshPath path = new NavMeshPath();
+                    navMeshAgent.CalculatePath(potentialLocation, path);
+                    if (path.status == NavMeshPathStatus.PathComplete) // cycles through this to check if the location is actually viable
+                    {
+                        //Debug.Log("New path made. It's location is: " + potentialLocation + " and it can path there :)");
+                        walkable = true;
+                    }
+                    else
+                    {
+                        //Debug.Log("New path made. It's location is: " + potentialLocation + " and it cannot path there :(");
+                    }
+                }
+
+                navMeshAgent.isStopped = false;
+                navMeshAgent.destination = potentialLocation; // picks spot to walk to
+
+                float stopDistance = navMeshAgent.stoppingDistance;
+                navMeshAgent.stoppingDistance = 0.1f;
+                yield return new WaitUntil(() => navMeshAgent.remainingDistance < navMeshAgent.stoppingDistance + 0.1f); // wait until they get close
+                navMeshAgent.stoppingDistance = stopDistance;
+
+
+                wander_headTurning = true; // causes the actual rotation of the head to begin (found in update)
+
+                for (int _i = 0; _i < 2; _i++) // does head turn thingy 3 times :)
+                {
+                    Vector3 lookLocation = new Vector3(transform.position.x + Random.Range(-wanderDistance, wanderDistance), transform.position.y, transform.position.z + Random.Range(-wanderDistance, wanderDistance));
+                    wanderLookDirection = lookLocation;
+                    yield return new WaitForSeconds(1);
+                }
+
+                wander_headTurning = false;
+            }
         }
 
-        yield return new WaitForSeconds(1); // little buffer at the end
+            yield return new WaitForSeconds(1); // little buffer at the end
 
         movementState = "idle"; // returns to idle
     }
@@ -622,20 +719,15 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
         }
         else if (Vector3.Distance(playerTarget.position, transform.position) <= visionConeLength) // at least within sight range
         {
-            Debug.Log("Player in cone length");
-
-            if (Physics.Raycast(transform.position, transform.position - playerTarget.transform.position, out RaycastHit rayHit, (Vector3.Distance(playerTarget.position, transform.position) - 3), obstacleLayer)) // checks if player behind things?
+            if (Physics.Raycast(laser_firePosition.position, playerTarget.transform.position - laser_firePosition.position, out RaycastHit rayHit, (Vector3.Distance(playerTarget.position, transform.position) - 3), obstacleLayer)) // checks if player behind things?
             {
-                Debug.Log("Ray hit a thing");
                 return false;
             }
             else
             {
                 Vector3 directionToTarget = (playerTarget.position - transform.position).normalized;
-                Debug.Log(Vector3.Angle(bulbHead.transform.forward, directionToTarget));
                 if (Vector3.Angle(bulbHead.transform.forward, directionToTarget) < visionConeWidth / 2)
                 {
-                    Debug.Log("PLAYER SEEN");
                     return true;
                 }
                 else

@@ -50,8 +50,8 @@ public class ScriptStealMenu : MonoBehaviour
 
     public Material swordMaterial;
     public Material electricMaterial;
-    public MeshRenderer sword;
-    public GameObject particles;
+    //public MeshRenderer sword;
+    //public GameObject particles;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -235,23 +235,23 @@ public class ScriptStealMenu : MonoBehaviour
             hud_movementSlot.UpdateSlot();
         }
 
-        if (combatSlot.heldBehavior != null)
-        {
-            sword.material = electricMaterial;
-        }
-        else
-        {
-            sword.material = swordMaterial;
-        }
+        //if (combatSlot.heldBehavior != null)
+        //{
+        //    sword.material = electricMaterial;
+        //}
+        //else
+        //{
+        //    sword.material = swordMaterial;
+        //}
 
-        if (movementSlot.heldBehavior != null)
-        {
-            particles.SetActive(true);
-        }
-        else
-        {
-            particles.SetActive(false);
-        }
+        //if (movementSlot.heldBehavior != null)
+        //{
+        //    particles.SetActive(true);
+        //}
+        //else
+        //{
+        //    particles.SetActive(false);
+        //}
     }
 
     public void ApplyBehaviorSelection()
@@ -283,23 +283,23 @@ public class ScriptStealMenu : MonoBehaviour
             menuOpen = false;
         }
 
-        if (combatSlot.heldBehavior != null)
-        {
-            sword.material = electricMaterial;
-        }
-        else
-        {
-            sword.material = swordMaterial;
-        }
+        //if (combatSlot.heldBehavior != null)
+        //{
+        //    sword.material = electricMaterial;
+        //}
+        //else
+        //{
+        //    sword.material = swordMaterial;
+        //}
 
-        if (movementSlot.heldBehavior != null)
-        {
-            particles.SetActive(true);
-        }
-        else
-        {
-            particles.SetActive(false);
-        }
+        //if (movementSlot.heldBehavior != null)
+        //{
+        //    particles.SetActive(true);
+        //}
+        //else
+        //{
+        //    particles.SetActive(false);
+        //}
 
         hud_combatSlot.heldBehavior = combatSlot.heldBehavior;
         hud_combatSlot.UpdateSlot();
