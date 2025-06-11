@@ -3,10 +3,13 @@ using UnityEngine;
 
 public class HitBoxGenerator : MonoBehaviour
 {
+    [SerializeField] bool showHitboxes = false;
     [SerializeField] List<SO_Hitbox> hitboxes = new();
 
     void OnDrawGizmos()
     {
+        if (!showHitboxes) return;
+
         foreach (SO_Hitbox hitbox in hitboxes)
         {
             Gizmos.color = hitbox.gizmoColor;

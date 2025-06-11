@@ -154,6 +154,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9686ebbbd90bb3e4195f26165ee32fd0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  showHitboxes: 0
   hitboxes:
   - {fileID: 11400000, guid: 3bd92e27ab4434744a49730eef305da8, type: 2}
 --- !u!1 &163141624993204816
