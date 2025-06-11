@@ -10,7 +10,7 @@ public class ScriptStealMenu : MonoBehaviour
     public InputActionReference westButton; // Pressing X
     public PlayerInput playerInput;
 
-    public GameObject player;
+    public GameObject player => GameObject.FindGameObjectWithTag("Player").transform.Find("PlayerController/Test_Bryson").gameObject;
     public float attackDistance;
 
     //public InputAction action;
@@ -46,7 +46,7 @@ public class ScriptStealMenu : MonoBehaviour
     //public Behavior targetedBehavior;
     [SerializeField] private Sprite emptySprite;
 
-    [SerializeField] private EnemyManager enemyManager;
+    [SerializeField] private EnemyManager enemyManager => GameObject.FindGameObjectWithTag("EnemyManager").GetComponent<EnemyManager>();
 
     public Material swordMaterial;
     public Material electricMaterial;

@@ -28,7 +28,7 @@ public class EnemyAI_Base : MonoBehaviour
     public Behavior heldBehavior;
     public bool behaviorActive = true;
     private bool delayedExit = false;
-    [SerializeField] private ScriptStealMenu scriptStealMenu;
+    [SerializeField] private ScriptStealMenu scriptStealMenu => GameObject.FindGameObjectWithTag("Canvas").transform.Find("ScriptStealMenu").GetComponent<ScriptStealMenu>();
 
     [Header("Health")]
     private RectTransform healthBar;
