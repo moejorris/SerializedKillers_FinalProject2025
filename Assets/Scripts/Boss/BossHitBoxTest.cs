@@ -12,4 +12,12 @@ public class BossHitBoxTest : MonoBehaviour
             Debug.Log("Player hit by attack! Applying damage: " + damage); // Log the hit and damage
         }
     }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Player")) // Check if the collided object is the player
+        {
+            Debug.Log("Player collided with attack! Applying damage: " + damage); // Log the collision and damage
+        }
+    }
 }

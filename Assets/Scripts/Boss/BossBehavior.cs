@@ -8,7 +8,7 @@ using System.Collections.Generic;
 // 4. Begin implementing makeing the boss fight on its own
 // All of this should be completed before the end of the week, so we can start working more on fine tuning the boss fight and adding more features to it.
 
-public enum  ElementalState{ None, Fire, Electric, Water, Rock } // Enum to represent the elemental states of the boss
+public enum  ElementalState{ None, Fire, Electric, Water } // Enum to represent the elemental states of the boss
 public class BossBehavior : MonoBehaviour
 {
     #region Unity Inspector Variables
@@ -81,7 +81,7 @@ public class BossBehavior : MonoBehaviour
         }
 
         // Initialize availableStates with all elements except None
-        availableStates = new List<ElementalState> { ElementalState.Fire, ElementalState.Electric, ElementalState.Water, ElementalState.Rock };
+        availableStates = new List<ElementalState> { ElementalState.Fire, ElementalState.Electric, ElementalState.Water};
         unusedStates = new List<ElementalState>(availableStates); // Initialize unusedStates with all available states
     }
 
@@ -104,12 +104,7 @@ public class BossBehavior : MonoBehaviour
             }
             if (Input.GetKeyDown(KeyCode.P))
             {
-                Debug.Log("The boss's current state is: " + currentState); // Log the current state of the boss
-                if (currentState == ElementalState.None)
-                {
-                    Debug.LogWarning("The boss is in None state! Please change the elemental state before spawning projectiles.");
-                    return; // Exit if the boss is in None state
-                }
+                anim.SetTrigger("Swing"); // Trigger the "Swing" Animation
             }
         }
     }
@@ -170,26 +165,28 @@ public class BossBehavior : MonoBehaviour
         keyboardRenderer.material.color = Color.blue; // Change the keyboard color to blue for water state
     }
 
-    #endregion
-    #region Rock Attack Methods
+    void SpawnWaveCrash()
+    {
+        if (projectilePrefabs.Length > 0 && player != null)
+        {
+            // Spawn the wave crash projectile at a random position around the player but facing towards the player
+            GameObject wave = Instantiate(projectilePrefabs[3], new Vector3(player.position.x + Random.Range(-15f, 15f), 1, player.position.z + Random.Range(-15f, 15f)), Quaternion.identity);
 
-    void ChangeToRock()
-    {
-        currentState = ElementalState.Rock; // Set the current state to rock
-        Debug.Log("Boss changed to Rock state!"); // Log the change to rock state
-        keyboardRenderer.material.color = Color.green; // Change the keyboard color to green for rock state
-    }
-    void SpawnRockProjectile()
-    {
-            if (projectilePrefabs.Length != 0 && player != null)
+            // Make the wave face the player
+            if (wave != null)
             {
-                Instantiate(projectilePrefabs[0], new Vector3(player.position.x, transform.position.y + 15, player.position.z), Quaternion.identity); // Spawn the projectile above the player
+                Vector3 direction = (player.position - wave.transform.position).normalized;
+                direction.y = 0; // Keep the wave upright (no tilt)
+                if (direction != Vector3.zero)
+                {
+                    wave.transform.rotation = Quaternion.LookRotation(direction);
+                }
             }
-            else
-            {
-                Debug.LogError("Projectile prefab or player reference is missing!"); // Log an error if the prefab or player is not set
-            }
+        }
     }
+
+
+
     #endregion
     void TeleportBoss()
     {
@@ -239,10 +236,7 @@ public class BossBehavior : MonoBehaviour
                     SpawnThunderbolt(); // Call the method to spawn a thunderbolt
                     break;
                 case ElementalState.Water:
-                    // SpawnWaterProjectile(); // Call the method to spawn a water projectile
-                    break;
-                case ElementalState.Rock:
-                    SpawnRockProjectile(); // Call the method to spawn a rock projectile
+                    SpawnWaveCrash(); // Call the method to spawn a water projectile
                     break;
             }
         }
@@ -285,10 +279,6 @@ public class BossBehavior : MonoBehaviour
                 ChangeToWater(); // Call the method to change to water state
                 Debug.Log("Boss changed to Water state!"); // Log the change to water state
                 break;
-            case ElementalState.Rock:
-                ChangeToRock(); // Call the method to change to rock state
-                Debug.Log("Boss changed to Rock state!"); // Log the change to rock state
-                break;
             default:
                 Debug.LogWarning("No elemental state set!"); // Log a warning if no elemental state is set
                 break;
@@ -304,7 +294,7 @@ public class BossBehavior : MonoBehaviour
         // If all states have been used, reset the list (excluding the current state)
         if (unusedStates.Count == 0)
         {
-            unusedStates = new List<ElementalState> { ElementalState.Fire, ElementalState.Electric, ElementalState.Water, ElementalState.Rock };
+            unusedStates = new List<ElementalState> { ElementalState.Fire, ElementalState.Electric, ElementalState.Water};
             unusedStates.Remove(currentState);
         }
 
