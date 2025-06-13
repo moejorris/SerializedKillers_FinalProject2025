@@ -18,7 +18,7 @@ public class Player_MovementMachine : MonoBehaviour
     enum TimeStep { Update, FixedUpdate }
 
     //Public Getters
-    public Vector3 ForwardDirection { get => _forwardDirection; }
+    public Vector3 ForwardDirection { get => _forwardDirection.normalized; }
     public RaycastHit GroundInformation { get => _groundInfo; }
     public float DeltaTime { get => currentDeltaTime(); }
     public bool isGrounded { get => _grounded; }

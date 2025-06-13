@@ -167,6 +167,7 @@ public class EnemyAI_Base : MonoBehaviour
 
     public void UpdateHealth()
     {
+        if (!healthBar) return;
         Vector3 scale = healthBar.localScale;
         scale.x = (health / maxHealth);
         healthBar.localScale = scale;
