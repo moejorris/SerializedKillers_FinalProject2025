@@ -10,7 +10,7 @@ public class ScriptStealMenu : MonoBehaviour
     public InputActionReference westButton; // Pressing X
     public PlayerInput playerInput;
 
-    public GameObject player => GameObject.FindGameObjectWithTag("Player").transform.Find("PlayerController/Test_Bryson").gameObject;
+    public GameObject player;
     public float attackDistance;
 
     //public InputAction action;
