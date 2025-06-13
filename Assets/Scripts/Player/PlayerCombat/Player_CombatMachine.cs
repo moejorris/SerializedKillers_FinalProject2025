@@ -7,6 +7,8 @@ using UnityEngine.InputSystem;
 
 public class Player_CombatMachine : MonoBehaviour
 {
+    Player_MovementMachine _machine => GetComponent<Player_MovementMachine>();
+    Player_RootMotion _rootMotion => GetComponent<Player_RootMotion>();
     [SerializeField] AnimatorOverrideController animatorOverride;
     int currentAnim = 1;
 
@@ -18,8 +20,16 @@ public class Player_CombatMachine : MonoBehaviour
 
     [SerializeField] InputActionReference attackInput;
 
+
+    [Header("Damage Collision")]
+    [SerializeField] float distanceForwards = 1f;
+    [SerializeField] float checkRadius = 1f;
+
     bool isAttacking = false;
     bool attackQueued = false;
+
+    [Header("Cosmetic")]
+    [SerializeField] TrailRenderer trailRenderer;
 
     void Update()
     {
@@ -52,16 +62,29 @@ public class Player_CombatMachine : MonoBehaviour
         animatorOverride["AttackPlaceholder" + currentAnim] = attack.animation;
         animator.runtimeAnimatorController = animatorOverride;
 
-        animator.CrossFade("Attack"+currentAnim, 0.1f);
+        animator.CrossFade("Attack"+currentAnim, 0.025f);
+        animator.speed = attack.animationSpeed;
+        float animationLength = attack.animation.length / attack.animationSpeed; // find a way to get the speed of the state and divide the length by that...
 
-        float animationLength = attack.animation.length; // find a way to get the speed of the state and divide the length by that...
+        if (trailRenderer)
+        {
+            trailRenderer.emitting = true;
+
+            CancelInvoke("DisableTrail");
+            Invoke("DisableTrail", animationLength * 0.5f);
+        }
+
+
+        CancelInvoke("AttackIsDone");
+        Invoke("AttackIsDone", animationLength * 0.75f);
+
+        HitCheck(); //add delay to this because right now it's as soon as you press the button
 
         if (attack.usesRootMotion)
         {
-            GetComponent<Player_MovementMachine>().DisableAllMovers(GetComponent<Player_RootMotion>());
-            CancelInvoke("ReEnableMovers");
-            Invoke("ReEnableMovers", animationLength * 0.9f);
+            _machine.DisableAllMovers(_rootMotion);
         }
+        else _rootMotion.enabled = false;
 
         CancelInvoke("ResetCombo");
         Invoke("ResetCombo", comboResetTime + animationLength);
@@ -69,10 +92,20 @@ public class Player_CombatMachine : MonoBehaviour
         GetNextAttack();
     }
 
-    void ReEnableMovers()
+    void DisableTrail()
     {
-        GetComponent<Player_MovementMachine>().EnableAllMovers();
+        trailRenderer.emitting = false;
+    }
+
+    void AttackIsDone()
+    {
         isAttacking = false;
+        animator.speed = 1;
+
+        _machine.EnableAllMovers();
+        _rootMotion.enabled = false;
+
+        if (trailRenderer) trailRenderer.emitting = false;
     }
 
     void GetNextAttack()
@@ -92,6 +125,27 @@ public class Player_CombatMachine : MonoBehaviour
     {
         currentComboID = 0;
         currentAnim = 1;
+    }
+
+    void HitCheck()
+    {
+        Collider[] hitObjects = Physics.OverlapSphere(transform.position + _machine.ForwardDirection * distanceForwards, checkRadius, ~0, QueryTriggerInteraction.Ignore);
+        foreach (Collider collider in hitObjects)
+        {
+            if (collider.CompareTag("Player") || !collider.gameObject.GetComponent<EnemyAI_Base>()) continue;
+
+            collider.gameObject.GetComponent<EnemyAI_Base>().TakeDamage(defaultAttacks[currentComboID].damage);
+            Debug.Log(collider.gameObject.name + " took " + defaultAttacks[currentComboID].damage + " damage!");
+        }
+    }
+
+    void OnDrawGizmos()
+    {
+        if (isAttacking)
+        {
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawWireSphere(transform.position + _machine.ForwardDirection * distanceForwards, checkRadius);
+        }
     }
 
     bool OutOfRangeCheck()

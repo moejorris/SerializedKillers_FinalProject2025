@@ -73,5 +73,5 @@ public class Player_Jump : MonoBehaviour
         _forceHandler.AddForce(direction.Value * value, ForceMode.VelocityChange);
     }
 
-    public void ResetAirJumps()  { Debug.Log("Reset Jumps"); _curAirJumps = _airJumps;}
+    public void ResetAirJumps() => _curAirJumps = _airJumps;
 }

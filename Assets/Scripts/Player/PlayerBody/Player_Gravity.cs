@@ -14,12 +14,7 @@ public class Player_Gravity : MonoBehaviour, IPlayerMover
 
     public float GravityAcceleration { get => acceleration * gravityScale; }
 
-    public Action PlayerJustLanded;
-
-    void Awake()
-    {
-
-    }
+    public Action PlayerJustLanded; //jump script listens to this and when it goes off it resets the amount of jumps
 
     void OnEnable()
     {
@@ -32,7 +27,6 @@ public class Player_Gravity : MonoBehaviour, IPlayerMover
     {
         if (JustLanded()) //if the player just landed
         {
-            Debug.Log("JustLanded");
             PlayerJustLanded();
             _currentGravity = gravityOnGround;
         }

@@ -13,5 +13,6 @@ MonoBehaviour:
   m_Name: Slash 2
   m_EditorClassIdentifier: 
   damage: 12
-  animation: {fileID: 7400000, guid: 2d6efdc531b4f1a4bbe46e019843c90a, type: 2}
-  usesRootMotion: 1
+  animation: {fileID: -203655887218126122, guid: b9ab26552ea99db4ea43c5fceeb95361, type: 3}
+  animationSpeed: 2
+  usesRootMotion: 0
