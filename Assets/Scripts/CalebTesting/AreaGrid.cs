@@ -11,7 +11,7 @@ public class AreaGrid : MonoBehaviour
     Node[,,] grid;
 
     float nodeDiameter;
-    int gridSizeX, gridSizeY, gridSizeZ;
+    public int gridSizeX, gridSizeY, gridSizeZ;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
