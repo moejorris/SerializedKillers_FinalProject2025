@@ -99,6 +99,7 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
         laser_firePosition = transform.Find("Head/LaserFirePosition");
         laser_lineRenderer = transform.Find("Head/LaserRenderer").GetComponent<LineRenderer>();
         laser_endSphere = transform.Find("Head/LaserEndPosSphere").gameObject;
+        healthBar = transform.Find("Canvas/Bar").GetComponent<RectTransform>();
     }
     // Update is called once per frame
     void Update()

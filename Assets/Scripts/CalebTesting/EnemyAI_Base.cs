@@ -31,7 +31,7 @@ public class EnemyAI_Base : MonoBehaviour
     [SerializeField] private ScriptStealMenu scriptStealMenu => GameObject.FindGameObjectWithTag("Canvas").transform.Find("ScriptStealMenu").GetComponent<ScriptStealMenu>();
 
     [Header("Health")]
-    private RectTransform healthBar;
+    public RectTransform healthBar;
     public float maxHealth = 20f;
     public float health = 20f;
 
@@ -42,6 +42,7 @@ public class EnemyAI_Base : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     public virtual void Start()
     {
+<<<<<<< Updated upstream
         navMeshAgent = GetComponent<NavMeshAgent>();
         healthBar = transform.Find("Canvas/Bar").GetComponent<RectTransform>();
 
@@ -49,6 +50,12 @@ public class EnemyAI_Base : MonoBehaviour
         {
             playerTarget = GameObject.FindGameObjectWithTag("Player").transform.Find("PlayerController").gameObject.transform;
         }
+=======
+        //navMeshAgent = GetComponent<NavMeshAgent>();
+        //healthBar = transform.Find("Canvas/Bar").GetComponent<RectTransform>();
+        scriptStealMenu = GameObject.FindGameObjectWithTag("Canvas").transform.Find("ScriptStealMenu").GetComponent<ScriptStealMenu>();
+        playerTarget = GameObject.FindGameObjectWithTag("Player").transform.Find("PlayerController/Test_Bryson").gameObject.transform;
+>>>>>>> Stashed changes
 
         UpdateHealth();
         //currentAngle = Random.Range(0f, 360f);
