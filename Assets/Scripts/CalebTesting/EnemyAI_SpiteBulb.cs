@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.Splines.Interpolators;
 
-[RequireComponent(typeof(NavMeshAgent))]
+
 [RequireComponent(typeof(Light))]
 public class EnemyAI_SpiteBulb : EnemyAI_Base
 {
@@ -94,7 +94,6 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     public override void Start()
     {
-        navMeshAgent = GetComponent<NavMeshAgent>();
         base.Start();
         bulbHead = transform.Find("Head").gameObject;
         laser_firePosition = transform.Find("Head/LaserFirePosition");
