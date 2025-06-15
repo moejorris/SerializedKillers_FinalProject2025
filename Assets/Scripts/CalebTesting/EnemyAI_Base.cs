@@ -43,6 +43,7 @@ public class EnemyAI_Base : MonoBehaviour
     public virtual void Start()
     {
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
         navMeshAgent = GetComponent<NavMeshAgent>();
         healthBar = transform.Find("Canvas/Bar").GetComponent<RectTransform>();
 
@@ -51,6 +52,8 @@ public class EnemyAI_Base : MonoBehaviour
             playerTarget = GameObject.FindGameObjectWithTag("Player").transform.Find("PlayerController").gameObject.transform;
         }
 =======
+=======
+>>>>>>> Stashed changes
         //navMeshAgent = GetComponent<NavMeshAgent>();
         //healthBar = transform.Find("Canvas/Bar").GetComponent<RectTransform>();
         scriptStealMenu = GameObject.FindGameObjectWithTag("Canvas").transform.Find("ScriptStealMenu").GetComponent<ScriptStealMenu>();

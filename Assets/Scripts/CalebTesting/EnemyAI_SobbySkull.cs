@@ -27,6 +27,9 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
         yOffset = Vector3.Distance(transform.position, navMeshAgent.transform.position);
         rigidBody = transform.GetComponent<Rigidbody>();
         healthBar = transform.parent.Find("Canvas/Bar").GetComponent<RectTransform>();
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
     }
 
