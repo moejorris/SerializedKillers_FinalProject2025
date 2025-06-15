@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.AI;
 
 public class EnemyAI_SobbySkull : EnemyAI_Base
 {
@@ -14,31 +15,26 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
     [SerializeField] private LayerMask playerLayer;
     [SerializeField] private LayerMask obstacleLayer;
 
+    Vector3 lagPos;
+    float yOffset;
+    Rigidbody rigidBody;
+    public float rollSpeed = 0.2f;
+    public float rollCycle = 0;
+
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     public override void Start()
     {
         base.Start();
-<<<<<<< Updated upstream
-        
-=======
         navMeshAgent = transform.parent.Find("NavmeshAgent").GetComponent<NavMeshAgent>();
         lagPos = transform.position;
         yOffset = Vector3.Distance(transform.position, navMeshAgent.transform.position);
         rigidBody = transform.GetComponent<Rigidbody>();
         healthBar = transform.parent.Find("Canvas/Bar").GetComponent<RectTransform>();
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
     }
-
-    // Update is called once per frame
     void Update()
     {
-<<<<<<< Updated upstream
         navMeshAgent.destination = playerTarget.position;
-=======
         if (behaviorActive) // has the water script
         {
             lagPos = transform.position;
@@ -154,7 +150,11 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
         Quaternion rotation = Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(pos, Vector3.up), Time.deltaTime * 10);
         //Debug.Log("rotating towards: " + rotation);
         transform.eulerAngles = new Vector3(0, rotation.eulerAngles.y, 0);
->>>>>>> Stashed changes
+    }
+
+    public bool PlayerInRollRange()
+    {
+        return true;
     }
 
 
@@ -200,8 +200,6 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
             return false;
         }
     }
-<<<<<<< Updated upstream
-=======
 
     public override void ActivateBehavior() // roll mode
     {
@@ -217,5 +215,4 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
 
         StartFlying();
     }
->>>>>>> Stashed changes
 }
