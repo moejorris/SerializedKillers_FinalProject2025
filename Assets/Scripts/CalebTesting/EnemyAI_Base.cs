@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.UI;
 
-[RequireComponent(typeof(NavMeshAgent))]
+
 public class EnemyAI_Base : MonoBehaviour
 {
     [Header("Navigation")]
@@ -28,7 +28,7 @@ public class EnemyAI_Base : MonoBehaviour
     public Behavior heldBehavior;
     public bool behaviorActive = true;
     private bool delayedExit = false;
-    [SerializeField] private ScriptStealMenu scriptStealMenu => GameObject.FindGameObjectWithTag("Canvas").transform.Find("ScriptStealMenu").GetComponent<ScriptStealMenu>();
+    [SerializeField] private ScriptStealMenu scriptStealMenu;
 
     [Header("Health")]
     private RectTransform healthBar;
@@ -42,13 +42,10 @@ public class EnemyAI_Base : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     public virtual void Start()
     {
-        navMeshAgent = GetComponent<NavMeshAgent>();
+        //navMeshAgent = GetComponent<NavMeshAgent>();
         healthBar = transform.Find("Canvas/Bar").GetComponent<RectTransform>();
-
-        if (playerTarget == null)
-        {
-            playerTarget = GameObject.FindGameObjectWithTag("Player").transform.Find("PlayerController").gameObject.transform;
-        }
+        scriptStealMenu = GameObject.FindGameObjectWithTag("Canvas").transform.Find("ScriptStealMenu").GetComponent<ScriptStealMenu>();
+        playerTarget = GameObject.FindGameObjectWithTag("Player").transform.Find("PlayerController/Test_Bryson").gameObject.transform;
 
         UpdateHealth();
         //currentAngle = Random.Range(0f, 360f);

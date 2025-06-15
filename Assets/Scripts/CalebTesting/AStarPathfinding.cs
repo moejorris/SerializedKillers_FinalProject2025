@@ -9,7 +9,6 @@ public class AStarPathfinding : MonoBehaviour
 
     AreaGrid grid;
 
-
     NodeHeap<Node> openSet;
 
 
@@ -25,7 +24,7 @@ public class AStarPathfinding : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKey(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Space))
         {
             FindPath(seeker.position, target.position);
         }

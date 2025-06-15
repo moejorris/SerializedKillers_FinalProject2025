@@ -56,6 +56,7 @@ public class ScriptStealMenu : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        player = GameObject.FindGameObjectWithTag("Player").transform.Find("PlayerController/Test_Bryson").gameObject;
         combatSlot = transform.Find("BG/CombatSlot").GetComponent<BehaviorSlot>();
         movementSlot = transform.Find("BG/MovementSlot").GetComponent<BehaviorSlot>();
         centerSlot = transform.Find("BG/CenterSlot").GetComponent<BehaviorSlot>();
