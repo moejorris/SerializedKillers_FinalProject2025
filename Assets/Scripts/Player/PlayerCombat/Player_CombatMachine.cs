@@ -24,6 +24,7 @@ public class Player_CombatMachine : MonoBehaviour
 
 
     [Header("Damage Collision")]
+    [SerializeField] bool showHitboxCollider;
     [SerializeField] float distanceForwards = 1f;
     [SerializeField] float checkRadius = 1f;
 
@@ -139,21 +140,37 @@ public class Player_CombatMachine : MonoBehaviour
     void HitCheck()
     {
         Collider[] hitObjects = Physics.OverlapSphere(transform.position + _machine.ForwardDirection * distanceForwards, checkRadius, ~0, QueryTriggerInteraction.Ignore);
+        Vector3 hitPositions = new Vector3();
+        float validEnemies = 0;
         foreach (Collider collider in hitObjects)
         {
             if (collider.CompareTag("Player") || !collider.gameObject.GetComponent<EnemyAI_Base>()) continue;
 
+            validEnemies++;
+            hitPositions += collider.transform.position;
             collider.gameObject.GetComponent<EnemyAI_Base>().TakeDamage(defaultAttacks[currentComboID].damage);
             Debug.Log(collider.gameObject.name + " took " + defaultAttacks[currentComboID].damage + " damage!");
         }
+
+        
+
+        if (Vector3.Distance(transform.position + _machine.ForwardDirection, hitPositions / validEnemies) <= checkRadius*2f && defaultAttacks[currentComboID].overrideMotion)
+        {
+            Debug.Log("Enemy is close");
+            //_forceHandler.AddForce(Vector3.zero, ForceMode.VelocityChange, Player_ForceHandler.OverrideMode.All);
+            _forceHandler.ResetVelocity();
+        }
+
     }
 
     void OnDrawGizmos()
     {
-        if (isAttacking)
+        if (isAttacking || showHitboxCollider)
         {
+            Vector3 dir = _machine.ForwardDirection == Vector3.zero ? transform.forward : _machine.ForwardDirection;
+
             Gizmos.color = Color.yellow;
-            Gizmos.DrawWireSphere(transform.position + _machine.ForwardDirection * distanceForwards, checkRadius);
+            Gizmos.DrawWireSphere(transform.position + dir * distanceForwards, checkRadius);
         }
     }
 

@@ -44,7 +44,6 @@ public class Player_ForceHandler : MonoBehaviour, IPlayerMover
         switch (overrideMode)
         {
             case OverrideMode.All: //overrides all current force, setting them to the input.
-                Debug.Log(forceToAdd.y);
                 forceCurrent = forceToAdd;
             break;
 
@@ -87,5 +86,10 @@ public class Player_ForceHandler : MonoBehaviour, IPlayerMover
         else forceCurrent = Vector3.zero;
 
         return forceCurrent;
+    }
+
+    public void ResetVelocity()
+    {
+        forceCurrent = Vector3.zero;
     }
 }
