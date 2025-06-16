@@ -2,7 +2,8 @@ using UnityEngine;
 
 public class FireHazard : MonoBehaviour
 {
-    public Behavior heldBehavior; // just to tell which type of element(?)
+    [SerializeField] private Behavior heldBehavior; // just to tell which type of element(?)
+    [SerializeField] private GameObject fireEffect;
     private bool fireActive = true;
     private ParticleSystem particles;
 
@@ -36,6 +37,18 @@ public class FireHazard : MonoBehaviour
                 if (other.transform.parent.GetComponent<EnemyAI_Base>().heldBehavior.behaviorName == "water")
                 {
                     PutOutFire();
+                }
+            }
+            else if (other.transform.parent != null && other.transform.parent.gameObject.CompareTag("Player"))
+            {
+                if (other.transform.Find("Test_Bryson").childCount < 2)
+                {
+                    GameObject effect = Instantiate(fireEffect, other.transform.Find("Test_Bryson"));
+                    effect.transform.position = other.transform.Find("Test_Bryson").position;
+                }
+                else
+                {
+                    // deals more damage since entering fire while on fire?
                 }
             }
         }
