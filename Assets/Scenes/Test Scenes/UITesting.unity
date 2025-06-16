@@ -2357,16 +2357,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1247570906}
   m_CullTransparentMesh: 1
---- !u!1 &1314177419 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 9179162918251526187, guid: b438f22a2483c8e498fa00f3b586992e, type: 3}
-  m_PrefabInstance: {fileID: 5704883147993801837}
-  m_PrefabAsset: {fileID: 0}
---- !u!23 &1314177421 stripped
-MeshRenderer:
-  m_CorrespondingSourceObject: {fileID: 8448016702553582307, guid: b438f22a2483c8e498fa00f3b586992e, type: 3}
-  m_PrefabInstance: {fileID: 5704883147993801837}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1314700537
 GameObject:
   m_ObjectHideFlags: 0
@@ -2869,11 +2859,6 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 1663696169}
   m_SourcePrefab: {fileID: 100100000, guid: 221ee92e73c803a42b396c5083667049, type: 3}
---- !u!1 &1393749927 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 4372443250330092795, guid: b438f22a2483c8e498fa00f3b586992e, type: 3}
-  m_PrefabInstance: {fileID: 5704883147993801837}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1439584374
 GameObject:
   m_ObjectHideFlags: 0
@@ -4523,22 +4508,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 1337442196208836245, guid: b438f22a2483c8e498fa00f3b586992e, type: 3}
-      propertyPath: litBulbColor
-      value: 
-      objectReference: {fileID: 2100000, guid: f51a925407a489c4d9f3588986e3a074, type: 2}
-    - target: {fileID: 1337442196208836245, guid: b438f22a2483c8e498fa00f3b586992e, type: 3}
-      propertyPath: newLightBulbHead
-      value: 
-      objectReference: {fileID: 1314177421}
-    - target: {fileID: 1337442196208836245, guid: b438f22a2483c8e498fa00f3b586992e, type: 3}
-      propertyPath: 'highlightableMeshes.Array.data[0]'
-      value: 
-      objectReference: {fileID: 1314177419}
-    - target: {fileID: 1337442196208836245, guid: b438f22a2483c8e498fa00f3b586992e, type: 3}
-      propertyPath: 'highlightableMeshes.Array.data[1]'
-      value: 
-      objectReference: {fileID: 1393749927}
     - target: {fileID: 1716701130711184122, guid: b438f22a2483c8e498fa00f3b586992e, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
       value: 0.0000005621034

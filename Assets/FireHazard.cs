@@ -41,10 +41,10 @@ public class FireHazard : MonoBehaviour
             }
             else if (other.transform.parent != null && other.transform.parent.gameObject.CompareTag("Player"))
             {
-                if (other.transform.Find("Test_Bryson").childCount < 2)
+                if (other.transform.Find("Meshes").childCount < 3)
                 {
-                    GameObject effect = Instantiate(fireEffect, other.transform.Find("Test_Bryson"));
-                    effect.transform.position = other.transform.Find("Test_Bryson").position;
+                    GameObject effect = Instantiate(fireEffect, other.transform.Find("Meshes"));
+                    effect.transform.position = other.transform.Find("Meshes").position;
                 }
                 else
                 {

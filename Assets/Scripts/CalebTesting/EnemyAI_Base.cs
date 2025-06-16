@@ -43,14 +43,13 @@ public class EnemyAI_Base : MonoBehaviour
     public virtual void Start()
     {
         navMeshAgent = GetComponent<NavMeshAgent>();
-        healthBar = transform.Find("Canvas/Bar").GetComponent<RectTransform>();
+        //healthBar = transform.parent.Find("Canvas/Bar").GetComponent<RectTransform>();
 
         if (playerTarget == null)
         {
-            playerTarget = GameObject.FindGameObjectWithTag("Player").transform.Find("PlayerController").gameObject.transform;
+            playerTarget = GameObject.FindGameObjectWithTag("Player").transform.Find("PlayerController/Meshes").gameObject.transform;
         }
         scriptStealMenu = GameObject.FindGameObjectWithTag("Canvas").transform.Find("ScriptStealMenu").GetComponent<ScriptStealMenu>();
-        playerTarget = GameObject.FindGameObjectWithTag("Player").transform.Find("PlayerController/Test_Bryson").gameObject.transform;
 
         UpdateHealth();
         //currentAngle = Random.Range(0f, 360f);
