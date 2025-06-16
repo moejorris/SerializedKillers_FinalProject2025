@@ -9,6 +9,8 @@ public class Player_CombatMachine : MonoBehaviour
 {
     Player_MovementMachine _machine => GetComponent<Player_MovementMachine>();
     Player_RootMotion _rootMotion => GetComponent<Player_RootMotion>();
+    Player_ForceHandler _forceHandler => GetComponent<Player_ForceHandler>();
+    Player_Rotate _rotation => GetComponent<Player_Rotate>();
     [SerializeField] AnimatorOverrideController animatorOverride;
     int currentAnim = 1;
 
@@ -62,7 +64,7 @@ public class Player_CombatMachine : MonoBehaviour
         animatorOverride["AttackPlaceholder" + currentAnim] = attack.animation;
         animator.runtimeAnimatorController = animatorOverride;
 
-        animator.CrossFade("Attack"+currentAnim, 0.025f);
+        animator.CrossFade("Attack" + currentAnim, 0.025f);
         animator.speed = attack.animationSpeed;
         float animationLength = attack.animation.length / attack.animationSpeed; // find a way to get the speed of the state and divide the length by that...
 
@@ -80,11 +82,17 @@ public class Player_CombatMachine : MonoBehaviour
 
         HitCheck(); //add delay to this because right now it's as soon as you press the button
 
-        if (attack.usesRootMotion)
+        if (attack.overrideMotion)
         {
-            _machine.DisableAllMovers(_rootMotion);
+            if (attack.usesRootMotion) _machine.DisableAllMovers(_rootMotion);
+            else _rootMotion.enabled = false;
+            _machine.DisableAllMovers(_forceHandler);
+            _rotation.enabled = false;
         }
-        else _rootMotion.enabled = false;
+        if (attack.vectorForce.magnitude > 0) // only apply force if necessary
+        {
+            _forceHandler.AddForce(LocalizeForceVector(attack.vectorForce), ForceMode.VelocityChange, Player_ForceHandler.OverrideMode.All);        
+        }
 
         CancelInvoke("ResetCombo");
         Invoke("ResetCombo", comboResetTime + animationLength);
@@ -104,6 +112,7 @@ public class Player_CombatMachine : MonoBehaviour
 
         _machine.EnableAllMovers();
         _rootMotion.enabled = false;
+        _rotation.enabled = true;
 
         if (trailRenderer) trailRenderer.emitting = false;
     }
@@ -148,13 +157,16 @@ public class Player_CombatMachine : MonoBehaviour
         }
     }
 
-    bool OutOfRangeCheck()
+    bool OutOfRangeCheck() //this might be stupid to keep in
     {
-        // Debug.Log(currentComboID);
-
         if (currentComboID < 0) return true;
         if (currentComboID >= defaultAttacks.Count) return true;
 
         return false;
+    }
+
+    Vector3 LocalizeForceVector(Vector3 vector)
+    {
+        return _machine.ForwardDirection * vector.z + _machine.RightDirection * vector.x + Vector3.up * vector.y;
     }
 }

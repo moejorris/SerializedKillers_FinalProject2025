@@ -14,11 +14,12 @@ public class Player_ForceHandler : MonoBehaviour, IPlayerMover
 
     [SerializeField] Vector3 forceCurrent;
 
+    public enum OverrideMode {None, OnlyChanged, All}
+
     void OnEnable() => _machine.AddMover(this); //Add itself to the movement machine!
     void OnDisable() => _machine.RemoveMover(this); //remove itself from the movement machine when no longer active!
 
-
-    public void AddForce(Vector3 forceToAdd, ForceMode forceMode = ForceMode.VelocityChange)
+    public void AddForce(Vector3 forceToAdd, ForceMode forceMode = ForceMode.VelocityChange, OverrideMode overrideMode = OverrideMode.None)
     {
         switch (forceMode)
         {
@@ -40,12 +41,43 @@ public class Player_ForceHandler : MonoBehaviour, IPlayerMover
                 break;
         }
 
-        //if gravity is present, apply vertical force there because gravity acts upon it. This could be reverse where gravity affects this script, but gravity was coded first so for now I'll leave it as is.
-        if (_gravity != null) _gravity.AddVerticalForce(forceToAdd.y);
-        else forceCurrent.y += forceToAdd.y;
+        switch (overrideMode)
+        {
+            case OverrideMode.All: //overrides all current force, setting them to the input.
+                Debug.Log(forceToAdd.y);
+                forceCurrent = forceToAdd;
+            break;
 
-        forceCurrent.x += forceToAdd.x;
-        forceCurrent.z += forceToAdd.z;
+            case OverrideMode.OnlyChanged: //only changes the axes that force is being applied. Ex: Vector3 (0, 10, 0) the Y axis will be set to 10, but x and z will be left alone.
+                if (forceToAdd.y != 0)
+                {
+                    if (_gravity)
+                    {
+                        _gravity.OverrideVerticalForce(forceToAdd.y);
+                    }
+                    else
+                    {
+                        forceCurrent.y = forceToAdd.y;
+                    }
+                }
+                if (forceToAdd.x != 0) forceCurrent.x = forceToAdd.x;
+                if (forceToAdd.z != 0) forceCurrent.z = forceToAdd.z;
+            break;
+
+            case OverrideMode.None: //adds force normally.
+                if (_gravity)
+                {
+                    _gravity.AddVerticalForce(forceToAdd.y);
+                }
+                else
+                {
+                    forceCurrent.y += forceToAdd.y;
+                }
+
+                forceCurrent.x += forceToAdd.x;
+                forceCurrent.z += forceToAdd.z;
+            break;
+        }
     }
 
     public Vector3 UpdateForce()

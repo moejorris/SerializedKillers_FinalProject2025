@@ -13,6 +13,8 @@ MonoBehaviour:
   m_Name: Slash 2
   m_EditorClassIdentifier: 
   damage: 12
-  animation: {fileID: -203655887218126122, guid: b9ab26552ea99db4ea43c5fceeb95361, type: 3}
-  animationSpeed: 2
+  animation: {fileID: 2509387512414106440, guid: b776906fb39ec7244b78cd28c50e88a3, type: 3}
+  animationSpeed: 1
+  overrideMotion: 1
   usesRootMotion: 0
+  vectorForce: {x: 0, y: -6, z: 12}

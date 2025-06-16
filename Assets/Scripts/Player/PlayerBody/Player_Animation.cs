@@ -1,5 +1,6 @@
 using UnityEngine;
 
+//Joe Morris
 public class Player_Animation : MonoBehaviour
 {
     [Header("Component References")]
@@ -27,6 +28,22 @@ public class Player_Animation : MonoBehaviour
 
     public void PlayDashAnimation()
     {
-        playerMeshAnimator.SetTrigger("Dash");
+        // playerMeshAnimator.SetTrigger("Dash");
+        playerMeshAnimator.Play("Dash");
+    }
+
+    public void PlayJumpAnimation()
+    {
+        playerMeshAnimator.Play("Jump");
+    }
+
+    public void PlayAirJumpAnimation()
+    {
+        playerMeshAnimator.Play("Air Jump");
+    }
+
+    public void UpdateGroundedStatus(bool _grounded)
+    {
+        playerMeshAnimator.SetBool("isGrounded", _grounded);
     }
 }

@@ -1,14 +1,18 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+//Joe Morris
 public class Player_MovementMachine : MonoBehaviour
 {
 
-    [Header("Parameters")]
+    //References/Dependencies
     CharacterController controller => GetComponent<CharacterController>();
+    Player_Animation _animation => GetComponent<Player_Animation>();
+
+    [Header("Parameters")]
     [SerializeField] TimeStep timeStep = TimeStep.Update;
 
-    enum GroundCheckMethod { Raycast, CapsuleCast, SphereCast}
+    enum GroundCheckMethod { Raycast, CapsuleCast, SphereCast, CheckSphere }
     [SerializeField] GroundCheckMethod groundCheckMethod = GroundCheckMethod.Raycast;
 
     List<IPlayerMover> activeMovers = new List<IPlayerMover>();
@@ -19,6 +23,7 @@ public class Player_MovementMachine : MonoBehaviour
 
     //Public Getters
     public Vector3 ForwardDirection { get => _forwardDirection.normalized; }
+    public Vector3 RightDirection { get => GetRightVector(); }
     public RaycastHit GroundInformation { get => _groundInfo; }
     public float DeltaTime { get => currentDeltaTime(); }
     public bool isGrounded { get => _grounded; }
@@ -50,7 +55,7 @@ public class Player_MovementMachine : MonoBehaviour
 
                     if (forceToAdd.magnitude > 0.05f)
                     {
-                        movementToMake += forceToAdd;                        
+                        movementToMake += forceToAdd;
 
                     }
                 }
@@ -60,6 +65,12 @@ public class Player_MovementMachine : MonoBehaviour
 
         controller.Move(movementToMake * currentDeltaTime());
         CurrentMotion = movementToMake;
+    }
+
+    //Get Right Vector
+    Vector3 GetRightVector()
+    {
+        return new Vector3(_forwardDirection.z, _forwardDirection.y, _forwardDirection.x);
     }
 
     //External Functions
@@ -108,8 +119,11 @@ public class Player_MovementMachine : MonoBehaviour
     //Private Functions
     void GroundCheck()
     {
+        bool prevGrounded = _grounded;
+
         switch (groundCheckMethod)
         {
+
             case GroundCheckMethod.Raycast:
                 _grounded = Physics.Raycast(transform.position, Vector3.down, out _groundInfo, 0.15f + controller.height / 2f, ~0, QueryTriggerInteraction.Ignore);
                 break;
@@ -139,12 +153,28 @@ public class Player_MovementMachine : MonoBehaviour
 
                 break;
 
+            case GroundCheckMethod.CheckSphere:
+
+                //Look into this incase it's worth it???
+                GroundCheckSphere();
+
+                break;
         }
+
+        if (prevGrounded != _grounded)
+        {
+            _animation.UpdateGroundedStatus(_grounded);
+        }
+    }
+
+    void GroundCheckSphere()
+    {
+
     }
 
     void OnDrawGizmos()
     {
-        if(groundCheckMethod == GroundCheckMethod.SphereCast)
+        if (groundCheckMethod == GroundCheckMethod.SphereCast)
         {
             if (_groundInfo.point != Vector3.zero)
             {

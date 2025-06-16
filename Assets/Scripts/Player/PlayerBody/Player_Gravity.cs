@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
-using UnityEngine.Events;
 
+//Joe Morris
 public class Player_Gravity : MonoBehaviour, IPlayerMover
 {
     Player_MovementMachine _machine => GetComponent<Player_MovementMachine>();
@@ -34,7 +34,7 @@ public class Player_Gravity : MonoBehaviour, IPlayerMover
         {
             // _currentGravity = 0f;
         }
-        else if(!_machine.isGrounded)
+        else if (!_machine.isGrounded)
         {
             _currentGravity += acceleration * gravityScale * _machine.DeltaTime;
         }
@@ -50,7 +50,7 @@ public class Player_Gravity : MonoBehaviour, IPlayerMover
     public bool JustLanded()
     {
         return _machine.isGrounded && !_groundedPreviousFrame;
-    } 
+    }
     public bool JustLeftGround() => !_machine.isGrounded && _groundedPreviousFrame;
 
     //External Function Calls
@@ -59,5 +59,10 @@ public class Player_Gravity : MonoBehaviour, IPlayerMover
         if (_machine.isGrounded) _currentGravity = 0;
 
         _currentGravity += y;
+    }
+
+    public void OverrideVerticalForce(float y)
+    {
+        _currentGravity = y;
     }
 }
