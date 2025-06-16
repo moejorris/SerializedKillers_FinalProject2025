@@ -11,11 +11,13 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
     [Header("Bulb General")]
     //public float idleActivateRange;
     [SerializeField] private string movementState = "idle";
+    [SerializeField] private MeshRenderer newLightBulbHead;
     private bool healing = false;
     private GameObject bulbHead;
     [SerializeField] private bool headCanTurn = false;
     public float followGracePeriod = 1;
     private float followTimer = 0;
+    private Animator bulbBodyAnimator;
 
     [SerializeField] private Material litBulbColor;
     [SerializeField] private Material unlitBulbColor;
@@ -100,10 +102,21 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
         laser_lineRenderer = transform.Find("Head/LaserRenderer").GetComponent<LineRenderer>();
         laser_endSphere = transform.Find("Head/LaserEndPosSphere").gameObject;
         healthBar = transform.Find("Canvas/Bar").GetComponent<RectTransform>();
+        bulbBodyAnimator = transform.Find("NewBody").GetComponent<Animator>();
+        bulbBodyAnimator.Play("Bulb_Sleep", 0, 50);
     }
     // Update is called once per frame
     void Update()
     {
+        if (navMeshAgent.velocity.magnitude > 0.1f)
+        {
+            bulbBodyAnimator.SetBool("Walking", true);
+        }
+        else
+        {
+            bulbBodyAnimator.SetBool("Walking", false);
+        }
+
         if (!preparingAttack)
         {
             if (movementState == "idle")
@@ -119,6 +132,7 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
                     headCanTurn = true;
                     healing = false;
                     StopCoroutine("HealTimer");
+                    bulbBodyAnimator.SetBool("Awake", true);
                     movementState = "wandering";
                 }
 
@@ -443,6 +457,7 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
         navMeshAgent.isStopped = false;
         attackState = "neutral";
         navMeshAgent.speed = 3;
+        //navMeshAgent.angularSpeed = 120;
         preparingAttack = false;
         attackOccuring = false;
     }
@@ -451,10 +466,12 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
     {
         attackOccuring = true;
         navMeshAgent.isStopped = true;
-
-        yield return new WaitForSeconds(2);
-
+        //navMeshAgent.angularSpeed = 0;
+        bulbBodyAnimator.Play("Melee_Attack");
         Debug.Log("IMAGINE A MELEE ANIMATION!");
+
+        yield return new WaitForSeconds(3);
+
 
         ExitMeleeAttack();
     }
@@ -486,9 +503,13 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
         attackOccuring = true;
         navMeshAgent.isStopped = true;
         headCanTurn = false;
+        bulbBodyAnimator.Play("Crouch");
 
         shockwaveAnimator.Play("ShockwaveTest");
-        yield return new WaitForSeconds(4f);
+        yield return new WaitForSeconds(2.8f);
+
+        bulbBodyAnimator.SetTrigger("Arise");
+        yield return new WaitForSeconds(2f);
 
         ExitShockwaveAttack();
     }
@@ -674,9 +695,10 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
             }
         }
 
-            yield return new WaitForSeconds(1); // little buffer at the end
+        yield return new WaitForSeconds(1); // little buffer at the end
 
         movementState = "idle"; // returns to idle
+        bulbBodyAnimator.SetBool("Awake", false);
     }
 
     public void BeginSpotSearch()
@@ -768,9 +790,9 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
     public override void ActivateBehavior()
     {
         base.ActivateBehavior();
-        Material[] newMats = bulbHead.GetComponent<MeshRenderer>().materials;
+        Material[] newMats = newLightBulbHead.materials;
         newMats[0] = litBulbColor;
-        bulbHead.GetComponent<MeshRenderer>().materials = newMats;
+        newLightBulbHead.materials = newMats;
     }
 
     public override void DeactivateBehavior()
@@ -778,8 +800,8 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
         ExitLaserAttack();
         ExitShockwaveAttack();
         base.DeactivateBehavior();
-        Material[] newMats = bulbHead.GetComponent<MeshRenderer>().materials;
+        Material[] newMats = newLightBulbHead.materials;
         newMats[0] = unlitBulbColor;
-        bulbHead.GetComponent<MeshRenderer>().materials = newMats;
+        newLightBulbHead.materials = newMats;
     }
 }
