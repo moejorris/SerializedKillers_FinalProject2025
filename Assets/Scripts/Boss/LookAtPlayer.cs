@@ -8,7 +8,7 @@ public class LookAtPlayer : MonoBehaviour
 
     void Awake()
     {
-        player = GameObject.FindGameObjectWithTag("Player").transform; // Find the player by tag
+        player = GameObject.FindGameObjectWithTag("Player").transform.Find("PlayerController").gameObject.transform; // Find the player by tag
         if (player == null)
         {
             Debug.LogError("Player not found! Make sure the player has the 'Player' tag assigned.");
@@ -52,13 +52,13 @@ public class LookAtPlayer : MonoBehaviour
         }
     }
 
-    void StopLooking()
+    public void StopLooking()
     {
         lookAtPlayer = false; // Set the flag to stop looking at the player
         targetRotation = transform.rotation; // Reset the target rotation to the current rotation
     }
 
-    void StartLooking()
+    public void StartLooking()
     {
         lookAtPlayer = true; // Set the flag to start looking at the player    
     }

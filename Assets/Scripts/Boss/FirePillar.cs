@@ -13,7 +13,7 @@ public class FirePillar : MonoBehaviour
     #region Unity Methods
     void Awake()
     {
-        target = GameObject.FindGameObjectWithTag("Player")?.transform; // Find the player by tag
+        target = GameObject.FindGameObjectWithTag("Player").transform.Find("PlayerController").gameObject.transform; // Find the player by tag
         if (target == null)
         {
             Debug.LogError("Player not found! Make sure the player has the 'Player' tag assigned.");
@@ -32,9 +32,9 @@ public class FirePillar : MonoBehaviour
 
     void OnTriggerStay(Collider other)
     {
-        if (other.CompareTag("Player"))
+        // Check if the collider is on the Player layer (replace 8 with your actual Player layer number if different)
+        if (other.gameObject.layer == LayerMask.NameToLayer("Player"))
         {
-            // If the fire pillar collides with the player, apply damage or effects while inside the pillar
             Debug.Log("Player hit by the fire pillar!");
             // Here you can add code to apply damage or effects to the player
         }

@@ -14,7 +14,7 @@ public class ThunderStrike : MonoBehaviour
     #region Unity Methods
     void Awake()
     {
-        target = GameObject.FindGameObjectWithTag("Player")?.transform; // Find the player by tag
+        target = GameObject.FindGameObjectWithTag("Player").transform.Find("PlayerController").gameObject.transform; // Find the player by tag
         if (target == null)
         {
             Debug.LogError("Player not found! Make sure the player has the 'Player' tag assigned.");

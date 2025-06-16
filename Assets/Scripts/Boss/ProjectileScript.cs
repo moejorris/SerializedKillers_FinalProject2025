@@ -2,9 +2,15 @@ using UnityEngine;
 
 public class ProjectileScript : MonoBehaviour
 {
+    private float lifeTime = 5f; // Lifetime of the projectile
+
+    void Awake()
+    {
+        Destroy(gameObject, lifeTime); // Destroy the projectile after its lifetime
+    }
     void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.CompareTag("Player"))
+        if (collision.gameObject.layer == LayerMask.NameToLayer("Player"))
         {
             Debug.Log("Projectile hit the player!"); // Log message for debugging
             // If the projectile hits the player, destroy the projectile
