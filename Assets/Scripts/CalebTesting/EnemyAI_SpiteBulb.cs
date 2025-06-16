@@ -19,6 +19,8 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
     private float followTimer = 0;
     private Animator bulbBodyAnimator;
 
+    private bool standingUp = false;
+
     [SerializeField] private Material litBulbColor;
     [SerializeField] private Material unlitBulbColor;
 
@@ -126,14 +128,24 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
                     healing = true;
                     StartCoroutine("HealTimer");
                 }
-
-                if (PlayerInAwakeRange() || !behaviorActive)
+                
+                if (standingUp)
                 {
-                    headCanTurn = true;
+                    //Debug.Log(bulbBodyAnimator.GetCurrentAnimatorClipInfo(0)[0].clip.name);
+                    if (bulbBodyAnimator.GetCurrentAnimatorClipInfo(0)[0].clip.name != "BulbActivate_A")
+                    {
+                        headCanTurn = true;
+                        movementState = "wandering";
+                        standingUp = false;
+                    }
+                }
+
+                if ((PlayerInAwakeRange() || !behaviorActive) && !standingUp)
+                {
+                    standingUp = true;
                     healing = false;
                     StopCoroutine("HealTimer");
                     bulbBodyAnimator.SetBool("Awake", true);
-                    movementState = "wandering";
                 }
 
                 SetHeadTarget(transform.forward, 5);
