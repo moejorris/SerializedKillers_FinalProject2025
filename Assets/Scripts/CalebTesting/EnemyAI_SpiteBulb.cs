@@ -3,6 +3,7 @@ using Unity.AI.Navigation;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.Splines.Interpolators;
+using static UnityEditor.PlayerSettings;
 
 
 [RequireComponent(typeof(Light))]
@@ -76,13 +77,6 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
     [SerializeField] private GameObject teleportExplosion;
     [SerializeField] private GameObject teleportLocationIndicator;
 
-    [Header("Bulb Circling")]
-    [SerializeField] private float circleSpeed = 10;
-    [SerializeField] private float circleRadius = 5;
-    [SerializeField] private float circlingRange = 8;
-    [SerializeField] private bool circlingPlayer = false;
-    private float currentAngle = 0;
-
 
     [Header("Bulb Shockwave Attack")]
     //private bool shockwave_inProgress = false;
@@ -99,10 +93,10 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
     public override void Start()
     {
         base.Start();
-        bulbHead = transform.Find("Head").gameObject;
-        laser_firePosition = transform.Find("Head/LaserFirePosition");
-        laser_lineRenderer = transform.Find("Head/LaserRenderer").GetComponent<LineRenderer>();
-        laser_endSphere = transform.Find("Head/LaserEndPosSphere").gameObject;
+        bulbHead = transform.Find("NewBody/JointGRP/Root_JNT/Body_JNT/Top_Body_JNT/LightBulb").gameObject;
+        laser_firePosition = bulbHead.transform.Find("LaserFirePosition");
+        laser_lineRenderer = bulbHead.transform.Find("LaserRenderer").GetComponent<LineRenderer>();
+        laser_endSphere = bulbHead.transform.Find("LaserEndPosSphere").gameObject;
         healthBar = transform.Find("Canvas/Bar").GetComponent<RectTransform>();
         bulbBodyAnimator = transform.Find("NewBody").GetComponent<Animator>();
         bulbBodyAnimator.Play("Bulb_Sleep", 0, 50);
@@ -123,22 +117,20 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
         {
             if (movementState == "idle")
             {
-                if (!healing)
+                if (!healing && !standingUp)
                 {
                     healing = true;
                     StartCoroutine("HealTimer");
                 }
                 
-                if (standingUp)
-                {
-                    //Debug.Log(bulbBodyAnimator.GetCurrentAnimatorClipInfo(0)[0].clip.name);
-                    if (bulbBodyAnimator.GetCurrentAnimatorClipInfo(0)[0].clip.name != "BulbActivate_A")
-                    {
-                        headCanTurn = true;
-                        movementState = "wandering";
-                        standingUp = false;
-                    }
-                }
+                //if (standingUp)
+                //{
+                //    //Debug.Log(bulbBodyAnimator.GetCurrentAnimatorClipInfo(0)[0].clip.name);
+                //    if (bulbBodyAnimator.GetCurrentAnimatorClipInfo(0)[0].clip.name != "BulbActivate_A")
+                //    {
+                        
+                //    }
+                //}
 
                 if ((PlayerInAwakeRange() || !behaviorActive) && !standingUp)
                 {
@@ -146,6 +138,7 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
                     healing = false;
                     StopCoroutine("HealTimer");
                     bulbBodyAnimator.SetBool("Awake", true);
+                    Invoke("StandingComplete", 1.8f);
                 }
 
                 SetHeadTarget(transform.forward, 5);
@@ -165,6 +158,7 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
                 {
                     if (!wandering) // hasn't started the wander timer coroutine
                     {
+                        Debug.Log("Was not wandering, coroutine started.");
                         wandering = true;
                         StopCoroutine("WanderTimer");
                         StartCoroutine("WanderTimer");
@@ -203,7 +197,7 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
                         }
                     }
 
-                    if ((PlayerInAttackRange() && attackCooldownTimer <= 0 && behaviorActive) || (attackCooldownTimer <= 0 && scaredAttackTimer <= 0))
+                    if ((attackCooldownTimer <= 0 && behaviorActive) || (attackCooldownTimer <= 0 && scaredAttackTimer <= 0))
                     {
                         PerformAttack();
                     }
@@ -257,7 +251,7 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
 
                 if (!attackOccuring)
                 {
-                    if (gapCloseTimer <= 0 || navMeshAgent.remainingDistance < 0.6f) // attacks if in range or after a few seconds of running if not
+                    if (gapCloseTimer <= 0 || navMeshAgent.remainingDistance < 1.5f) // attacks if in range or after a few seconds of running if not
                     {
                         StopCoroutine("MeleeAttack");
                         StartCoroutine("MeleeAttack");
@@ -278,7 +272,7 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
 
                 if (!attackOccuring)
                 {
-                    if (gapCloseTimer <= 0 || navMeshAgent.remainingDistance < 0.6f) // attacks if in range or after a few seconds of running if not
+                    if (gapCloseTimer <= 0 || navMeshAgent.remainingDistance < 1.5f) // attacks if in range or after a few seconds of running if not
                     {
                         StopCoroutine("ShockwaveAttack");
                         StartCoroutine("ShockwaveAttack");
@@ -295,7 +289,7 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
                 {
                     if (laser_inProgress)
                     {
-                        SetHeadTarget(playerTarget.position - bulbHead.transform.position, 15);
+                        SetHeadTarget(playerTarget.position - bulbHead.transform.position, 18);
                     }
                 }
                 else
@@ -357,6 +351,17 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
         }
     }
 
+    public void StandingComplete()
+    {
+        headCanTurn = true;
+        wandering = false;
+        movementState = "wandering";
+        standingUp = false;
+        healing = false;
+        StopCoroutine("HealTimer");
+        Debug.Log("Standing Complete Called");
+    }
+
     private void FixedUpdate()
     {
         if (laser_inProgress)
@@ -373,18 +378,18 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
         while (!teleportSpotFound)
         {
             failureAttempts++;
-            Debug.Log("Attempt Number " + failureAttempts + "!");
+            //Debug.Log("Attempt Number " + failureAttempts + "!");
             teleportPosition = new Vector3(Random.Range(-teleportRange, teleportRange), Random.Range(-teleportRange, teleportRange), Random.Range(-teleportRange, teleportRange));
             NavMeshHit hit;
             if (NavMesh.FindClosestEdge(teleportPosition, out hit, NavMesh.AllAreas))
             {
-                Debug.Log("HIT FOUND!");
+                //Debug.Log("HIT FOUND!");
                 teleportPosition = hit.position;
                 teleportSpotFound = true;
             }
             if (failureAttempts == 10)
             {
-                Debug.Log("FAILURE!");
+                //Debug.Log("FAILURE!");
                 teleportSpotFound = true;
             }
         }
@@ -396,33 +401,6 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
         transform.position = teleportPosition;
         //navMeshAgent.updatePosition = true;
         teleportExplosion.SetActive(true);
-    }
-
-    public void CirclePlayer()
-    {
-        currentAngle += circleSpeed * Time.deltaTime;
-        currentAngle %= 360; // Keep angle within 0-360 degrees
-
-        // Calculate the point on the circle
-        float x = Mathf.Cos(currentAngle * Mathf.Deg2Rad) * circleRadius;
-        float z = Mathf.Sin(currentAngle * Mathf.Deg2Rad) * circleRadius;
-        Vector3 circlePos = new Vector3(x, 0, z);
-
-        navMeshAgent.destination = playerTarget.position + circlePos;
-        //navMeshAgent.updateRotation = false;
-
-        //Vector3 direction = playerTarget.position - transform.position;
-        //Quaternion rotation = Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(direction), Time.deltaTime * circlingRotationSpeed);
-        //transform.eulerAngles = new Vector3(0, rotation.eulerAngles.y, 0);
-
-        //if (targetDistance > attackDistance)
-        //{
-        //    circlePlayer = false;
-        //    navMeshAgent.isStopped = true;
-        //    animator.SetBool("Attack", true);
-        //}
-
-        //transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(direction), Time.deltaTime * circlingRotationSpeed);
     }
 
     public void PerformAttack()
@@ -456,7 +434,7 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
 
     public void EnterMeleeAttack()
     {
-        gapCloseTimer = 3;
+        gapCloseTimer = 1.5f;
         attackState = "melee";
         navMeshAgent.stoppingDistance = 2f;
         navMeshAgent.speed = 6f;
@@ -480,7 +458,6 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
         navMeshAgent.isStopped = true;
         //navMeshAgent.angularSpeed = 0;
         bulbBodyAnimator.Play("Melee_Attack");
-        Debug.Log("IMAGINE A MELEE ANIMATION!");
 
         yield return new WaitForSeconds(3);
 
@@ -521,7 +498,7 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
         yield return new WaitForSeconds(2.8f);
 
         bulbBodyAnimator.SetTrigger("Arise");
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(1.8f);
 
         ExitShockwaveAttack();
     }
@@ -545,7 +522,7 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
 
         laser_lineRenderer.gameObject.SetActive(false);
         laser_endSphere.SetActive(false);
-        transform.Find("Head/Capsule").gameObject.SetActive(false);
+        bulbHead.transform.Find("Capsule").gameObject.SetActive(false);
         StopCoroutine("LaserAttack");
     }
 
@@ -553,25 +530,28 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
     {
         attackOccuring = true;
         navMeshAgent.isStopped = true;
+        bulbBodyAnimator.Play("Crouch");
 
-        Debug.Log("Charging Laser...");
+        yield return new WaitForSeconds(1);
+
         laser_lineRenderer.gameObject.SetActive(true);
         laser_endSphere.SetActive(true);
         laser_inProgress = true;
         headCanTurn = true;
-        yield return new WaitForSeconds(7);
+        yield return new WaitForSeconds(4);
 
-        Debug.Log("No longer turning head...");
         laser_inProgress = false;
         headCanTurn = false;
         laser_lineRenderer.gameObject.SetActive(false);
         laser_endSphere.SetActive(false);
-        yield return new WaitForSeconds(0.6f);
+        yield return new WaitForSeconds(0.3f);
 
-        Debug.Log("LASER FIRED BOOOOOM");
-        transform.Find("Head/Capsule").gameObject.SetActive(true);
+
+        bulbHead.transform.Find("Capsule").gameObject.SetActive(true);
         yield return new WaitForSeconds(0.5f);
-        transform.Find("Head/Capsule").gameObject.SetActive(false);
+        bulbHead.transform.Find("Capsule").gameObject.SetActive(false);
+        bulbBodyAnimator.SetTrigger("Arise");
+        yield return new WaitForSeconds(1f);
 
         ExitLaserAttack();
     }
@@ -581,6 +561,11 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
         laser_lineRenderer.SetPosition(0, laser_firePosition.position);
 
         Vector3 endPosition = laser_firePosition.position + (laser_firePosition.forward * 100);
+
+        Quaternion lookRotation = Quaternion.Lerp(laser_firePosition.transform.rotation, Quaternion.LookRotation(playerTarget.position - laser_firePosition.position), Time.deltaTime * 10);
+
+        //Quaternion.LookRotation(playerTarget.position - laser_firePosition.position);
+        laser_firePosition.rotation = Quaternion.Euler(lookRotation.eulerAngles.x, bulbHead.transform.eulerAngles.y, lookRotation.eulerAngles.z);
 
         if (Physics.Raycast(laser_firePosition.position, laser_firePosition.forward, out RaycastHit hit, 100f, laser_targetLayers))
         {
@@ -600,14 +585,14 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
 
     IEnumerator AttackTimer()
     {
-        Debug.Log("Attack timer started.");
+        //Debug.Log("Attack timer started.");
 
         yield return new WaitForSeconds(attackCooldownTimer);
 
         //canAttack = true;
         attackCooldownTimer = 0;
 
-        Debug.Log("Attack timer completed.");
+        //Debug.Log("Attack timer completed.");
     } // called by the AttackCooldown function.
 
     IEnumerator WanderTimer()
@@ -777,17 +762,17 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
         }
     }
 
-    public bool PlayerInAttackRange()
-    {
-        if (Vector3.Distance(playerTarget.position, transform.position) < attackRange)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
+    //public bool PlayerInAttackRange()
+    //{
+    //    if (Vector3.Distance(playerTarget.position, transform.position) < attackRange)
+    //    {
+    //        return true;
+    //    }
+    //    else
+    //    {
+    //        return false;
+    //    }
+    //}
 
     public void SetHeadTarget(Vector3 pos, float speed = 5)
     {
