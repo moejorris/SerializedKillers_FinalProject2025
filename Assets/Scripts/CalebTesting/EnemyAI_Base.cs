@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.UI;
+using System.Collections;
+using System.Collections.Generic;
 
 [RequireComponent(typeof(NavMeshAgent))]
 public class EnemyAI_Base : MonoBehaviour
@@ -29,21 +31,33 @@ public class EnemyAI_Base : MonoBehaviour
     public bool behaviorActive = true;
     private bool delayedExit = false;
     [SerializeField] private ScriptStealMenu scriptStealMenu;
+    public Image selectedIcon;
 
     [Header("Health")]
     public RectTransform healthBar;
+    public RectTransform whiteHealthBar;
     public float maxHealth = 20f;
     public float health = 20f;
+    private float healthSpeedMult = 1;
+
+    public Renderer[] meshes;
+    public List<Material> materialList;
 
     [Header("Highlighting")]
     [SerializeField] private GameObject[] highlightableMeshes;
 
-
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     public virtual void Start()
     {
+        foreach (Renderer mesh in meshes)
+        {
+            foreach (Material material in mesh.materials)
+            {
+                materialList.Add(material);
+                Debug.Log("added " + material);
+            }
+        }
+
         navMeshAgent = GetComponent<NavMeshAgent>();
-        //healthBar = transform.parent.Find("Canvas/Bar").GetComponent<RectTransform>();
 
         if (playerTarget == null)
         {
@@ -52,123 +66,40 @@ public class EnemyAI_Base : MonoBehaviour
         scriptStealMenu = GameObject.FindGameObjectWithTag("Canvas").transform.Find("ScriptStealMenu").GetComponent<ScriptStealMenu>();
 
         UpdateHealth();
-        //currentAngle = Random.Range(0f, 360f);
-        //transform.Find("Canvas/Image").GetComponent<Image>().sprite = heldBehavior.behavioricon;
-        //animator = GetComponent<Animator>();
     }
 
+    public virtual void Update()
+    {
+        if (whiteHealthBar.localScale.x > healthBar.localScale.x)
+        {
+            float lerpScale = Mathf.Lerp(whiteHealthBar.localScale.x, healthBar.localScale.x, healthSpeedMult);
+            Vector3 whiteBarScale = whiteHealthBar.localScale;
+            whiteBarScale.x = lerpScale;
+            whiteHealthBar.localScale = whiteBarScale;
+            healthSpeedMult += (Time.deltaTime / 25f);
+        }
+    }
 
-    // Update is called once per frame
-    //void Update()
-    //{
-
-
-
-
-
-
-    //if (flyingEnemy)
-    //{
-    //    navMeshAgent.enabled = false;
-    //    if (!behaviorActive)
-    //    {
-    //        GetComponent<Rigidbody>().useGravity = false;
-    //        transform.LookAt(playerTarget.transform.position);
-    //        GetComponent<Rigidbody>().AddForce(transform.forward / 10);
-
-    //        if (Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, 50f, flightDetectionLayer))
-    //        {
-    //            if (hit.distance > 5)
-    //            {
-    //                GetComponent<Rigidbody>().AddForce(Vector3.up / 3);
-    //            }
-    //        }
-    //    }
-    //    else
-    //    {
-    //        GetComponent<Rigidbody>().useGravity = true;
-    //    }
-
-    //    if (delayedExit && !scriptStealMenu.menuOpen)
-    //    {
-    //        delayedExit = false;
-    //        transform.Find("Capsule").gameObject.layer = 0;
-    //        scriptStealMenu.selectedEnemy = null;
-    //        scriptStealMenu.centerSlot.RemoveBehavior();
-    //    }
-
-    //    if (scriptStealMenu.selectedEnemy != this && transform.Find("Capsule").gameObject.layer == 6)
-    //    {
-    //        DeselectEnemy();
-    //    }
-    //}
-    //else
-    //{
-    //    if (circlePlayer)
-    //    {
-    //        currentAngle += angleSpeed * Time.deltaTime;
-    //        currentAngle %= 360; // Keep angle within 0-360 degrees
-
-    //        // Calculate the point on the circle
-    //        float x = Mathf.Cos(currentAngle * Mathf.Deg2Rad) * radius;
-    //        float z = Mathf.Sin(currentAngle * Mathf.Deg2Rad) * radius;
-    //        Vector3 circlePos = new Vector3(x, 0, z);
-
-    //        navMeshAgent.destination = playerTarget.position + circlePos;
-    //        navMeshAgent.updateRotation = false;
-
-    //        Vector3 direction = playerTarget.position - transform.position;
-    //        Quaternion rotation = Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(direction), Time.deltaTime * circlingRotationSpeed);
-    //        transform.eulerAngles = new Vector3(0, rotation.eulerAngles.y, 0);
-
-    //        //if (targetDistance > attackDistance)
-    //        //{
-    //        //    circlePlayer = false;
-    //        //    navMeshAgent.isStopped = true;
-    //        //    animator.SetBool("Attack", true);
-    //        //}
-
-    //        //transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(direction), Time.deltaTime * circlingRotationSpeed);
-    //    }
-    //    else
-    //    {
-    //        navMeshAgent.updateRotation = true;
-    //        targetDistance = Vector3.Distance(navMeshAgent.transform.position, playerTarget.position);
-    //        if (targetDistance < attackRange)
-    //        {
-    //            //circlePlayer = true;
-    //            navMeshAgent.isStopped = true;
-    //            //animator.SetBool("Attack", true);
-    //        }
-    //        else
-    //        {
-    //            navMeshAgent.isStopped = false;
-    //            //animator.SetBool("Attack", false);
-    //            if (targetDistance < followRange) // if the player is within follow range, the entity will head to that positon. otherwise, the last known position.
-    //            {
-    //                navMeshAgent.destination = playerTarget.position;
-    //            }
-    //        }
-    //    }
-
-    //    if (delayedExit && !scriptStealMenu.menuOpen)
-    //    {
-    //        delayedExit = false;
-    //        transform.Find("Capsule").gameObject.layer = 0;
-    //        scriptStealMenu.selectedEnemy = null;
-    //        scriptStealMenu.centerSlot.RemoveBehavior();
-    //    }
-
-    //    if (scriptStealMenu.selectedEnemy != this && transform.Find("Capsule").gameObject.layer == 6)
-    //    {
-    //        DeselectEnemy();
-    //    }
-    //}
-    // }
+    IEnumerator MaterialFade()
+    {
+        float percent = 0;
+        for (int i = 0; i < 5; i++)
+        {
+            foreach (Material material in materialList)
+            {
+                material.SetFloat("_Percentage", percent);
+            }
+            if (i == 0) yield return new WaitForSeconds(0.04f);
+            percent += 0.25f;
+            yield return new WaitForSeconds(0.03f);
+        }
+    }
 
     public void UpdateHealth()
     {
-        if (!healthBar) return;
+        if (!healthBar || !whiteHealthBar) return;
+
+        healthSpeedMult = 0;
         Vector3 scale = healthBar.localScale;
         scale.x = (health / maxHealth);
         healthBar.localScale = scale;
@@ -176,7 +107,13 @@ public class EnemyAI_Base : MonoBehaviour
 
     public virtual void TakeDamage(float amount)
     {
+        if (!healthBar || !whiteHealthBar) return; // in case no thing exists
+
         health -= amount;
+
+        StopCoroutine("MaterialFade");
+        StartCoroutine("MaterialFade");
+
         UpdateHealth();
         if (health <= 0)
         {
@@ -213,6 +150,7 @@ public class EnemyAI_Base : MonoBehaviour
 
         scriptStealMenu.selectedEnemy = this;
         scriptStealMenu.UpdateCenterSlot();
+        selectedIcon.enabled = true;
     }
 
     public virtual void DeselectEnemy()
@@ -224,5 +162,6 @@ public class EnemyAI_Base : MonoBehaviour
 
         scriptStealMenu.selectedEnemy = null;
         scriptStealMenu.UpdateCenterSlot();
+        selectedIcon.enabled = false;
     }
 }

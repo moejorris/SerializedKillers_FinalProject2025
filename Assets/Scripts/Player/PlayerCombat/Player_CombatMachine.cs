@@ -7,6 +7,7 @@ using UnityEngine.InputSystem;
 
 public class Player_CombatMachine : MonoBehaviour
 {
+    ScriptStealMenu scriptStealMenu => GameObject.FindGameObjectWithTag("Canvas").transform.Find("ScriptStealMenu").GetComponent<ScriptStealMenu>();
     Player_MovementMachine _machine => GetComponent<Player_MovementMachine>();
     Player_RootMotion _rootMotion => GetComponent<Player_RootMotion>();
     Player_ForceHandler _forceHandler => GetComponent<Player_ForceHandler>();
@@ -137,11 +138,14 @@ public class Player_CombatMachine : MonoBehaviour
         currentAnim = 1;
     }
 
-    void HitCheck()
+    void HitCheck() // Caleb was here O_O
     {
         Collider[] hitObjects = Physics.OverlapSphere(transform.position + _machine.ForwardDirection * distanceForwards, checkRadius, ~0, QueryTriggerInteraction.Ignore);
         Vector3 hitPositions = new Vector3();
         float validEnemies = 0;
+
+        EnemyAI_Base selectedEnemy = null;
+
         foreach (Collider collider in hitObjects)
         {
             if (collider.CompareTag("Player") || !collider.gameObject.GetComponent<EnemyAI_Base>()) continue;
@@ -150,9 +154,10 @@ public class Player_CombatMachine : MonoBehaviour
             hitPositions += collider.transform.position;
             collider.gameObject.GetComponent<EnemyAI_Base>().TakeDamage(defaultAttacks[currentComboID].damage);
             Debug.Log(collider.gameObject.name + " took " + defaultAttacks[currentComboID].damage + " damage!");
+            selectedEnemy = collider.gameObject.GetComponent<EnemyAI_Base>();
         }
 
-        
+        if (selectedEnemy) scriptStealMenu.UpdateSelectedEnemy(selectedEnemy);
 
         if (Vector3.Distance(transform.position + _machine.ForwardDirection, hitPositions / validEnemies) <= checkRadius*2f && defaultAttacks[currentComboID].overrideMotion)
         {
@@ -161,6 +166,31 @@ public class Player_CombatMachine : MonoBehaviour
             _forceHandler.ResetVelocity();
         }
 
+        // VVV commented-out copy of the function prior to me editing in case I somehow destroy this function VVV
+        if (1 > 5000)
+        {
+            //Collider[] hitObjects = Physics.OverlapSphere(transform.position + _machine.ForwardDirection * distanceForwards, checkRadius, ~0, QueryTriggerInteraction.Ignore);
+            //Vector3 hitPositions = new Vector3();
+            //float validEnemies = 0;
+            //foreach (Collider collider in hitObjects)
+            //{
+            //    if (collider.CompareTag("Player") || !collider.gameObject.GetComponent<EnemyAI_Base>()) continue;
+
+            //    validEnemies++;
+            //    hitPositions += collider.transform.position;
+            //    collider.gameObject.GetComponent<EnemyAI_Base>().TakeDamage(defaultAttacks[currentComboID].damage);
+            //    Debug.Log(collider.gameObject.name + " took " + defaultAttacks[currentComboID].damage + " damage!");
+            //}
+
+
+
+            //if (Vector3.Distance(transform.position + _machine.ForwardDirection, hitPositions / validEnemies) <= checkRadius * 2f && defaultAttacks[currentComboID].overrideMotion)
+            //{
+            //    Debug.Log("Enemy is close");
+            //    //_forceHandler.AddForce(Vector3.zero, ForceMode.VelocityChange, Player_ForceHandler.OverrideMode.All);
+            //    _forceHandler.ResetVelocity();
+            //}
+        } 
     }
 
     void OnDrawGizmos()

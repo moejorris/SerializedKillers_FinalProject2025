@@ -4832,9 +4832,13 @@ MonoBehaviour:
   heldBehavior: {fileID: 11400000, guid: 5121a43f96def934084246ff74dd77e3, type: 2}
   behaviorActive: 1
   scriptStealMenu: {fileID: 0}
+  selectedIcon: {fileID: 0}
   healthBar: {fileID: 0}
+  whiteHealthBar: {fileID: 0}
   maxHealth: 20
   health: 20
+  meshes: []
+  materialList: []
   highlightableMeshes:
   - {fileID: 2053181873}
   - {fileID: 6691737496704667195}

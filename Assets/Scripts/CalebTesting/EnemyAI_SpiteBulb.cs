@@ -2,6 +2,7 @@ using System.Collections;
 using Unity.AI.Navigation;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.UI;
 using UnityEngine.Splines.Interpolators;
 using static UnityEditor.PlayerSettings;
 
@@ -97,12 +98,14 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
         laser_firePosition = bulbHead.transform.Find("LaserFirePosition");
         laser_lineRenderer = bulbHead.transform.Find("LaserRenderer").GetComponent<LineRenderer>();
         laser_endSphere = bulbHead.transform.Find("LaserEndPosSphere").gameObject;
-        healthBar = transform.Find("Canvas/Bar").GetComponent<RectTransform>();
+        healthBar = transform.Find("Canvas/Bar/Health").GetComponent<RectTransform>();
+        whiteHealthBar = transform.Find("Canvas/Bar/White").GetComponent<RectTransform>();
         bulbBodyAnimator = transform.Find("NewBody").GetComponent<Animator>();
         bulbBodyAnimator.Play("Bulb_Sleep", 0, 50);
+        selectedIcon = transform.Find("Canvas/SelectedIcon").GetComponent<Image>();
     }
     // Update is called once per frame
-    void Update()
+    public override void Update()
     {
         if (navMeshAgent.velocity.magnitude > 0.1f)
         {
@@ -349,6 +352,8 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
             //    navMeshAgent.destination = playerTarget.position;
             //}
         }
+
+        base.Update();
     }
 
     public void StandingComplete()

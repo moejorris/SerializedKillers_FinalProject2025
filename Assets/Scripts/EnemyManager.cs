@@ -29,6 +29,18 @@ public class EnemyManager : MonoBehaviour
         {
             enemies.Add(enemy.GetComponent<EnemyAI_Base>());
         }
+
+        Debug.Log("Update Enemy List called! It has " + enemies.Count);
+    }
+
+    public void SelectEnemy(EnemyAI_Base enemy)
+    {
+        UpdateEnemyList();
+        foreach (EnemyAI_Base enemyScript in enemies)
+        {
+            enemyScript.DeselectEnemy();
+        }
+        enemy.SelectEnemy();
     }
 
     public void ActivateBehavior(Behavior behavior)

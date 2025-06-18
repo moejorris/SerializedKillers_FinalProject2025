@@ -71,28 +71,28 @@ public class ScriptStealMenu : MonoBehaviour
     {
         if (!menuOpen)
         {
-            Ray cameraRay = Camera.main.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(cameraRay, out RaycastHit hit, 100, enemyLayer, queryTriggerInteraction: QueryTriggerInteraction.Collide))
-            {
-                if (hit.transform.gameObject.layer != 7) // temp issue due to rigidbody making parent take the collider stuff and not child?
-                {
-                    if (hit.transform.GetComponent<EnemyAI_Base>() != null && hit.transform.GetComponent<EnemyAI_Base>().behaviorActive)
-                    {
-                        hit.transform.GetComponent<EnemyAI_Base>().SelectEnemy();
-                    }
-                }
-                else
-                {
-                    if (hit.transform.parent.GetComponent<EnemyAI_Base>() != null && hit.transform.parent.GetComponent<EnemyAI_Base>().behaviorActive)
-                    {
-                        hit.transform.parent.GetComponent<EnemyAI_Base>().SelectEnemy();
-                    }
-                }
-            }
-            else if (selectedEnemy != null)
-            {
-                selectedEnemy.DeselectEnemy();
-            }
+            //Ray cameraRay = Camera.main.ScreenPointToRay(Input.mousePosition);
+            //if (Physics.Raycast(cameraRay, out RaycastHit hit, 100, enemyLayer, queryTriggerInteraction: QueryTriggerInteraction.Collide))
+            //{
+            //    if (hit.transform.gameObject.layer != 7) // temp issue due to rigidbody making parent take the collider stuff and not child?
+            //    {
+            //        if (hit.transform.GetComponent<EnemyAI_Base>() != null && hit.transform.GetComponent<EnemyAI_Base>().behaviorActive)
+            //        {
+            //            hit.transform.GetComponent<EnemyAI_Base>().SelectEnemy();
+            //        }
+            //    }
+            //    else
+            //    {
+            //        if (hit.transform.parent.GetComponent<EnemyAI_Base>() != null && hit.transform.parent.GetComponent<EnemyAI_Base>().behaviorActive)
+            //        {
+            //            hit.transform.parent.GetComponent<EnemyAI_Base>().SelectEnemy();
+            //        }
+            //    }
+            //}
+            //else if (selectedEnemy != null)
+            //{
+            //    selectedEnemy.DeselectEnemy();
+            //}
         }
 
 
@@ -183,24 +183,24 @@ public class ScriptStealMenu : MonoBehaviour
             if (westButton.action.WasPerformedThisFrame() || Input.GetMouseButtonDown(0))
             {
                 
-                RaycastHit[] hits = Physics.RaycastAll(player.transform.position, player.transform.forward, attackDistance);
-                foreach (RaycastHit hit in hits)
-                {
-                    if (hit.transform.gameObject.layer != 7) // temp issue due to rigidbody making parent take the collider stuff and not child?
-                    {
-                        if (hit.transform.GetComponent<EnemyAI_Base>() != null)
-                        {
-                            hit.transform.GetComponent<EnemyAI_Base>().TakeDamage(5);
-                        }
-                    }
-                    else
-                    {
-                        if (hit.transform.parent.GetComponent<EnemyAI_Base>() != null)
-                        {
-                            hit.transform.parent.GetComponent<EnemyAI_Base>().TakeDamage(5);
-                        }
-                    }
-                } 
+                //RaycastHit[] hits = Physics.RaycastAll(player.transform.position, player.transform.forward, attackDistance);
+                //foreach (RaycastHit hit in hits)
+                //{
+                //    if (hit.transform.gameObject.layer != 7) // temp issue due to rigidbody making parent take the collider stuff and not child?
+                //    {
+                //        if (hit.transform.GetComponent<EnemyAI_Base>() != null)
+                //        {
+                //            hit.transform.GetComponent<EnemyAI_Base>().TakeDamage(5);
+                //        }
+                //    }
+                //    else
+                //    {
+                //        if (hit.transform.parent.GetComponent<EnemyAI_Base>() != null)
+                //        {
+                //            hit.transform.parent.GetComponent<EnemyAI_Base>().TakeDamage(5);
+                //        }
+                //    }
+                //} 
             }
 
 
@@ -217,6 +217,14 @@ public class ScriptStealMenu : MonoBehaviour
         }
 
         Time.timeScale = slowTime;
+    }
+
+    public void UpdateSelectedEnemy(EnemyAI_Base enemy)
+    {
+        if (selectedEnemy != enemy)
+        {
+            enemyManager.SelectEnemy(enemy);
+        }
     }
 
     public void RemoveBehaviorSelection()
