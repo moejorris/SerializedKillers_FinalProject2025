@@ -4847,5 +4847,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fireLifetime: 5
-  fireDamage: 5
+  fireDamage: 1
   timeBetweenDamage: 1

@@ -62,6 +62,7 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
     [Header("Bulb Attack Melee")]
     [SerializeField] private float meleeRange = 1;
     [SerializeField] private float meleeDamage = 3;
+    [SerializeField] private SpriteRenderer[] slashes;
     private float gapCloseTimer = 2.3f;
 
     [Header("Bulb Laser Attack")]
@@ -293,7 +294,7 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
                 {
                     if (PlayerVisible())
                     {
-                        if (Vector3.Distance(playerTarget.position, transform.position) < longRangeAttackDis) // way too close!!! gets away
+                        if (Vector3.Distance(playerTarget.position, transform.position) < longRangeAttackDis-3) // way too close!!! gets away
                         {
                             Vector3 newPos = transform.position + ((transform.position - playerTarget.position).normalized * (longRangeAttackDis - Vector3.Distance(playerTarget.position, transform.position)));
                             navMeshAgent.destination = newPos;
@@ -318,7 +319,8 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
 
             if (!PlayerVisible()) // in case the player runs away while an attack was occuring
             {
-
+                navMeshAgent.destination = transform.position;
+                followTimer = 5;
             }
         }
 
@@ -458,15 +460,24 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
         //navMeshAgent.angularSpeed = 0;
         bulbBodyAnimator.Play("Melee_Attack");
         yield return new WaitForSeconds(1);
+        foreach (SpriteRenderer slash in slashes)
+        {
+            slash.enabled = true;
+        }
         MeleeHitCheck();
-        yield return new WaitForSeconds(2);
+        yield return new WaitForSeconds(0.1f);
+        foreach (SpriteRenderer slash in slashes)
+        {
+            slash.enabled = false;
+        }
+        yield return new WaitForSeconds(1.9f);
 
 
         ExitMeleeAttack();
     }
     private void OnDrawGizmos()
     {
-        Gizmos.DrawSphere(transform.position + transform.forward, meleeRange);
+        //Gizmos.DrawSphere(transform.position + transform.forward, meleeRange);
     }
 
     public void MeleeHitCheck()
@@ -516,12 +527,32 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
         bulbBodyAnimator.Play("Crouch");
 
         shockwaveAnimator.Play("ShockwaveTest");
-        yield return new WaitForSeconds(2.8f);
+
+        yield return new WaitForSeconds(1.34f);
+        ShockwaveHitCheck();
+        yield return new WaitForSeconds(1.46f);
 
         bulbBodyAnimator.SetTrigger("Arise");
         yield return new WaitForSeconds(1.8f);
 
         ExitShockwaveAttack();
+    }
+
+    public void ShockwaveHitCheck()
+    {
+        RaycastHit[] hits = Physics.SphereCastAll(transform.position, 4.3f, transform.forward, 0, playerLayer);
+
+        //Debug.Log(hits.Length);
+
+        foreach (RaycastHit hit in hits)
+        {
+            if (hit.transform.parent != null && hit.transform.parent.CompareTag("Player"))
+            {
+                Debug.Log("Player Hit!");
+                playerHealth.TakeDamage(6);
+                break;
+            }
+        }
     }
 
     public void EnterLaserAttack()

@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.AI;
 using System.Collections;
+using UnityEngine.UI;
 
 public class EnemyAI_Overclock : EnemyAI_Base
 {
@@ -68,11 +69,14 @@ public class EnemyAI_Overclock : EnemyAI_Base
     {
         base.Start();
         healthBar = transform.Find("Canvas/Bar").GetComponent<RectTransform>();
+        selectedIcon = transform.Find("Canvas/SelectedIcon").GetComponent<Image>();
+        healthBar = transform.Find("Canvas/Bar/Health").GetComponent<RectTransform>();
+        whiteHealthBar = transform.Find("Canvas/Bar/White").GetComponent<RectTransform>();
     }
 
 
     // Update is called once per frame
-    void Update()
+    public override void Update()
     {
         if (!preparingAttack)
         {
@@ -211,6 +215,8 @@ public class EnemyAI_Overclock : EnemyAI_Base
 
             }
         }
+
+        base.Update();
     }
     public void PerformAttack()
     {
