@@ -54,11 +54,14 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
     
     [SerializeField] private float attackCooldownTimer = 0;
     [SerializeField] private float longRangeAttackDis = 10;
+    [SerializeField] private PlayerHealth playerHealth => GameObject.FindGameObjectWithTag("Canvas").GetComponent<PlayerHealth>();
 
     [Range(0f, 100f)]
     [SerializeField] private float shockwaveAttackChance;
 
     [Header("Bulb Attack Melee")]
+    [SerializeField] private float meleeRange = 1;
+    [SerializeField] private float meleeDamage = 3;
     private float gapCloseTimer = 2.3f;
 
     [Header("Bulb Laser Attack")]
@@ -125,15 +128,6 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
                     healing = true;
                     StartCoroutine("HealTimer");
                 }
-                
-                //if (standingUp)
-                //{
-                //    //Debug.Log(bulbBodyAnimator.GetCurrentAnimatorClipInfo(0)[0].clip.name);
-                //    if (bulbBodyAnimator.GetCurrentAnimatorClipInfo(0)[0].clip.name != "BulbActivate_A")
-                //    {
-                        
-                //    }
-                //}
 
                 if ((PlayerInAwakeRange() || !behaviorActive) && !standingUp)
                 {
@@ -463,11 +457,33 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
         navMeshAgent.isStopped = true;
         //navMeshAgent.angularSpeed = 0;
         bulbBodyAnimator.Play("Melee_Attack");
-
-        yield return new WaitForSeconds(3);
+        yield return new WaitForSeconds(1);
+        MeleeHitCheck();
+        yield return new WaitForSeconds(2);
 
 
         ExitMeleeAttack();
+    }
+    private void OnDrawGizmos()
+    {
+        Gizmos.DrawSphere(transform.position + transform.forward, meleeRange);
+    }
+
+    public void MeleeHitCheck()
+    {
+        RaycastHit[] hits = Physics.SphereCastAll(transform.position + transform.forward, meleeRange, transform.forward, 0, playerLayer);
+
+        //Debug.Log(hits.Length);
+
+        foreach (RaycastHit hit in hits)
+        {
+            if (hit.transform.parent != null && hit.transform.parent.CompareTag("Player"))
+            {
+                Debug.Log("Player Hit!");
+                playerHealth.TakeDamage(meleeDamage);
+                break;
+            }
+        }
     }
 
     public void EnterShockwaveAttack()
