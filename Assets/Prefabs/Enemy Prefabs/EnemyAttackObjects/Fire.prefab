@@ -4902,4 +4902,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   heldBehavior: {fileID: 11400000, guid: 459b7ba3e2c104d48b3c3eb892dcff0b, type: 2}
   fireEffect: {fileID: 2025842942695824325, guid: f3931ba7fbaa8d04c9d6cb80f828d482, type: 3}
-  fps: 7
+  fps: 14
