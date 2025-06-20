@@ -57,6 +57,9 @@ public class EnemyAI_Overclock : EnemyAI_Base
     [SerializeField] private float dashAttackLength = 2;
     private float dashAttackTimer = 0;
 
+    [Header("Overclock Flamethrower Attack")]
+    [SerializeField] private ParticleSystem flamethrowerParticles;
+
     [Header("Overclock Script Change Behavior")]
     [SerializeField] private float stalkingFollowDistance = 15f;
 
@@ -152,18 +155,13 @@ public class EnemyAI_Overclock : EnemyAI_Base
             }
             else if (movementState == "cooldown")
             {
-                
+
             }
         }
         else
         {
             if (attackState == "dash") // basically, makes the guy run to the player for a few seconds
             {
-                if (PlayerVisible())
-                {
-                    TurnBodyTowards(playerTarget.position - transform.position, 15);
-                }
-
                 if (!attackOccuring)
                 {
                     if (attackPrepTimer <= 0) // attacks if in range or after a few seconds of running if not
@@ -186,6 +184,13 @@ public class EnemyAI_Overclock : EnemyAI_Base
                     if (dashAttackTimer <= 0 || PlayerDistance() <= 1.3f)
                     {
                         flameDashing = false;
+                    }
+                }
+                else
+                {
+                    if (PlayerVisible())
+                    {
+                        TurnBodyTowards(playerTarget.position - transform.position, 15);
                     }
                 }
             }
@@ -270,8 +275,9 @@ public class EnemyAI_Overclock : EnemyAI_Base
         attackOccuring = true;
         navMeshAgent.isStopped = true;
 
-        yield return new WaitForSeconds(1);
-
+        yield return new WaitForSeconds(0.4f);
+        flamethrowerParticles.Play();
+        yield return new WaitForSeconds(4.8f);
         Debug.Log("Flame Attack Animation!!!");
         AttemptFlameTrail();
 
@@ -342,7 +348,7 @@ public class EnemyAI_Overclock : EnemyAI_Base
     IEnumerator CooldownMode()
     {
         movementState = "cooldown";
-        while(heatLevel > 0)
+        while (heatLevel > 0)
         {
             yield return new WaitForSeconds(0.05f);
             heatLevel -= 1;
