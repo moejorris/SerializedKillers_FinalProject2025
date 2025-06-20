@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 using UnityEngine.InputSystem;
 
 //Joe Morris
@@ -62,6 +63,20 @@ public class Player_CombatMachine : MonoBehaviour
         attackQueued = false;
 
         PlayerAttackSO attack = defaultAttacks[currentComboID];
+
+        //TODO:
+        //Arkham Method:
+        //Check to find possible victims
+        //iterate through them to find most likely intended to be attacked by player by getting joystick dir relative to cam and closest of them
+        //snap player to look at that enemy
+        //if movement force is greater than the distance from player to chosen enemy, limit force so the player doesn't move if not necessary.
+        //Consider just using the distance as the move force so the player gets close enough on it's own???
+
+        //TODO:
+        //Also standard targeting method
+        //Get target (somehow)
+        //Rotate player towards it (not immediate snap)
+        //Make cam look at it... look at avg position of player and target (player.position + target.position / 2f)
 
         animatorOverride["AttackPlaceholder" + currentAnim] = attack.animation;
         animator.runtimeAnimatorController = animatorOverride;
@@ -127,9 +142,8 @@ public class Player_CombatMachine : MonoBehaviour
         }
         else ResetCombo();
 
+        //toggle between using anim states 1 and 2 for transitionary purposes as opposed to using one anim state for attacks
         currentAnim = currentAnim == 1 ? 2 : 1;
-
-        // currentComboID = Mathf.Clamp(currentComboID, 0, defaultAttacks.Count); //Don't clamp to Count - 1 because then the combo would never reset
     }
 
     void ResetCombo()
@@ -138,11 +152,13 @@ public class Player_CombatMachine : MonoBehaviour
         currentAnim = 1;
     }
 
-    void HitCheck() // Caleb was here O_O
+    void HitCheck() // Caleb was here O_O //This needs a major refactor
     {
         Collider[] hitObjects = Physics.OverlapSphere(transform.position + _machine.ForwardDirection * distanceForwards, checkRadius, ~0, QueryTriggerInteraction.Ignore);
         Vector3 hitPositions = new Vector3();
         float validEnemies = 0;
+
+        //TODO Create List of Enemy movement controllers
 
         EnemyAI_Base selectedEnemy = null;
 
@@ -152,14 +168,18 @@ public class Player_CombatMachine : MonoBehaviour
 
             validEnemies++;
             hitPositions += collider.transform.position;
-            collider.gameObject.GetComponent<EnemyAI_Base>().TakeDamage(defaultAttacks[currentComboID].damage);
+            collider.gameObject.GetComponent<EnemyAI_Base>().TakeDamage(defaultAttacks[currentComboID].damage); //TODO apply script effect to enemy when damaging
             Debug.Log(collider.gameObject.name + " took " + defaultAttacks[currentComboID].damage + " damage!");
             selectedEnemy = collider.gameObject.GetComponent<EnemyAI_Base>();
+
+            //TODO add enemy to List of movement controllers
         }
+
+        //TODO foreach enemy movement controller, apply knockback force to them. Possibly divide knockback by list count???
 
         if (selectedEnemy) scriptStealMenu.UpdateSelectedEnemy(selectedEnemy);
 
-        if (Vector3.Distance(transform.position + _machine.ForwardDirection, hitPositions / validEnemies) <= checkRadius*2f && defaultAttacks[currentComboID].overrideMotion)
+        if (Vector3.Distance(transform.position + _machine.ForwardDirection, hitPositions / validEnemies) <= checkRadius*2f && defaultAttacks[currentComboID].overrideMotion) //this didn't work lol TODO fix this
         {
             Debug.Log("Enemy is close");
             //_forceHandler.AddForce(Vector3.zero, ForceMode.VelocityChange, Player_ForceHandler.OverrideMode.All);

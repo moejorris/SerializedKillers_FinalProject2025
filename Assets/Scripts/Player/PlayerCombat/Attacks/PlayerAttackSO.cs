@@ -8,7 +8,12 @@ public class PlayerAttackSO : ScriptableObject
     public float damage;
     public AnimationClip animation;
     public float animationSpeed = 1;
+
+    [Header("Player Movement")]
     public bool overrideMotion;
     public bool usesRootMotion;
     public Vector3 vectorForce;
+
+    [Header("Enemy Movement")]
+    public float knockback;
 }

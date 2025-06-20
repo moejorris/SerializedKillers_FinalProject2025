@@ -11,6 +11,8 @@ public class Player_Animation : MonoBehaviour
     [SerializeField] Player_MovementMachine machine;
     [SerializeField] Player_Walk walk;
 
+    float foursTimer = 0;
+
     void Awake()
     {
         machine = GetComponent<Player_MovementMachine>();
@@ -19,11 +21,17 @@ public class Player_Animation : MonoBehaviour
 
     void LateUpdate()
     {
-        playerMeshAnimator.SetFloat("NormalizedWalkSpeed", walk.GetNormalizedSpeed());
 
+        foursTimer += Time.deltaTime;
 
-        if (machine.ForwardDirection != Vector3.zero)
+        if (foursTimer >= 0.1f) // 0.1f in between updates to emulate choppy feeling 
+        {
             playerMeshTransform.forward = machine.ForwardDirection;
+            playerMeshAnimator.SetFloat("NormalizedWalkSpeed", walk.GetNormalizedSpeed());
+            foursTimer = 0;
+        }
+
+        playerMeshTransform.position = transform.position - Vector3.up; //tried making position choppy, but man it looked awful!
     }
 
     public void PlayDashAnimation()
