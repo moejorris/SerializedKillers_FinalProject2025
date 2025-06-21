@@ -38,7 +38,7 @@ Material:
   - MOTIONVECTORS
   - SHADOWCASTER
   - DepthOnly
-  m_LockedProperties: 
+  m_LockedProperties: _ElectricityColor
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -57,7 +57,7 @@ Material:
     m_Ints: []
     m_Floats:
     - _AlphaClip: 1
-    - _AlphaClipping: 0.391
+    - _AlphaClipping: 0
     - _AlphaToMask: 0
     - _Blend: 0
     - _BlendModePreserveSpecular: 1
@@ -68,15 +68,15 @@ Material:
     - _DecalMeshViewBias: 0
     - _DrawOrder: 0
     - _DstBlend: 10
-    - _IntersectionDepth: 4.01
-    - _NoiseScale: 225
-    - _Power: 14.8
+    - _IntersectionDepth: 23.2
+    - _NoiseScale: 129
+    - _Power: 4.29
     - _QueueControl: 0
     - _QueueOffset: 0
     - _ReceiveShadows: 1
     - _SrcBlend: 5
     - _Surface: 1
-    - _Thickness: 1.9
+    - _Thickness: 1.65
     - _Transparency: 1
     - _WorkflowMode: 1
     - _ZTest: 4
@@ -84,9 +84,9 @@ Material:
     - _ZWriteControl: 0
     m_Colors:
     - _Color: {r: 1, g: 0.8396226, b: 0.37264147, a: 1}
-    - _ElectricityColor: {r: 1, g: 0.7795662, b: 0.19339621, a: 1}
-    - _IntersectionColor: {r: 1, g: 0.7711443, b: 0, a: 1}
+    - _ElectricityColor: {r: 1, g: 0.7795662, b: 0.19339618, a: 1}
+    - _IntersectionColor: {r: 1, g: 0.77114433, b: 0, a: 1}
     - _Speed1: {r: 0, g: 0.05, b: 0, a: 0}
-    - _Speed2: {r: 0.1, g: -0.2, b: 0, a: 0}
+    - _Speed2: {r: 0.1, g: -0.3, b: 0, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

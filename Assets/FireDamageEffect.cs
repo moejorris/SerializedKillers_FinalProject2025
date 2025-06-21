@@ -3,22 +3,10 @@ using UnityEngine;
 public class FireDamageEffect : MonoBehaviour
 {
     private PlayerHealth playerHealth => GameObject.FindGameObjectWithTag("Canvas").GetComponent<PlayerHealth>();
-    [SerializeField] private float fireLifetime = 5;
+    public float fireLifetime = 4;
     [SerializeField] private float fireDamage = 1;
     [SerializeField] private float timeBetweenDamage = 1;
     private float timer;
-
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        ParticleSystem ps = GetComponent<ParticleSystem>();
-        ps.Stop();
-
-        var main = ps.main;
-        main.duration = fireLifetime;
-
-        ps.Play();
-    }
 
     // Update is called once per frame
     void Update()
@@ -30,6 +18,16 @@ public class FireDamageEffect : MonoBehaviour
             {
                 timer = 0;
                 playerHealth.TakeDamage(fireDamage);
+            }
+        }
+
+        fireLifetime -= Time.deltaTime;
+        if (fireLifetime <= 1)
+        {
+            GetComponent<ParticleSystem>().Stop();
+            if (fireLifetime <= 0)
+            {
+                Destroy(gameObject);
             }
         }
     }

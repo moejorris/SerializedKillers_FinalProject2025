@@ -6,19 +6,13 @@ public class FireHazard : MonoBehaviour
     [SerializeField] private GameObject fireEffect;
     private bool fireActive = true;
     private ParticleSystem particles;
+    [SerializeField] private int fps;
+    private float timeElapsed = 0;
+    private float displayTime = 0;
 
     private void Start()
     {
         particles = transform.Find("Particle System").GetComponent<ParticleSystem>();
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        if (particles == null)
-        {
-            Destroy(gameObject);
-        }
     }
 
     public void PutOutFire()
@@ -27,7 +21,23 @@ public class FireHazard : MonoBehaviour
         particles.Stop();
     }
 
-    private void OnTriggerEnter(Collider other)
+    private void LateUpdate()
+    {
+        timeElapsed += Time.deltaTime;
+        if (timeElapsed > particles.main.duration + 1)
+        {
+            Destroy(gameObject);
+        }
+
+        if ((timeElapsed - displayTime) > 1f / fps)
+        {
+            displayTime = timeElapsed;
+            particles.Simulate(0.15f, true, false, false);
+            particles.Pause();
+        }
+    }
+
+    private void OnTriggerStay(Collider other)
     {
         if (fireActive)
         {
@@ -41,13 +51,18 @@ public class FireHazard : MonoBehaviour
             }
             else if (other.transform.parent != null && other.transform.parent.gameObject.CompareTag("Player"))
             {
-                if (other.transform.Find("Meshes").childCount < 3)
+                if (other.transform.parent.Find("Meshes/PCHAR_ALPHA_03").childCount < 3)
                 {
-                    GameObject effect = Instantiate(fireEffect, other.transform.Find("Meshes"));
-                    effect.transform.position = other.transform.Find("Meshes").position;
+                    GameObject effect = Instantiate(fireEffect, other.transform.parent.Find("Meshes/PCHAR_ALPHA_03"));
+                    effect.transform.position = other.transform.parent.Find("Meshes/PCHAR_ALPHA_03").position;
                 }
                 else
                 {
+                    FireDamageEffect damageEffect = other.transform.parent.Find("Meshes/PCHAR_ALPHA_03").GetComponentInChildren<FireDamageEffect>();
+                    if (damageEffect != null)
+                    {
+                        damageEffect.fireLifetime = 4;
+                    }
                     // deals more damage since entering fire while on fire?
                 }
             }

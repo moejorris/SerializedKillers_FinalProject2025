@@ -482,7 +482,7 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
 
     public void MeleeHitCheck()
     {
-        RaycastHit[] hits = Physics.SphereCastAll(transform.position + transform.forward, meleeRange, transform.forward, 0, playerLayer);
+        RaycastHit[] hits = Physics.SphereCastAll(transform.position, meleeRange, transform.forward, 1, playerLayer);
 
         //Debug.Log(hits.Length);
 
@@ -600,12 +600,30 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
 
 
         bulbHead.transform.Find("Capsule").gameObject.SetActive(true);
+        LaserHitCheck();
         yield return new WaitForSeconds(0.5f);
         bulbHead.transform.Find("Capsule").gameObject.SetActive(false);
         bulbBodyAnimator.SetTrigger("Arise");
         yield return new WaitForSeconds(1f);
 
         ExitLaserAttack();
+    }
+
+    public void LaserHitCheck()
+    {
+        RaycastHit[] hits = Physics.SphereCastAll(transform.position + bulbHead.transform.forward, 1, bulbHead.transform.forward, 25, playerLayer);
+
+        //Debug.Log(hits.Length);
+
+        foreach (RaycastHit hit in hits)
+        {
+            if (hit.transform.parent != null && hit.transform.parent.CompareTag("Player"))
+            {
+                Debug.Log("Player Hit!");
+                playerHealth.TakeDamage(8);
+                break;
+            }
+        }
     }
 
     public void UpdateLaserPosition()
