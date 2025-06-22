@@ -13,8 +13,12 @@ MonoBehaviour:
   m_Name: Slash 3
   m_EditorClassIdentifier: 
   damage: 15
+  hitboxDelay: 0.2
+  hitboxDuration: 0.15
   animation: {fileID: 807648270786780877, guid: b776906fb39ec7244b78cd28c50e88a3, type: 3}
   animationSpeed: 1
   overrideMotion: 1
   usesRootMotion: 0
   vectorForce: {x: 0, y: -6, z: 24}
+  knockback: 0
+  particleEffect: {fileID: 3355244673728713408, guid: 9dcb7d7afa5bbd649a0e55d10bb12baa, type: 3}

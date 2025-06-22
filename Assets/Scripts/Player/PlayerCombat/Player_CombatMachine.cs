@@ -1,7 +1,8 @@
 using System.Collections.Generic;
+using System.Collections;
 using UnityEngine;
-using UnityEngine.AI;
 using UnityEngine.InputSystem;
+
 
 //Joe Morris
 //SGD FP '25
@@ -27,14 +28,15 @@ public class Player_CombatMachine : MonoBehaviour
 
     [Header("Damage Collision")]
     [SerializeField] bool showHitboxCollider;
+    [SerializeField] bool onlyShowHitboxWhenEnabled = true;
+    bool hitBoxActive;
     [SerializeField] float distanceForwards = 1f;
     [SerializeField] float checkRadius = 1f;
 
     bool isAttacking = false;
     bool attackQueued = false;
 
-    [Header("Cosmetic")]
-    [SerializeField] TrailRenderer trailRenderer;
+    PlayerAttackSO currentAttack;
 
     void Update()
     {
@@ -59,11 +61,6 @@ public class Player_CombatMachine : MonoBehaviour
     {
         if (OutOfRangeCheck()) return;
 
-        isAttacking = true;
-        attackQueued = false;
-
-        PlayerAttackSO attack = defaultAttacks[currentComboID];
-
         //TODO:
         //Arkham Method:
         //Check to find possible victims
@@ -77,49 +74,63 @@ public class Player_CombatMachine : MonoBehaviour
         //Get target (somehow)
         //Rotate player towards it (not immediate snap)
         //Make cam look at it... look at avg position of player and target (player.position + target.position / 2f)
+        isAttacking = true;
+        attackQueued = false;
 
-        animatorOverride["AttackPlaceholder" + currentAnim] = attack.animation;
-        animator.runtimeAnimatorController = animatorOverride;
+        currentAttack = defaultAttacks[currentComboID];
 
-        animator.CrossFade("Attack" + currentAnim, 0.025f);
-        animator.speed = attack.animationSpeed;
-        float animationLength = attack.animation.length / attack.animationSpeed; // find a way to get the speed of the state and divide the length by that...
+        HandleAnimation();
 
-        if (trailRenderer)
-        {
-            trailRenderer.emitting = true;
+        HandleParticle();
 
-            CancelInvoke("DisableTrail");
-            Invoke("DisableTrail", animationLength * 0.5f);
-        }
+        float attackTime = currentAttack.animation.length / currentAttack.animationSpeed; // find a way to get the speed of the state and divide the length by that...
 
 
         CancelInvoke("AttackIsDone");
-        Invoke("AttackIsDone", animationLength * 0.75f);
+        Invoke("AttackIsDone", attackTime * 0.75f);
 
-        HitCheck(); //add delay to this because right now it's as soon as you press the button
+        StartCoroutine(LongHitCheck());
 
-        if (attack.overrideMotion)
+        // HitCheck(); //add delay to this because right now it's as soon as you press the button
+
+        if (currentAttack.overrideMotion)
         {
-            if (attack.usesRootMotion) _machine.DisableAllMovers(_rootMotion);
+            if (currentAttack.usesRootMotion) _machine.DisableAllMovers(_rootMotion);
             else _rootMotion.enabled = false;
             _machine.DisableAllMovers(_forceHandler);
             _rotation.enabled = false;
         }
-        if (attack.vectorForce.magnitude > 0) // only apply force if necessary
+        if (currentAttack.vectorForce.magnitude > 0) // only apply force if necessary
         {
-            _forceHandler.AddForce(LocalizeForceVector(attack.vectorForce), ForceMode.VelocityChange, Player_ForceHandler.OverrideMode.All);        
+            _forceHandler.AddForce(LocalizeForceVector(currentAttack.vectorForce), ForceMode.VelocityChange, Player_ForceHandler.OverrideMode.All);        
         }
 
         CancelInvoke("ResetCombo");
-        Invoke("ResetCombo", comboResetTime + animationLength);
+        Invoke("ResetCombo", comboResetTime + attackTime);
 
         GetNextAttack();
     }
 
-    void DisableTrail()
+    void HandleHitbox()
     {
-        trailRenderer.emitting = false;
+
+    }
+
+    void HandleParticle()
+    {
+        if (currentAttack.particleEffect)
+        {
+            Instantiate(currentAttack.particleEffect, animator.transform);
+        }
+    }
+
+    void HandleAnimation()
+    {
+        animatorOverride["AttackPlaceholder" + currentAnim] = currentAttack.animation;
+        animator.runtimeAnimatorController = animatorOverride;
+
+        animator.CrossFade("Attack" + currentAnim, 0.025f);
+        animator.speed = currentAttack.animationSpeed;
     }
 
     void AttackIsDone()
@@ -131,7 +142,6 @@ public class Player_CombatMachine : MonoBehaviour
         _rootMotion.enabled = false;
         _rotation.enabled = true;
 
-        if (trailRenderer) trailRenderer.emitting = false;
     }
 
     void GetNextAttack()
@@ -150,6 +160,61 @@ public class Player_CombatMachine : MonoBehaviour
     {
         currentComboID = 0;
         currentAnim = 1;
+    }
+
+    IEnumerator LongHitCheck()
+    {
+        yield return new WaitForSeconds(currentAttack.hitboxDelay);
+
+        float completionTime = currentAttack.hitboxDuration;
+
+        hitBoxActive = true;
+
+        if (completionTime == 0)
+        {
+            //check hitbox one frame
+
+            Collider[] hitObjects = Physics.OverlapSphere(transform.position + _machine.ForwardDirection * distanceForwards, checkRadius, ~0, QueryTriggerInteraction.Ignore);
+
+            foreach (Collider collider in hitObjects)
+            {
+                if (collider.CompareTag("Player")) continue;
+
+                EnemyAI_Base enemy = collider.GetComponent<EnemyAI_Base>();
+
+                if (enemy == null) continue;
+
+                enemy.TakeDamage(currentAttack.damage);
+            }
+        }
+        else
+        {
+            List<EnemyAI_Base> enemiesHit = new();
+
+            float currentTime = 0;
+
+            while (currentTime < completionTime)
+            {
+                Collider[] hitObjects = Physics.OverlapSphere(transform.position + _machine.ForwardDirection * distanceForwards, checkRadius, ~0, QueryTriggerInteraction.Ignore);
+
+                foreach (Collider collider in hitObjects)
+                {
+                    if (collider.CompareTag("Player")) continue;
+
+                    EnemyAI_Base enemy = collider.GetComponent<EnemyAI_Base>();
+
+                    if (enemy == null || enemiesHit.Contains(enemy)) continue;
+
+                    enemy.TakeDamage(currentAttack.damage);
+                    enemiesHit.Add(enemy);
+                }
+
+                yield return new WaitForEndOfFrame();
+                currentTime += Time.deltaTime;
+            }
+        }
+
+        hitBoxActive = false;
     }
 
     void HitCheck() // Caleb was here O_O //This needs a major refactor
@@ -215,7 +280,9 @@ public class Player_CombatMachine : MonoBehaviour
 
     void OnDrawGizmos()
     {
-        if (isAttacking || showHitboxCollider)
+        if (!showHitboxCollider) return;
+
+        if ((hitBoxActive && onlyShowHitboxWhenEnabled) || !onlyShowHitboxWhenEnabled)
         {
             Vector3 dir = _machine.ForwardDirection == Vector3.zero ? transform.forward : _machine.ForwardDirection;
 

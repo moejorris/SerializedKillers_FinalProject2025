@@ -5,7 +5,12 @@ using UnityEngine;
 //Joe Morris
 public class PlayerAttackSO : ScriptableObject
 {
+    [Header("Damaging")]
     public float damage;
+    public float hitboxDelay;
+    public float hitboxDuration;
+
+    [Header("Animation")]
     public AnimationClip animation;
     public float animationSpeed = 1;
 
@@ -16,4 +21,12 @@ public class PlayerAttackSO : ScriptableObject
 
     [Header("Enemy Movement")]
     public float knockback;
+
+    [Header("Cosmetic")]
+    public GameObject particleEffect;
+    
+    [Header("Sound")]
+    public AudioClip swingSound;
+    public AudioClip impactSound;
+
 }

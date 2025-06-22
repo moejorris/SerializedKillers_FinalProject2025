@@ -61,7 +61,7 @@ public class EnemyAI_Base : MonoBehaviour
 
         if (playerTarget == null)
         {
-            playerTarget = GameObject.FindGameObjectWithTag("Player").transform.Find("Meshes/PCHAR_ALPHA_03").gameObject.transform;
+            playerTarget = GameObject.FindGameObjectWithTag("PlayerMesh").transform;
         }
         scriptStealMenu = GameObject.FindGameObjectWithTag("Canvas").transform.Find("ScriptStealMenu").GetComponent<ScriptStealMenu>();
 

@@ -51,14 +51,14 @@ public class FireHazard : MonoBehaviour
             }
             else if (other.transform.parent != null && other.transform.parent.gameObject.CompareTag("Player"))
             {
-                if (other.transform.parent.Find("Meshes/PCHAR_ALPHA_03").childCount < 3)
+                if (other.transform.parent.Find("Meshes").childCount < 3)
                 {
-                    GameObject effect = Instantiate(fireEffect, other.transform.parent.Find("Meshes/PCHAR_ALPHA_03"));
-                    effect.transform.position = other.transform.parent.Find("Meshes/PCHAR_ALPHA_03").position;
+                    GameObject effect = Instantiate(fireEffect, other.transform.parent.Find("Meshes"));
+                    effect.transform.position = other.transform.parent.Find("Meshes").position;
                 }
                 else
                 {
-                    FireDamageEffect damageEffect = other.transform.parent.Find("Meshes/PCHAR_ALPHA_03").GetComponentInChildren<FireDamageEffect>();
+                    FireDamageEffect damageEffect = other.transform.parent.Find("Meshes").GetComponentInChildren<FireDamageEffect>();
                     if (damageEffect != null)
                     {
                         damageEffect.fireLifetime = 4;
