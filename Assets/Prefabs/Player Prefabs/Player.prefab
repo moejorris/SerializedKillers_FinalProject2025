@@ -11484,6 +11484,9 @@ MonoBehaviour:
   onlyShowHitboxWhenEnabled: 1
   distanceForwards: 1.21
   checkRadius: 1.44
+  isBatman: 1
+  walkInput: {fileID: -1680190386980627800, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  maxLeapDistance: 15
 --- !u!114 &2845844426926673644
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14019,7 +14022,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 93f4a97608995b5499ede8408b5df655, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.22
+      value: -0.09
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 93f4a97608995b5499ede8408b5df655, type: 3}
       propertyPath: m_LocalPosition.z

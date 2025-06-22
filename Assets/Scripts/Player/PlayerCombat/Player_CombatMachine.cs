@@ -33,6 +33,11 @@ public class Player_CombatMachine : MonoBehaviour
     [SerializeField] float distanceForwards = 1f;
     [SerializeField] float checkRadius = 1f;
 
+    [Header("Batman Arkham Combat Settings")]
+    [SerializeField] bool isBatman = true;
+    [SerializeField] InputActionReference walkInput;
+    [SerializeField] float maxLeapDistance = 10f;
+
     bool isAttacking = false;
     bool attackQueued = false;
 
@@ -86,18 +91,81 @@ public class Player_CombatMachine : MonoBehaviour
 
         float attackTime = currentAttack.animation.length / currentAttack.animationSpeed; // find a way to get the speed of the state and divide the length by that...
 
+        StartCoroutine(HitCheck());
+        HandleMovement();
+        HandleRotation();
+        HandleMoveToTarget();
 
         CancelInvoke("AttackIsDone");
         Invoke("AttackIsDone", attackTime * 0.75f);
 
-        StartCoroutine(HitCheck());
-        HandleMovement();
-        HandleRotation();
 
         CancelInvoke("ResetCombo");
         Invoke("ResetCombo", comboResetTime + attackTime);
 
         GetNextAttack();
+    }
+
+    void HandleMoveToTarget()
+    {
+        if (!isBatman) return;
+
+        Vector3 inputDir = IntendedMoveDirection();
+
+        if (inputDir.magnitude < 0.5f) inputDir = _machine.ForwardDirection;
+
+        Collider[] checkSphereColliders = Physics.OverlapSphere(transform.position + inputDir * (maxLeapDistance / 2f), maxLeapDistance / 2f, ~0, QueryTriggerInteraction.Ignore);
+
+        List<EnemyAI_Base> potentialTargets = new();
+
+        foreach (Collider collider in checkSphereColliders)
+        {
+            EnemyAI_Base enemy = collider.GetComponent<EnemyAI_Base>();
+
+            if (!enemy) continue;
+
+            float dist = Vector3.Distance(transform.position, enemy.transform.position);
+
+            if (dist > maxLeapDistance) continue;
+
+            if (dist > checkRadius && walkInput.action.ReadValue<Vector2>().magnitude == 0) continue;
+
+            RaycastHit hit;
+
+            if (!Physics.Raycast(transform.position, enemy.transform.position - transform.position, out hit, dist + 2, ~0, QueryTriggerInteraction.Ignore) || hit.collider != collider) continue;
+
+            potentialTargets.Add(enemy);
+        }
+
+        Debug.Log("Arkham Combat: Found " + potentialTargets.Count + " potential targets.");
+
+        if (potentialTargets.Count < 1) return;
+
+        float dot = 0.5f;
+        EnemyAI_Base mostInLineEnemy = null;
+
+        foreach (EnemyAI_Base enemy in potentialTargets)
+        {
+            float testDot = Vector3.Dot(enemy.transform.position - transform.position, inputDir);
+
+            if (testDot > dot)
+            {
+                dot = testDot;
+                mostInLineEnemy = enemy;
+            }
+        }
+
+        if (mostInLineEnemy == null) return;
+
+        Debug.Log("Arkham Combat: Found Most In Line Enemy: " + mostInLineEnemy.transform.name);
+
+        GetComponent<CharacterController>().enabled = false;
+
+        _machine.SetForwardDirection(mostInLineEnemy.transform.position - transform.position);
+        transform.position = mostInLineEnemy.transform.position - (mostInLineEnemy.transform.position - transform.position).normalized * checkRadius;
+        transform.position = new Vector3(transform.position.x, mostInLineEnemy.transform.position.y, transform.position.z);
+
+        GetComponent<CharacterController>().enabled = true;
     }
 
     void HandleParticle()
@@ -110,7 +178,7 @@ public class Player_CombatMachine : MonoBehaviour
 
     void HandleRotation()
     {
-        if (currentAttack.lockRotation)
+        if (currentAttack.lockRotation || isBatman)
         {
             _rotation.enabled = false;
         }
@@ -118,15 +186,18 @@ public class Player_CombatMachine : MonoBehaviour
 
     void HandleMovement()
     {
-        if (currentAttack.overrideMotion)
+        if (currentAttack.overrideMotion || isBatman)
         {
             if (currentAttack.usesRootMotion) _machine.DisableAllMovers(_rootMotion);
             else _rootMotion.enabled = false;
             _machine.DisableAllMovers(_forceHandler);
         }
+
+        if (isBatman) return;
+
         if (currentAttack.vectorForce.magnitude > 0) // only apply force if necessary
         {
-            _forceHandler.AddForce(LocalizeForceVector(currentAttack.vectorForce), ForceMode.VelocityChange, Player_ForceHandler.OverrideMode.All);        
+            _forceHandler.AddForce(LocalizeForceVector(currentAttack.vectorForce), ForceMode.VelocityChange, Player_ForceHandler.OverrideMode.All);
         }
     }
 
@@ -241,7 +312,7 @@ public class Player_CombatMachine : MonoBehaviour
                 enemy.TakeDamage(currentAttack.damage);
                 hitEnemy = true;
             }
-            if(hitEnemy) HandleImpactSound();
+            if (hitEnemy) HandleImpactSound();
         }
         else
         {
@@ -306,5 +377,15 @@ public class Player_CombatMachine : MonoBehaviour
     Vector3 LocalizeForceVector(Vector3 vector)
     {
         return _machine.ForwardDirection * vector.z + _machine.RightDirection * vector.x + Vector3.up * vector.y;
+    }
+    
+    Vector3 IntendedMoveDirection()
+    {
+        Vector3 camForward = Vector3.ProjectOnPlane(Camera.main.transform.forward, Vector3.up);
+        Vector3 camRight = Vector3.ProjectOnPlane(Camera.main.transform.right, Vector3.up);
+
+        Vector2 moveInput = walkInput.action.ReadValue<Vector2>();
+
+        return moveInput.x * camRight.normalized + moveInput.y * camForward.normalized;
     }
 }

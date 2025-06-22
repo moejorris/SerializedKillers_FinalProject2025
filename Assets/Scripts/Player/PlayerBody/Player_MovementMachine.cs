@@ -12,7 +12,7 @@ public class Player_MovementMachine : MonoBehaviour
     [Header("Parameters")]
     [SerializeField] TimeStep timeStep = TimeStep.Update;
 
-    enum GroundCheckMethod { Raycast, CapsuleCast, SphereCast, CheckSphere }
+    enum GroundCheckMethod { Raycast, CapsuleCast, SphereCast }
     [SerializeField] GroundCheckMethod groundCheckMethod = GroundCheckMethod.Raycast;
 
     List<IPlayerMover> activeMovers = new List<IPlayerMover>();
@@ -152,24 +152,12 @@ public class Player_MovementMachine : MonoBehaviour
                 _grounded = Physics.SphereCast(transform.position, controller.radius, Vector3.down, out _groundInfo, controller.height / 2f, ~0, QueryTriggerInteraction.Ignore);
 
                 break;
-
-            case GroundCheckMethod.CheckSphere:
-
-                //Look into this incase it's worth it???
-                GroundCheckSphere();
-
-                break;
         }
 
         if (prevGrounded != _grounded)
         {
             _animation.UpdateGroundedStatus(_grounded);
         }
-    }
-
-    void GroundCheckSphere()
-    {
-
     }
 
     void OnDrawGizmos()
