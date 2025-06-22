@@ -372,10 +372,8 @@ public class EnemyAI_Overclock : EnemyAI_Base
             Vector3 spawnPoint = location;
             Physics.Raycast(raycast, out RaycastHit hit, 15, 0);
             spawnPoint.y = hit.point.y + 0.2f;
-            ParticleSystem fire = Instantiate(firePrefab, spawnPoint, Quaternion.identity).transform.Find("Particle System").GetComponent<ParticleSystem>();
-
-            var fire_main = fire.main;
-            fire_main.duration = fireDur;
+            FireHazard fire = Instantiate(firePrefab, spawnPoint, Quaternion.identity).GetComponent<FireHazard>();
+            fire.fireDuration = fireDur;
         }
     }
 

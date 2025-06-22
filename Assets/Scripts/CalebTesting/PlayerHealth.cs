@@ -7,6 +7,8 @@ public class PlayerHealth : MonoBehaviour
     [SerializeField] private GameObject HeartHolder;
     [SerializeField] private Image[] redHearts;
     [SerializeField] private Image[] whiteHearts;
+    [SerializeField] private AudioClip healSound;
+    [SerializeField] private AudioClip damageSound;
     public float speed = 1;
     private float maxHealth = 20;
     public float health;
@@ -23,8 +25,19 @@ public class PlayerHealth : MonoBehaviour
 
     }
 
+    void PlaySound(AudioClip clip)
+    {
+        GameObject soundObject = Instantiate(new GameObject(), transform);
+        AudioSource audioSource = soundObject.AddComponent<AudioSource>();
+        audioSource.clip = clip;
+
+        audioSource.PlayOneShot(clip);
+        Destroy(soundObject, clip.length);
+    }
+
     public void TakeDamage(float dmg)
     {
+        PlaySound(damageSound);
         health -= dmg;
         if (health < 0) health = 0;
 
@@ -35,6 +48,7 @@ public class PlayerHealth : MonoBehaviour
 
     public void HealDamage(float hp)
     {
+        PlaySound(healSound);
         health += hp;
         if (health > maxHealth) health = maxHealth;
 

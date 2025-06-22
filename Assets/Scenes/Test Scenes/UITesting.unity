@@ -4647,6 +4647,8 @@ MonoBehaviour:
   - {fileID: 195424577}
   - {fileID: 1187739039}
   - {fileID: 2041775296}
+  healSound: {fileID: 8300000, guid: 0daa7567300c82542b41ef2de9967be3, type: 3}
+  damageSound: {fileID: 8300000, guid: bd2e8009641b77147a3191a1838adcd0, type: 3}
   speed: 7
   health: 0
 --- !u!1001 &1386055727
@@ -7604,6 +7606,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1337442196208836245, guid: b438f22a2483c8e498fa00f3b586992e, type: 3}
+      propertyPath: shockwaveAttackChance
+      value: 61.3
+      objectReference: {fileID: 0}
     - target: {fileID: 2463201169264508749, guid: b438f22a2483c8e498fa00f3b586992e, type: 3}
       propertyPath: m_LocalPosition.x
       value: -8.63
@@ -7647,10 +7653,6 @@ PrefabInstance:
     - target: {fileID: 8823160757367770844, guid: b438f22a2483c8e498fa00f3b586992e, type: 3}
       propertyPath: m_Name
       value: SpiteBulb
-      objectReference: {fileID: 0}
-    - target: {fileID: 8823160757367770844, guid: b438f22a2483c8e498fa00f3b586992e, type: 3}
-      propertyPath: m_IsActive
-      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

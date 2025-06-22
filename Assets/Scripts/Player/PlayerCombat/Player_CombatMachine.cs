@@ -330,6 +330,11 @@ public class Player_CombatMachine : MonoBehaviour
                 {
                     if (collider.CompareTag("Player")) continue;
 
+                    if (collider.GetComponent<BreakableObject>())
+                    {
+                        collider.GetComponent<BreakableObject>().DestroyObjct();
+                    }
+
                     EnemyAI_Base enemy = collider.GetComponent<EnemyAI_Base>();
 
                     if (enemy == null || enemiesHit.Contains(enemy)) continue;

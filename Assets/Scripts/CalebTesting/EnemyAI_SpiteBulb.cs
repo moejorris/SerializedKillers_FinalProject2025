@@ -466,7 +466,7 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
         }
 
         Vector3 rotation = transform.eulerAngles;
-        rotation.y += 20;
+        rotation.y += 30;
         transform.eulerAngles = rotation;
 
         MeleeHitCheck();

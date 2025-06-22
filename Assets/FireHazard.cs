@@ -9,6 +9,7 @@ public class FireHazard : MonoBehaviour
     [SerializeField] private int fps;
     private float timeElapsed = 0;
     private float displayTime = 0;
+    public float fireDuration = 5;
 
     private void Start()
     {
@@ -18,15 +19,19 @@ public class FireHazard : MonoBehaviour
     public void PutOutFire()
     {
         fireActive = false;
-        particles.Stop();
+        timeElapsed = fireDuration;
     }
 
     private void LateUpdate()
     {
         timeElapsed += Time.deltaTime;
-        if (timeElapsed > particles.main.duration + 1)
+        if (timeElapsed > fireDuration)
         {
-            Destroy(gameObject);
+            particles.loop = false;
+            if (particles.particleCount <= 0)
+            {
+                Destroy(gameObject);
+            }
         }
 
         if ((timeElapsed - displayTime) > 1f / fps)
