@@ -19,6 +19,9 @@ public class PlayerAttackSO : ScriptableObject
     public bool usesRootMotion;
     public Vector3 vectorForce;
 
+    [Header("Player Rotation")]
+    public bool lockRotation = false;
+
     [Header("Enemy Movement")]
     public float knockback;
 
@@ -26,7 +29,7 @@ public class PlayerAttackSO : ScriptableObject
     public GameObject particleEffect;
     
     [Header("Sound")]
-    public AudioClip swingSound;
-    public AudioClip impactSound;
+    public SoundEffectSO swingSound;
+    public SoundEffectSO impactSound;
 
 }

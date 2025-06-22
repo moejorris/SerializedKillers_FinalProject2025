@@ -17,8 +17,11 @@ MonoBehaviour:
   hitboxDuration: 0.15
   animation: {fileID: 807648270786780877, guid: b776906fb39ec7244b78cd28c50e88a3, type: 3}
   animationSpeed: 1
-  overrideMotion: 1
+  overrideMotion: 0
   usesRootMotion: 0
-  vectorForce: {x: 0, y: -6, z: 24}
+  vectorForce: {x: 0, y: 0, z: 0}
+  lockRotation: 0
   knockback: 0
   particleEffect: {fileID: 3355244673728713408, guid: 9dcb7d7afa5bbd649a0e55d10bb12baa, type: 3}
+  swingSound: {fileID: 11400000, guid: e84a7759d7b5459478de416ca9783d4e, type: 2}
+  impactSound: {fileID: 11400000, guid: d17eff48ec48814469041aee0ec167d4, type: 2}

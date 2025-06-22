@@ -74,13 +74,14 @@ public class Player_CombatMachine : MonoBehaviour
         //Get target (somehow)
         //Rotate player towards it (not immediate snap)
         //Make cam look at it... look at avg position of player and target (player.position + target.position / 2f)
+
         isAttacking = true;
         attackQueued = false;
 
         currentAttack = defaultAttacks[currentComboID];
 
         HandleAnimation();
-
+        HandleSound();
         HandleParticle();
 
         float attackTime = currentAttack.animation.length / currentAttack.animationSpeed; // find a way to get the speed of the state and divide the length by that...
@@ -89,31 +90,14 @@ public class Player_CombatMachine : MonoBehaviour
         CancelInvoke("AttackIsDone");
         Invoke("AttackIsDone", attackTime * 0.75f);
 
-        StartCoroutine(LongHitCheck());
-
-        // HitCheck(); //add delay to this because right now it's as soon as you press the button
-
-        if (currentAttack.overrideMotion)
-        {
-            if (currentAttack.usesRootMotion) _machine.DisableAllMovers(_rootMotion);
-            else _rootMotion.enabled = false;
-            _machine.DisableAllMovers(_forceHandler);
-            _rotation.enabled = false;
-        }
-        if (currentAttack.vectorForce.magnitude > 0) // only apply force if necessary
-        {
-            _forceHandler.AddForce(LocalizeForceVector(currentAttack.vectorForce), ForceMode.VelocityChange, Player_ForceHandler.OverrideMode.All);        
-        }
+        StartCoroutine(HitCheck());
+        HandleMovement();
+        HandleRotation();
 
         CancelInvoke("ResetCombo");
         Invoke("ResetCombo", comboResetTime + attackTime);
 
         GetNextAttack();
-    }
-
-    void HandleHitbox()
-    {
-
     }
 
     void HandleParticle()
@@ -122,6 +106,70 @@ public class Player_CombatMachine : MonoBehaviour
         {
             Instantiate(currentAttack.particleEffect, animator.transform);
         }
+    }
+
+    void HandleRotation()
+    {
+        if (currentAttack.lockRotation)
+        {
+            _rotation.enabled = false;
+        }
+    }
+
+    void HandleMovement()
+    {
+        if (currentAttack.overrideMotion)
+        {
+            if (currentAttack.usesRootMotion) _machine.DisableAllMovers(_rootMotion);
+            else _rootMotion.enabled = false;
+            _machine.DisableAllMovers(_forceHandler);
+        }
+        if (currentAttack.vectorForce.magnitude > 0) // only apply force if necessary
+        {
+            _forceHandler.AddForce(LocalizeForceVector(currentAttack.vectorForce), ForceMode.VelocityChange, Player_ForceHandler.OverrideMode.All);        
+        }
+    }
+
+    void HandleSound()
+    {
+        if (currentAttack.swingSound != null)
+        {
+            if (currentAttack.hitboxDelay > 0)
+            {
+                StopCoroutine("PlaySoundDelayed_TEMP");
+                StartCoroutine(PlaySoundDelayed_TEMP(currentAttack.swingSound, currentAttack.hitboxDelay));
+            }
+            else PlaySound_TEMP(currentAttack.swingSound);
+        }
+    }
+
+    void HandleImpactSound()
+    {
+        if (currentAttack.impactSound != null)
+        {
+            PlaySound_TEMP(currentAttack.impactSound);
+        }
+    }
+
+    IEnumerator PlaySoundDelayed_TEMP(SoundEffectSO sound, float delay = 0) ///TEMP Until a proper sound manager/player is developed.
+    {
+        yield return new WaitForSeconds(delay);
+        PlaySound_TEMP(sound);
+    }
+
+    void PlaySound_TEMP(SoundEffectSO sound)
+    {
+        GameObject soundObject = Instantiate(new GameObject(), transform);
+        AudioSource audioSource = soundObject.AddComponent<AudioSource>();
+        AudioClip clip = sound.SoundEffect();
+
+        if (sound.usesRandomPitch)
+        {
+            audioSource.pitch = sound.RandomPitch;
+        }
+
+        audioSource.PlayOneShot(clip);
+        Destroy(soundObject, clip.length);
     }
 
     void HandleAnimation()
@@ -162,7 +210,7 @@ public class Player_CombatMachine : MonoBehaviour
         currentAnim = 1;
     }
 
-    IEnumerator LongHitCheck()
+    IEnumerator HitCheck()
     {
         yield return new WaitForSeconds(currentAttack.hitboxDelay);
 
@@ -170,12 +218,16 @@ public class Player_CombatMachine : MonoBehaviour
 
         hitBoxActive = true;
 
+        EnemyAI_Base selectedEnemy = null;
+
+        //TODO: Refactor this so both long and one frame hit checks use a func since they use much of the same code
         if (completionTime == 0)
         {
             //check hitbox one frame
 
             Collider[] hitObjects = Physics.OverlapSphere(transform.position + _machine.ForwardDirection * distanceForwards, checkRadius, ~0, QueryTriggerInteraction.Ignore);
 
+            bool hitEnemy = false;
             foreach (Collider collider in hitObjects)
             {
                 if (collider.CompareTag("Player")) continue;
@@ -184,8 +236,12 @@ public class Player_CombatMachine : MonoBehaviour
 
                 if (enemy == null) continue;
 
+                selectedEnemy = collider.gameObject.GetComponent<EnemyAI_Base>();
+
                 enemy.TakeDamage(currentAttack.damage);
+                hitEnemy = true;
             }
+            if(hitEnemy) HandleImpactSound();
         }
         else
         {
@@ -197,6 +253,8 @@ public class Player_CombatMachine : MonoBehaviour
             {
                 Collider[] hitObjects = Physics.OverlapSphere(transform.position + _machine.ForwardDirection * distanceForwards, checkRadius, ~0, QueryTriggerInteraction.Ignore);
 
+                bool enemyHitThisFrame = false;
+
                 foreach (Collider collider in hitObjects)
                 {
                     if (collider.CompareTag("Player")) continue;
@@ -205,79 +263,25 @@ public class Player_CombatMachine : MonoBehaviour
 
                     if (enemy == null || enemiesHit.Contains(enemy)) continue;
 
+                    selectedEnemy = collider.gameObject.GetComponent<EnemyAI_Base>();
+
+
                     enemy.TakeDamage(currentAttack.damage);
                     enemiesHit.Add(enemy);
+                    enemyHitThisFrame = true;
                 }
+
+                if (enemyHitThisFrame) HandleImpactSound();
 
                 yield return new WaitForEndOfFrame();
                 currentTime += Time.deltaTime;
             }
         }
 
-        hitBoxActive = false;
-    }
-
-    void HitCheck() // Caleb was here O_O //This needs a major refactor
-    {
-        Collider[] hitObjects = Physics.OverlapSphere(transform.position + _machine.ForwardDirection * distanceForwards, checkRadius, ~0, QueryTriggerInteraction.Ignore);
-        Vector3 hitPositions = new Vector3();
-        float validEnemies = 0;
-
-        //TODO Create List of Enemy movement controllers
-
-        EnemyAI_Base selectedEnemy = null;
-
-        foreach (Collider collider in hitObjects)
-        {
-            if (collider.CompareTag("Player") || !collider.gameObject.GetComponent<EnemyAI_Base>()) continue;
-
-            validEnemies++;
-            hitPositions += collider.transform.position;
-            collider.gameObject.GetComponent<EnemyAI_Base>().TakeDamage(defaultAttacks[currentComboID].damage); //TODO apply script effect to enemy when damaging
-            Debug.Log(collider.gameObject.name + " took " + defaultAttacks[currentComboID].damage + " damage!");
-            selectedEnemy = collider.gameObject.GetComponent<EnemyAI_Base>();
-
-            //TODO add enemy to List of movement controllers
-        }
-
-        //TODO foreach enemy movement controller, apply knockback force to them. Possibly divide knockback by list count???
-
         if (selectedEnemy) scriptStealMenu.UpdateSelectedEnemy(selectedEnemy);
 
-        if (Vector3.Distance(transform.position + _machine.ForwardDirection, hitPositions / validEnemies) <= checkRadius*2f && defaultAttacks[currentComboID].overrideMotion) //this didn't work lol TODO fix this
-        {
-            Debug.Log("Enemy is close");
-            //_forceHandler.AddForce(Vector3.zero, ForceMode.VelocityChange, Player_ForceHandler.OverrideMode.All);
-            _forceHandler.ResetVelocity();
-        }
-
-        // VVV commented-out copy of the function prior to me editing in case I somehow destroy this function VVV
-        if (1 > 5000)
-        {
-            //Collider[] hitObjects = Physics.OverlapSphere(transform.position + _machine.ForwardDirection * distanceForwards, checkRadius, ~0, QueryTriggerInteraction.Ignore);
-            //Vector3 hitPositions = new Vector3();
-            //float validEnemies = 0;
-            //foreach (Collider collider in hitObjects)
-            //{
-            //    if (collider.CompareTag("Player") || !collider.gameObject.GetComponent<EnemyAI_Base>()) continue;
-
-            //    validEnemies++;
-            //    hitPositions += collider.transform.position;
-            //    collider.gameObject.GetComponent<EnemyAI_Base>().TakeDamage(defaultAttacks[currentComboID].damage);
-            //    Debug.Log(collider.gameObject.name + " took " + defaultAttacks[currentComboID].damage + " damage!");
-            //}
-
-
-
-            //if (Vector3.Distance(transform.position + _machine.ForwardDirection, hitPositions / validEnemies) <= checkRadius * 2f && defaultAttacks[currentComboID].overrideMotion)
-            //{
-            //    Debug.Log("Enemy is close");
-            //    //_forceHandler.AddForce(Vector3.zero, ForceMode.VelocityChange, Player_ForceHandler.OverrideMode.All);
-            //    _forceHandler.ResetVelocity();
-            //}
-        } 
+        hitBoxActive = false;
     }
-
     void OnDrawGizmos()
     {
         if (!showHitboxCollider) return;
