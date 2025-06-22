@@ -41,7 +41,7 @@ ParticleSystem:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2135711469307626468}
   serializedVersion: 8
-  lengthInSec: 4
+  lengthInSec: 5.5
   simulationSpeed: 1
   stopAction: 2
   cullingMode: 0
@@ -4845,7 +4845,7 @@ GameObject:
   - component: {fileID: 8413224190899922425}
   - component: {fileID: 7226565915027846956}
   m_Layer: 9
-  m_Name: Fire
+  m_Name: FireHazard
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

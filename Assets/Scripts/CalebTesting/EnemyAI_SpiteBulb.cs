@@ -464,6 +464,11 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
         {
             slash.enabled = true;
         }
+
+        Vector3 rotation = transform.eulerAngles;
+        rotation.y += 20;
+        transform.eulerAngles = rotation;
+
         MeleeHitCheck();
         yield return new WaitForSeconds(0.1f);
         foreach (SpriteRenderer slash in slashes)

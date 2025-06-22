@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using System.Collections;
 using UnityEngine.UI;
+using UnityEditor;
 
 public class EnemyAI_Overclock : EnemyAI_Base
 {
@@ -52,13 +53,20 @@ public class EnemyAI_Overclock : EnemyAI_Base
     [SerializeField] private float fireDashChance;
 
     [Header("Overclock Dash Attack")]
-    [SerializeField] private bool flameDashing = false;
+    [SerializeField] private bool spawningFlames = false;
     [SerializeField] private float dashSpeed = 1f;
     [SerializeField] private float dashAttackLength = 2;
     private float dashAttackTimer = 0;
 
     [Header("Overclock Flamethrower Attack")]
     [SerializeField] private ParticleSystem flamethrowerParticles;
+    [SerializeField] private float flamethrowerDistance;
+    [SerializeField] private float flamethrowerArc;
+
+    [SerializeField] private float arcSweepSpeed;
+    [SerializeField] private Vector3 flamethrowerPosition;
+    [SerializeField] private float flamethrowerParticleDur = 7;
+    private float flameTimer;
 
     [Header("Overclock Script Change Behavior")]
     [SerializeField] private float stalkingFollowDistance = 15f;
@@ -77,6 +85,16 @@ public class EnemyAI_Overclock : EnemyAI_Base
         whiteHealthBar = transform.Find("Canvas/Bar/White").GetComponent<RectTransform>();
     }
 
+    private void OnDrawGizmos()
+    {
+        //Vector3 direction = transform.forward;
+        //Vector3 axis = Vector3.up;
+        //Quaternion rotationAxis = Quaternion.AngleAxis(-flamethrowerArc * 0.5f, axis);
+        //Vector3 rotatedDirectionalAxis = rotationAxis * direction;
+
+        //Handles.color = Color.red;
+        //Handles.DrawSolidArc(transform.position, Vector3.up, rotatedDirectionalAxis, flamethrowerArc, flamethrowerDistance);
+    }
 
     // Update is called once per frame
     public override void Update()
@@ -175,15 +193,15 @@ public class EnemyAI_Overclock : EnemyAI_Base
                     }
                 }
 
-                if (flameDashing) // starts in the coroutine. this makes it go forward until either the dashLengthTimer runs out or it gets close to the player
+                if (spawningFlames) // starts in the coroutine. this makes it go forward until either the dashLengthTimer runs out or it gets close to the player
                 {
                     transform.position += (transform.forward.normalized * Time.deltaTime) * dashSpeed;
-                    AttemptFlameTrail();
+                    SpawnFire(transform.position);
 
                     dashAttackTimer -= Time.deltaTime;
                     if (dashAttackTimer <= 0 || PlayerDistance() <= 1.3f)
                     {
-                        flameDashing = false;
+                        spawningFlames = false;
                     }
                 }
                 else
@@ -201,9 +219,33 @@ public class EnemyAI_Overclock : EnemyAI_Base
                     navMeshAgent.destination = playerTarget.position;
                 }
 
+                if (spawningFlames)
+                {
+                    flameTimer += Time.deltaTime * 100;
+                    Debug.Log(flameTimer);
+
+                    Vector3 direction = transform.forward;
+                    Vector3 axis = Vector3.up;
+                    Quaternion rotationAxis = Quaternion.AngleAxis(flameTimer, axis);
+                    Vector3 rotatedDirectionalAxis = (rotationAxis * direction).normalized;
+                    rotatedDirectionalAxis.y = transform.position.y;
+                    rotatedDirectionalAxis *= flamethrowerDistance;
+
+                    flamethrowerPosition = transform.position + rotatedDirectionalAxis;
+
+                    Debug.DrawRay(transform.position, rotatedDirectionalAxis, Color.red);
+
+                    if (flameTimer > flamethrowerArc / 2)
+                    {
+                        flameTimer = -flamethrowerArc / 2;
+                    }
+
+                    SpawnFire(flamethrowerPosition, 10);
+                }
+
                 if (!attackOccuring)
                 {
-                    if (attackPrepTimer <= 0 || navMeshAgent.remainingDistance < 0.3f) // attacks if in range or after a few seconds of running if not
+                    if (attackPrepTimer <= 0 || navMeshAgent.remainingDistance < 0.5f) // attacks if in range or after a few seconds of running if not
                     {
                         StopCoroutine("FlamethrowerAttack");
                         StartCoroutine("FlamethrowerAttack");
@@ -275,11 +317,10 @@ public class EnemyAI_Overclock : EnemyAI_Base
         attackOccuring = true;
         navMeshAgent.isStopped = true;
 
-        yield return new WaitForSeconds(0.4f);
         flamethrowerParticles.Play();
+        spawningFlames = true;
         yield return new WaitForSeconds(4.8f);
-        Debug.Log("Flame Attack Animation!!!");
-        AttemptFlameTrail();
+        spawningFlames = false;
 
         ExitFlamethrowerAttack();
     }
@@ -301,7 +342,7 @@ public class EnemyAI_Overclock : EnemyAI_Base
         navMeshAgent.speed = 3;
         preparingAttack = false;
         attackOccuring = false;
-        flameDashing = false;
+        spawningFlames = false;
     }
 
     IEnumerator DashAttack()
@@ -310,29 +351,32 @@ public class EnemyAI_Overclock : EnemyAI_Base
         navMeshAgent.isStopped = true;
 
         dashAttackTimer = dashAttackLength;
-        flameDashing = true;
-        yield return new WaitUntil(() => !flameDashing);
+        spawningFlames = true;
+        yield return new WaitUntil(() => !spawningFlames);
 
         Debug.Log("FLAME BOOM!");
 
         ExitDashAttack();
     }
 
-    public void AttemptFlameTrail()
+    public void SpawnFire(Vector3 location, float fireDur = 5.5f)
     {
         Ray raycast = new Ray();
-        raycast.origin = transform.position;
+        raycast.origin = location;
         raycast.direction = Vector3.down;
 
-        Debug.DrawRay(transform.position, Vector3.down);
+        //Debug.DrawRay(transform.position, Vector3.down);
 
-        if (!Physics.Raycast(raycast, 3, fireMask))
+        if (!Physics.Raycast(raycast, 5, fireMask))
         {
-            Vector3 spawnPoint = transform.position;
-            spawnPoint.y -= 0.7f;
-            Instantiate(firePrefab, spawnPoint, Quaternion.identity);
-        }
+            Vector3 spawnPoint = location;
+            Physics.Raycast(raycast, out RaycastHit hit, 15, 0);
+            spawnPoint.y = hit.point.y + 0.2f;
+            ParticleSystem fire = Instantiate(firePrefab, spawnPoint, Quaternion.identity).transform.Find("Particle System").GetComponent<ParticleSystem>();
 
+            var fire_main = fire.main;
+            fire_main.duration = fireDur;
+        }
     }
 
     public void IncreaseHeatMeter(float amount)

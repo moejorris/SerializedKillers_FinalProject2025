@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 7420044043514228354}
   - component: {fileID: 1033581350230591985}
   m_Layer: 0
-  m_Name: FireEffect
+  m_Name: FireStatusEffect
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
