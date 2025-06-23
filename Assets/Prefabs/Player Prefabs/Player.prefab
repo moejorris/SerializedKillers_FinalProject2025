@@ -2253,13 +2253,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2432400081083171313}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.16638963, y: 0.0000000111015686, z: -0.000000011376045, w: 0.9860601}
-  m_LocalPosition: {x: -0, y: -3.29, z: -12.33}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0, y: 0, z: -12.33}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4931094360512396646}
-  m_LocalEulerAnglesHint: {x: -19.156, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2489919547241440172
 GameObject:
   m_ObjectHideFlags: 0
@@ -21154,7 +21154,7 @@ MonoBehaviour:
   checkRadius: 1.44
   isBatman: 1
   walkInput: {fileID: -1680190386980627800, guid: 052faaac586de48259a63d0c4782560b, type: 3}
-  maxLeapDistance: 10
+  maxLeapDistance: 13
   minDashDistance: 4
   minDotProduct: 0.75
 --- !u!114 &2845844426926673644
