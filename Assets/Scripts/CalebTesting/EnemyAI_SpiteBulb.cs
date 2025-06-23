@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.UI;
 using UnityEngine.Splines.Interpolators;
-using static UnityEditor.PlayerSettings;
+//using static UnityEditor.PlayerSettings;
 
 
 [RequireComponent(typeof(Light))]
@@ -547,14 +547,22 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
     {
         RaycastHit[] hits = Physics.SphereCastAll(transform.position, 4.3f, transform.forward, 0, playerLayer);
 
-        //Debug.Log(hits.Length);
-
         foreach (RaycastHit hit in hits)
         {
             if (hit.transform.parent != null && hit.transform.parent.CompareTag("Player"))
             {
                 Debug.Log("Player Hit!");
                 playerHealth.TakeDamage(6);
+
+                Player_ForceHandler forceHandler = hit.collider.GetComponent<Player_ForceHandler>();
+
+                if(forceHandler != null)
+                {
+                    Vector3 dir = (hit.transform.position - transform.position).normalized + Vector3.up * 0.25f;
+                    forceHandler.AddForce(dir * 20f, ForceMode.VelocityChange);
+
+                }
+
                 break;
             }
         }

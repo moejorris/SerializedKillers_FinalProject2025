@@ -40,8 +40,11 @@ public class Player_ScriptSteal : MonoBehaviour
         {
             if (selectedEnemy != null)
             {
-                scriptStealing = true;
-                StealScript();
+                if (selectedEnemy.behaviorActive)
+                {
+                    scriptStealing = true;
+                    StealScript();
+                }
             }
             else if (!scriptStealing)
             {
