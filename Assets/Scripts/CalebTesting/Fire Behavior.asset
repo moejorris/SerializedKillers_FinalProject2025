@@ -14,3 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   behavioricon: {fileID: 21300000, guid: be275218ea2bd824f95fc60058ba8b56, type: 3}
   behaviorName: fire
+  color: {r: 1, g: 0.0844529, b: 0, a: 1}

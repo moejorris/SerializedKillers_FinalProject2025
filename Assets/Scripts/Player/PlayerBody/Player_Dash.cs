@@ -9,7 +9,7 @@ public class Player_Dash : MonoBehaviour, IPlayerMover
     Player_Rotate rotate;
     Player_Gravity gravity;
     Player_Animation animate;
-    Player_ScriptSteal scriptSteal => GetComponent<Player_ScriptSteal>();
+    Player_ScriptSteal _scriptSteal => GetComponent<Player_ScriptSteal>();
     [SerializeField] InputActionReference dashInput;
     [SerializeField] InputActionReference walkInput;
     [Header("How far the dash should move the player (in Meters/Unity Units)")]
@@ -142,9 +142,9 @@ public class Player_Dash : MonoBehaviour, IPlayerMover
         // tr.time = _travelTime;
         tr.emitting = true;
 
-        if (scriptSteal)
+        if (_scriptSteal)
         {
-            // tr.colorGradient = ColorGradient(_scriptSteal.scriptEffectColor, Color.white);
+            tr.colorGradient = ColorGradient(_scriptSteal.scriptEffectColor, Color.white);
         }
         else
         {

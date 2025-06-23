@@ -5,4 +5,5 @@ public class Behavior : ScriptableObject
 {
     public Sprite behavioricon;
     public string behaviorName;
+    public Color color;
 }

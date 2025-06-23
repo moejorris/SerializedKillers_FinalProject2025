@@ -859,7 +859,7 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
         }
     }
 
-    public override void ActivateBehavior()
+    public override void ActivateBehavior() // Arise needs to in some way be called so the enemy doesn't get stuck crouched when stealing!!!
     {
         base.ActivateBehavior();
         Material[] newMats = newLightBulbHead.materials;
@@ -867,7 +867,7 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
         newLightBulbHead.materials = newMats;
     }
 
-    public override void DeactivateBehavior()
+    public override void DeactivateBehavior() // Arise needs to in some way be called so the enemy doesn't get stuck crouched when stealing!!!
     {
         ExitLaserAttack();
         ExitShockwaveAttack();

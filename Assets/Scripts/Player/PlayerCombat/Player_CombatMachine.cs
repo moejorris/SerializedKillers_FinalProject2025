@@ -226,7 +226,7 @@ public class Player_CombatMachine : MonoBehaviour
             ParticleSystem.MainModule particle = Instantiate(currentAttack.particleEffect, animator.transform).GetComponent<ParticleSystem>().main;
             if (_scriptSteal)
             {
-                // particle.startColor = _scriptSteal.scriptEffectColor;
+                particle.startColor = _scriptSteal.scriptEffectColor;
             }
             else
             {

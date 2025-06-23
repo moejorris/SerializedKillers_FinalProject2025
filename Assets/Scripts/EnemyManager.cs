@@ -61,4 +61,20 @@ public class EnemyManager : MonoBehaviour
             }
         }
     }
+
+    public void UpdateEnemyBehaviors(Behavior behavior = null)
+    {
+        UpdateEnemyList();
+        foreach (EnemyAI_Base enemyScript in enemies)
+        {
+            if (enemyScript.heldBehavior == behavior)
+            {
+                enemyScript.DeactivateBehavior();
+            }
+            else if (!enemyScript.behaviorActive)
+            {
+                enemyScript.ActivateBehavior();
+            }
+        }
+    }
 }
