@@ -9,6 +9,7 @@ public class Player_Dash : MonoBehaviour, IPlayerMover
     Player_Rotate rotate;
     Player_Gravity gravity;
     Player_Animation animate;
+    Player_ScriptSteal scriptSteal => GetComponent<Player_ScriptSteal>();
     [SerializeField] InputActionReference dashInput;
     [SerializeField] InputActionReference walkInput;
     [Header("How far the dash should move the player (in Meters/Unity Units)")]
@@ -140,6 +141,34 @@ public class Player_Dash : MonoBehaviour, IPlayerMover
 
         // tr.time = _travelTime;
         tr.emitting = true;
+
+        if (scriptSteal)
+        {
+            // tr.colorGradient = ColorGradient(_scriptSteal.scriptEffectColor, Color.white);
+        }
+        else
+        {
+            tr.colorGradient = ColorGradient(Color.white, Color.white);
+        }
+    }
+
+    Gradient ColorGradient(Color color1, Color color2)
+    {
+        var gradient = new Gradient();
+
+        // Blend color from red at 0% to blue at 100%
+        var colors = new GradientColorKey[2];
+        colors[0] = new GradientColorKey(color1, 0.0f);
+        colors[1] = new GradientColorKey(color2, 1.0f);
+
+        // Blend alpha from opaque at 0% to transparent at 100%
+        var alphas = new GradientAlphaKey[2];
+        alphas[0] = new GradientAlphaKey(1.0f, 0.0f);
+        alphas[1] = new GradientAlphaKey(0.0f, 1.0f);
+
+        gradient.SetKeys(colors, alphas);
+
+        return gradient;
     }
 
     void DisableTrail()

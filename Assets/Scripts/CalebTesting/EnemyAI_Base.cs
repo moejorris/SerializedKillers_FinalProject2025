@@ -3,9 +3,10 @@ using UnityEngine.AI;
 using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 
 [RequireComponent(typeof(NavMeshAgent))]
-public class EnemyAI_Base : MonoBehaviour
+public class EnemyAI_Base : MonoBehaviour, ITargetable, IDamageable
 {
     [Header("Navigation")]
     public Transform playerTarget;
@@ -45,6 +46,9 @@ public class EnemyAI_Base : MonoBehaviour
 
     [Header("Highlighting")]
     [SerializeField] private GameObject[] highlightableMeshes;
+
+    [Header("Targeting")]
+    public float TargetScore { get; set;}
 
     public virtual void Start()
     {
@@ -105,11 +109,11 @@ public class EnemyAI_Base : MonoBehaviour
         healthBar.localScale = scale;
     }
 
-    public virtual void TakeDamage(float amount)
+    public virtual void TakeDamage(float damage)
     {
         if (!healthBar || !whiteHealthBar) return; // in case no thing exists
 
-        health -= amount;
+        health -= damage;
 
         StopCoroutine("MaterialFade");
         StartCoroutine("MaterialFade");

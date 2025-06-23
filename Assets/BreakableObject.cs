@@ -1,13 +1,15 @@
 using UnityEngine;
 
-public class BreakableObject : MonoBehaviour
+public class BreakableObject : MonoBehaviour, ITargetable, IDamageable
 {
     [Range(0, 100)]
     [SerializeField] private int itemDropChance = 25;
     [SerializeField] private GameObject heldItem;
     [SerializeField] private Behavior requiredBehavior;
 
-    public void DestroyObjct()
+    public float TargetScore { get; set;}
+
+    public virtual void TakeDamage(float damage)
     {
         if (heldItem != null)
         {

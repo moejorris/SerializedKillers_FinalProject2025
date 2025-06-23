@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEditor;
+using UnityEngine.XR;
 
 
 //Joe Morris
@@ -10,11 +12,11 @@ using UnityEngine.InputSystem;
 public class Player_CombatMachine : MonoBehaviour
 {
     ScriptStealMenu scriptStealMenu => GameObject.FindGameObjectWithTag("Canvas").transform.Find("ScriptStealMenu").GetComponent<ScriptStealMenu>();
-    Player_ScriptSteal scriptSteal => GetComponent<Player_ScriptSteal>();
     Player_MovementMachine _machine => GetComponent<Player_MovementMachine>();
     Player_RootMotion _rootMotion => GetComponent<Player_RootMotion>();
     Player_ForceHandler _forceHandler => GetComponent<Player_ForceHandler>();
     Player_Rotate _rotation => GetComponent<Player_Rotate>();
+    Player_ScriptSteal _scriptSteal => GetComponent<Player_ScriptSteal>();
 
 
     [SerializeField] AnimatorOverrideController animatorOverride;
@@ -41,7 +43,7 @@ public class Player_CombatMachine : MonoBehaviour
     [SerializeField] InputActionReference walkInput;
     [SerializeField] float maxLeapDistance = 8f;
     [SerializeField] float minDashDistance = 4f;
-    [SerializeField] bool targetEnemiesOnly = false;
+    [SerializeField] float minDotProduct = 0.75f;
 
     //Local Stuff
     bool isAttacking = false;
@@ -126,15 +128,15 @@ public class Player_CombatMachine : MonoBehaviour
 
         Collider[] checkSphereColliders = Physics.OverlapSphere(transform.position + inputDir * (maxLeapDistance / 2f), maxLeapDistance / 2f, ~0, QueryTriggerInteraction.Ignore);
 
-        List<EnemyAI_Base> potentialTargets = new();
+        List<ITargetable> potentialTargets = new();
 
         foreach (Collider collider in checkSphereColliders)
         {
-            EnemyAI_Base enemy = collider.GetComponent<EnemyAI_Base>();
+            ITargetable target = collider.GetComponent<ITargetable>();
 
-            if (!enemy) continue;
+            if (target == null) continue;
 
-            float dist = Vector3.Distance(transform.position, enemy.transform.position);
+            float dist = Vector3.Distance(transform.position, target.transform.position);
 
             if (dist > maxLeapDistance) continue;
 
@@ -142,50 +144,78 @@ public class Player_CombatMachine : MonoBehaviour
 
             RaycastHit hit;
 
-            if (!Physics.Raycast(transform.position, enemy.transform.position - transform.position, out hit, dist + 2, ~0, QueryTriggerInteraction.Ignore) || hit.collider != collider) continue;
+            if (!Physics.Raycast(transform.position, target.transform.position - transform.position, out hit, dist + 2, ~0, QueryTriggerInteraction.Ignore) || hit.collider != collider) continue;
 
-            potentialTargets.Add(enemy);
+            potentialTargets.Add(target);
         }
 
         Debug.Log("Arkham Combat: Found " + potentialTargets.Count + " potential targets.");
 
         if (potentialTargets.Count < 1) return;
 
-        float dot = 0.5f;
-        EnemyAI_Base mostInLineEnemy = null;
+        ITargetable selectedTarget = null;
 
-        foreach (EnemyAI_Base enemy in potentialTargets)
+        foreach (ITargetable target in potentialTargets)
         {
-            float testDot = Vector3.Dot(enemy.transform.position - transform.position, inputDir);
+            target.TargetScore = 0;
 
-            if (testDot > dot)
+            float testDot = Vector3.Dot(target.transform.position - transform.position, inputDir);
+
+            if (testDot < minDotProduct) continue;
+
+            target.TargetScore += testDot;
+            target.TargetScore += 1 - (Vector3.Distance(transform.position, target.transform.position) / maxLeapDistance);
+        }
+
+        float highScore = 0;
+        foreach (ITargetable target in potentialTargets)
+        {
+            if (target.TargetScore > highScore)
             {
-                dot = testDot;
-                mostInLineEnemy = enemy;
+                highScore = target.TargetScore;
+                selectedTarget = target;
             }
         }
 
-        if (mostInLineEnemy == null) return;
+        foreach (ITargetable target in potentialTargets)
+        {
+            if (target.TargetScore == highScore)
+            {
+                Handles.color = Color.green;
+            }
+            else if (target.TargetScore >= highScore / 2f)
+            {
+                Handles.color = Color.red;
+            }
+            else
+            {
+                Handles.color = Color.black;
+            }
+
+            // Handles.DrawSolidDisc(target.transform.position + Vector3.up, Vector3.up, 1f);
+        }
+
+        if (selectedTarget == null || highScore == 0) return;
 
         _rotation.enabled = false;
 
-        Debug.Log("Arkham Combat: Found Most In Line Enemy: " + mostInLineEnemy.transform.name);
+        Debug.Log("Arkham Combat: Found Most In Line Target: " + selectedTarget.transform.name);
 
-        float enemyDist = Vector3.Distance(mostInLineEnemy.transform.position, transform.position);
+        float targetDistance = Vector3.Distance(selectedTarget.transform.position, transform.position);
 
-        if (enemyDist > minDashDistance)
+        if (targetDistance > minDashDistance)
         {
             _machine.DisableAllMovers(GetComponent<Player_Dash>());
-            GetComponent<Player_Dash>().ExternalDash(mostInLineEnemy.transform.position);
+            GetComponent<Player_Dash>().ExternalDash(selectedTarget.transform.position);
         }
         else
         {
-            Vector3 newDir = mostInLineEnemy.transform.position - transform.position;
+            Vector3 newDir = selectedTarget.transform.position - transform.position;
             newDir.y = 0;
 
             _machine.SetForwardDirection(newDir);
             _machine.DisableAllMovers(_forceHandler);
-            _forceHandler.AddForce(_machine.ForwardDirection * Vector3.Distance(transform.position, mostInLineEnemy.transform.position - _machine.ForwardDirection * checkRadius) * 5f, ForceMode.VelocityChange);        
+            _forceHandler.AddForce(_machine.ForwardDirection * Vector3.Distance(transform.position, selectedTarget.transform.position - _machine.ForwardDirection * checkRadius) * 5f, ForceMode.VelocityChange);        
         }
     }
 
@@ -193,7 +223,15 @@ public class Player_CombatMachine : MonoBehaviour
     {
         if (currentAttack.particleEffect)
         {
-            Instantiate(currentAttack.particleEffect, animator.transform);
+            ParticleSystem.MainModule particle = Instantiate(currentAttack.particleEffect, animator.transform).GetComponent<ParticleSystem>().main;
+            if (_scriptSteal)
+            {
+                // particle.startColor = _scriptSteal.scriptEffectColor;
+            }
+            else
+            {
+                particle.startColor = Color.white;
+            }
         }
     }
 
@@ -320,25 +358,25 @@ public class Player_CombatMachine : MonoBehaviour
 
             Collider[] hitObjects = Physics.OverlapSphere(transform.position + _machine.ForwardDirection * distanceForwards, checkRadius, ~0, QueryTriggerInteraction.Ignore);
 
-            bool hitEnemy = false;
+            bool hitSomething = false;
             foreach (Collider collider in hitObjects)
             {
                 if (collider.CompareTag("Player")) continue;
 
-                EnemyAI_Base enemy = collider.GetComponent<EnemyAI_Base>();
+                IDamageable damageable = collider.GetComponent<IDamageable>();
 
-                if (enemy == null) continue;
+                if (damageable == null) continue;
 
                 selectedEnemy = collider.gameObject.GetComponent<EnemyAI_Base>();
 
-                enemy.TakeDamage(currentAttack.damage);
-                hitEnemy = true;
+                damageable.TakeDamage(currentAttack.damage);
+                hitSomething = true;
             }
-            if (hitEnemy) HandleImpactSound();
+            if (hitSomething) HandleImpactSound();
         }
         else
         {
-            List<EnemyAI_Base> enemiesHit = new();
+            List<IDamageable> damageablesHit = new();
 
             float currentTime = 0;
 
@@ -346,37 +384,32 @@ public class Player_CombatMachine : MonoBehaviour
             {
                 Collider[] hitObjects = Physics.OverlapSphere(transform.position + _machine.ForwardDirection * distanceForwards, checkRadius, ~0, QueryTriggerInteraction.Ignore);
 
-                bool enemyHitThisFrame = false;
+                bool somethingHitThisFrame = false;
 
                 foreach (Collider collider in hitObjects)
                 {
                     if (collider.CompareTag("Player")) continue;
 
-                    if (collider.GetComponent<BreakableObject>())
-                    {
-                        collider.GetComponent<BreakableObject>().DestroyObjct();
-                    }
+                    IDamageable damageable = collider.GetComponent<IDamageable>();
 
-                    EnemyAI_Base enemy = collider.GetComponent<EnemyAI_Base>();
-
-                    if (enemy == null || enemiesHit.Contains(enemy)) continue;
+                    if (damageable == null || damageablesHit.Contains(damageable)) continue;
 
                     selectedEnemy = collider.gameObject.GetComponent<EnemyAI_Base>();
 
 
-                    enemy.TakeDamage(currentAttack.damage);
-                    enemiesHit.Add(enemy);
-                    enemyHitThisFrame = true;
+                    damageable.TakeDamage(currentAttack.damage);
+                    damageablesHit.Add(damageable);
+                    somethingHitThisFrame = true;
                 }
 
-                if (enemyHitThisFrame) HandleImpactSound();
+                if (somethingHitThisFrame) HandleImpactSound();
 
                 yield return new WaitForEndOfFrame();
                 currentTime += Time.deltaTime;
             }
         }
 
-        if (selectedEnemy) scriptSteal.UpdateSelectedEnemy(selectedEnemy);
+        if (selectedEnemy) _scriptSteal.ChangeSelectedEnemy(selectedEnemy);
 
         hitBoxActive = false;
     }

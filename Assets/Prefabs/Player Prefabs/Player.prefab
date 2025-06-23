@@ -5409,7 +5409,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &3901690592899528515
 Transform:
   m_ObjectHideFlags: 0
@@ -11486,7 +11486,9 @@ MonoBehaviour:
   checkRadius: 1.44
   isBatman: 1
   walkInput: {fileID: -1680190386980627800, guid: 052faaac586de48259a63d0c4782560b, type: 3}
-  maxLeapDistance: 15
+  maxLeapDistance: 10
+  minDashDistance: 4
+  minDotProduct: 0.75
 --- !u!114 &2845844426926673644
 MonoBehaviour:
   m_ObjectHideFlags: 0
