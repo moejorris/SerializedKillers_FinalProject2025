@@ -21,6 +21,12 @@ public class BossBehaviorV2 : MonoBehaviour
     [Tooltip("Max number of attacks before the boss can use before becoming vulnerable")]
     [SerializeField] private int maxAttacks = 3; // Maximum number of attacks before the boss becomes vulnerable
     [Header("Boss Components")]
+    [Tooltip("Reference to the boss health bar RectTransform.")]
+    [SerializeField] private RectTransform healthBar; // Assign this in the inspector
+    [Tooltip("Prefabs for enemies the boss will spawn in periodically")]
+    [SerializeField] private GameObject[] enemiesToSpawn; // Array of enemies for the boss to spawn in
+    [Tooltip("Spawn Points for enemies to spawn into")]
+    [SerializeField] private Transform[] enemySpawnPoints; // Array of spawn positions
     [Tooltip("Prefabs for the boss's attacks")]
     [SerializeField] private GameObject[] attackPrefabs; // Array of attack prefabs
     [Tooltip("Teleport positions for the boss to teleport to")]
@@ -149,6 +155,21 @@ public class BossBehaviorV2 : MonoBehaviour
             Gizmos.DrawLine(transform.position, player.position); // Draw a line from the boss to the player
         }
     }
+
+    void UpdateUI()
+    {
+        // Update the health bar by reducing its scale on the x-axis through its rect transform
+        if (healthBar != null)
+        {
+            float healthPercentage = health / 100f; // Calculate the health percentage of the boss
+            healthBar.localScale = new Vector3(healthPercentage, 1f, 1f); // Update the health bar scale based on the health percentage
+        }
+        else
+        {
+            Debug.LogError("Health bar reference not assigned! Please assign it in the inspector.");
+        }
+    }
+
     #endregion
     #region Elemental  Methods
     void ChangeElementalState(BossState newState)
@@ -224,7 +245,7 @@ public class BossBehaviorV2 : MonoBehaviour
     {
         if (attackPrefabs.Length > 0 && player != null)
         {
-            Instantiate(attackPrefabs[1], new Vector3(player.position.x, 97.85f, player.position.z), Quaternion.identity); // Spawn the thunderbolt above the player
+            Instantiate(attackPrefabs[1], new Vector3(player.position.x, 150.35f, player.position.z), Quaternion.identity); // Spawn the thunderbolt above the player
         }
         else
         {
@@ -325,6 +346,7 @@ public class BossBehaviorV2 : MonoBehaviour
         {
             EndVulnerable(); // End the vulnerable state
         }
+        UpdateUI();
     }
 
     void StartVulnerable()
@@ -379,6 +401,7 @@ public class BossBehaviorV2 : MonoBehaviour
         Debug.Log("Boss is summoning an attack!"); // Log the attack summon
         StartCoroutine(SummonProjectileCoroutine(2f)); // Start the summon projectile coroutine
     }
+
     void Attack()
     {
         attacksUsed++;
@@ -391,6 +414,7 @@ public class BossBehaviorV2 : MonoBehaviour
         anim.SetTrigger("Summon"); // Trigger the summon animation
         attackTimer = 0f; // Reset the attack timer
     }
+
     private IEnumerator SummonProjectileCoroutine(float delay)
     {
         for (int count = 0; count < 5; count++)
@@ -413,6 +437,15 @@ public class BossBehaviorV2 : MonoBehaviour
                 default:
                     Debug.LogWarning("No State is set! Cannot spawn elemental based projectile"); // Log a warning if no attack is spawned
                     break;
+            }
+        }
+
+        void SpawnEnemies()
+        {
+            foreach(Transform spawn in enemySpawnPoints)
+            {
+                int randomIndex = Random.Range(0, enemiesToSpawn.Length);
+                Instantiate(enemiesToSpawn[randomIndex], spawn.position, spawn.rotation);
             }
         }
     }
