@@ -6331,7 +6331,7 @@ MonoBehaviour:
   navMeshAgent: {fileID: 2762355081595221215}
   heldBehavior: {fileID: 11400000, guid: 9e4df872e93e7984384719275cc16db8, type: 2}
   behaviorActive: 1
-  scriptStealMenu: {fileID: 0}
+  scriptSteal: {fileID: 0}
   selectedIcon: {fileID: 0}
   healthBar: {fileID: 0}
   whiteHealthBar: {fileID: 0}
@@ -6372,7 +6372,7 @@ MonoBehaviour:
   shockwaveAttackCooldown: 2
   attackCooldownTimer: 0
   longRangeAttackDis: 7.5
-  shockwaveAttackChance: 0
+  shockwaveAttackChance: 61.3
   meleeRange: 1.4
   meleeDamage: 3
   slashes:
