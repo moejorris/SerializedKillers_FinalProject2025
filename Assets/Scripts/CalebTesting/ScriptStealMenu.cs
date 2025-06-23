@@ -286,7 +286,7 @@ public class ScriptStealMenu : MonoBehaviour
 
             centerSlot.RemoveBehavior();
             //selectedEnemy.behaviorActive = false;
-            selectedEnemy.DeselectEnemy();
+            selectedEnemy.UnHighlightEnemy();
             menuPanel.SetActive(false);
             menuOpen = false;
         }

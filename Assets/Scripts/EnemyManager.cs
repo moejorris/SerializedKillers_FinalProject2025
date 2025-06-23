@@ -24,9 +24,18 @@ public class EnemyManager : MonoBehaviour
         UpdateEnemyList();
         foreach (EnemyAI_Base enemyScript in enemies)
         {
-            enemyScript.DeselectEnemy();
+            enemyScript.UnHighlightEnemy();
         }
-        enemy.SelectEnemy();
+        enemy.HighlightEnemy();
+    }
+
+    public void DeselectlEnemies()
+    {
+        UpdateEnemyList();
+        foreach (EnemyAI_Base enemyScript in enemies)
+        {
+            enemyScript.UnHighlightEnemy();
+        }
     }
 
     public void ActivateBehavior(Behavior behavior)

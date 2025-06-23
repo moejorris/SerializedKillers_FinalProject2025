@@ -19,13 +19,24 @@ public class Player_ScriptSteal : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        UpdateEnemySelection();
     }
-    public void UpdateSelectedEnemy(EnemyAI_Base enemy)
+
+    public void UpdateEnemySelection()
+    {
+        if (selectedEnemy == null || Vector3.Distance(transform.position, selectedEnemy.transform.position) > 10)
+        {
+            selectedEnemy = null;
+            enemyManager.DeselectlEnemies();
+        }
+    }
+
+    public void ChangeSelectedEnemy(EnemyAI_Base enemy)
     {
         if (selectedEnemy != enemy)
         {
             enemyManager.SelectEnemy(enemy);
+            selectedEnemy = enemy;
         }
     }
 

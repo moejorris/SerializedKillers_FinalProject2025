@@ -141,27 +141,21 @@ public class EnemyAI_Base : MonoBehaviour
         behaviorActive = false;
     }
 
-    public virtual void SelectEnemy()
+    public virtual void HighlightEnemy()
     {
         foreach (GameObject highlightPiece in highlightableMeshes) // highlights the pieces in the array
         {
             highlightPiece.layer = 6;
         }
-
-        scriptStealMenu.selectedEnemy = this;
-        scriptStealMenu.UpdateCenterSlot();
         selectedIcon.enabled = true;
     }
 
-    public virtual void DeselectEnemy()
+    public virtual void UnHighlightEnemy()
     {
         foreach (GameObject highlightPiece in highlightableMeshes) // unhighlights the pieces in the array
         {
             highlightPiece.layer = 0;
         }
-
-        scriptStealMenu.selectedEnemy = null;
-        scriptStealMenu.UpdateCenterSlot();
         selectedIcon.enabled = false;
     }
 }
