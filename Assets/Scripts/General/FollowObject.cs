@@ -7,6 +7,7 @@ public class FollowObject : MonoBehaviour
     [SerializeField] UpdateType updateMethod;
     [SerializeField] Transform targetObject;
     [SerializeField] float lerpSpeed = 0;
+    [SerializeField] Vector3 offset = new();
     void Update()
     {
         if (!updateMethod.Equals(UpdateType.Update)) return;
@@ -29,11 +30,11 @@ public class FollowObject : MonoBehaviour
     {
         if (lerpSpeed != 0)
         {
-            transform.position = Vector3.Slerp(transform.position, targetObject.position, deltaTime * lerpSpeed);
+            transform.position = Vector3.Slerp(transform.position, targetObject.position + offset, deltaTime * lerpSpeed);
         }
         else
         {
-            transform.position = targetObject.position;
+            transform.position = targetObject.position + offset;
         }
     }
 }
