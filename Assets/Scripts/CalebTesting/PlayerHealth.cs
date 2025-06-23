@@ -21,8 +21,6 @@ public class PlayerHealth : MonoBehaviour
     {
         health = maxHealth;
         UpdateHealth();
-
-
     }
 
     void PlaySound(AudioClip clip)

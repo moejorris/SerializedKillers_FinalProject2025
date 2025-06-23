@@ -10,6 +10,7 @@ using UnityEngine.InputSystem;
 public class Player_CombatMachine : MonoBehaviour
 {
     ScriptStealMenu scriptStealMenu => GameObject.FindGameObjectWithTag("Canvas").transform.Find("ScriptStealMenu").GetComponent<ScriptStealMenu>();
+    Player_ScriptSteal scriptSteal => GetComponent<Player_ScriptSteal>();
     Player_MovementMachine _machine => GetComponent<Player_MovementMachine>();
     Player_RootMotion _rootMotion => GetComponent<Player_RootMotion>();
     Player_ForceHandler _forceHandler => GetComponent<Player_ForceHandler>();
@@ -375,7 +376,7 @@ public class Player_CombatMachine : MonoBehaviour
             }
         }
 
-        if (selectedEnemy) scriptStealMenu.UpdateSelectedEnemy(selectedEnemy);
+        if (selectedEnemy) scriptSteal.UpdateSelectedEnemy(selectedEnemy);
 
         hitBoxActive = false;
     }
