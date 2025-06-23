@@ -14,7 +14,7 @@ public class Player_Dash : MonoBehaviour, IPlayerMover
     [Header("How far the dash should move the player (in Meters/Unity Units)")]
     [SerializeField] float _distance = 4f;
     [Header("How long one dash should take (in Seconds)")]
-    [SerializeField] float _travelTime = 0.25f;
+    public float _travelTime = 0.25f;
     [Header("Whether or not Gravity is applied while dashing")]
     [SerializeField] bool _ignoresGravity = true;
     Vector3 _force;
@@ -35,7 +35,7 @@ public class Player_Dash : MonoBehaviour, IPlayerMover
     {
         if (!_isDashing && dashInput.action.WasPerformedThisFrame())
         {
-            StartCoroutine("Dash");
+            StartCoroutine(Dash(transform.position + (DashDirection() * _distance)));
         }
     }
 
@@ -45,47 +45,57 @@ public class Player_Dash : MonoBehaviour, IPlayerMover
         // return Vector3.zero;
     }
 
-    IEnumerator Dash() //Fix distance not being reflected accurately in game!!!
+    public void ExternalDash(Vector3 destination)
     {
+        StartCoroutine(Dash(destination, false));
+    }
+
+    IEnumerator Dash(Vector3 destination, bool updateOtherMovers = true, float tTime = 0)
+    {
+        if (tTime == 0) tTime = _travelTime;
+
         _isDashing = true;
 
         EnableTrail();
 
-        _machine.SetForwardDirection(DashDirection()); //Snaps player to the direction they are trying to dash in so they dash in the correct direction
+        Vector3 forwardDir = destination - transform.position;
+        forwardDir.y = 0;
 
-        Vector3 destination = transform.position + (_machine.ForwardDirection.normalized * _distance);
+        _machine.SetForwardDirection(forwardDir); //Snaps player to the direction they are trying to dash in so they dash in the correct direction
+
         Vector3 startPosition = transform.position;
 
-        Debug.DrawLine(startPosition, destination + startPosition, Color.blue, _travelTime);
+        Debug.DrawLine(startPosition, destination + startPosition, Color.blue, tTime);
 
         // destination.y = 0;
         // startPosition.y = 0;
 
-        UpdateOtherMoveComponents(); //disables walking and turning. TODO: Disable jumping once that's done
         animate?.PlayDashAnimation();
+
+        if (updateOtherMovers) UpdateOtherMoveComponents();
 
         float t = 0;
 
-        if (_travelTime < _machine.DeltaTime)
+        if (tTime < _machine.DeltaTime)
         {
             _controller.Move(destination - startPosition);
 
             yield return new WaitForSeconds(_machine.DeltaTime);
 
         }
-        else while (t < _travelTime)
-            {
-                destination.y = transform.position.y;
-                startPosition.y = transform.position.y;
+        else while (t < tTime)
+        {
+            destination.y = transform.position.y;
+            startPosition.y = transform.position.y;
 
-                _force = Vector3.Lerp(startPosition, destination, t / _travelTime) - transform.position;
+            _force = Vector3.Lerp(startPosition, destination, t / tTime) - transform.position;
 
-                _force = Vector3.ProjectOnPlane(_force, _machine.GroundInformation.normal);
+            _force = Vector3.ProjectOnPlane(_force, _machine.GroundInformation.normal);
 
-                yield return new WaitForSeconds(_machine.DeltaTime);
+            yield return new WaitForSeconds(_machine.DeltaTime);
 
-                t = Mathf.Clamp(t + _machine.DeltaTime, 0, _travelTime);
-            }
+            t = Mathf.Clamp(t + _machine.DeltaTime, 0, tTime);
+        }
 
         _force = Vector3.zero;
 
@@ -93,7 +103,7 @@ public class Player_Dash : MonoBehaviour, IPlayerMover
 
         DisableTrail();
 
-        UpdateOtherMoveComponents(); //re-enables walking and turning
+        if(updateOtherMovers) UpdateOtherMoveComponents(); //re-enables walking and turning
     }
 
     void UpdateOtherMoveComponents()

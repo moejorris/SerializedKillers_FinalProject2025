@@ -14,6 +14,8 @@ public class Player_CombatMachine : MonoBehaviour
     Player_RootMotion _rootMotion => GetComponent<Player_RootMotion>();
     Player_ForceHandler _forceHandler => GetComponent<Player_ForceHandler>();
     Player_Rotate _rotation => GetComponent<Player_Rotate>();
+
+
     [SerializeField] AnimatorOverrideController animatorOverride;
     int currentAnim = 1;
 
@@ -36,8 +38,11 @@ public class Player_CombatMachine : MonoBehaviour
     [Header("Batman Arkham Combat Settings")]
     [SerializeField] bool isBatman = true;
     [SerializeField] InputActionReference walkInput;
-    [SerializeField] float maxLeapDistance = 10f;
+    [SerializeField] float maxLeapDistance = 8f;
+    [SerializeField] float minDashDistance = 4f;
+    [SerializeField] bool targetEnemiesOnly = false;
 
+    //Local Stuff
     bool isAttacking = false;
     bool attackQueued = false;
 
@@ -67,14 +72,6 @@ public class Player_CombatMachine : MonoBehaviour
         if (OutOfRangeCheck()) return;
 
         //TODO:
-        //Arkham Method:
-        //Check to find possible victims
-        //iterate through them to find most likely intended to be attacked by player by getting joystick dir relative to cam and closest of them
-        //snap player to look at that enemy
-        //if movement force is greater than the distance from player to chosen enemy, limit force so the player doesn't move if not necessary.
-        //Consider just using the distance as the move force so the player gets close enough on it's own???
-
-        //TODO:
         //Also standard targeting method
         //Get target (somehow)
         //Rotate player towards it (not immediate snap)
@@ -86,8 +83,7 @@ public class Player_CombatMachine : MonoBehaviour
         currentAttack = defaultAttacks[currentComboID];
 
         HandleAnimation();
-        HandleSound();
-        HandleParticle();
+
 
         float attackTime = currentAttack.animation.length / currentAttack.animationSpeed; // find a way to get the speed of the state and divide the length by that...
 
@@ -95,6 +91,15 @@ public class Player_CombatMachine : MonoBehaviour
         HandleMovement();
         HandleRotation();
         HandleMoveToTarget();
+
+        animator.speed = 0;
+
+        //Wait for dash to finish/player is close to enemy to start attack
+
+        animator.speed = currentAttack.animationSpeed;
+
+        HandleSound();
+        HandleParticle();
 
         CancelInvoke("AttackIsDone");
         Invoke("AttackIsDone", attackTime * 0.75f);
@@ -108,7 +113,11 @@ public class Player_CombatMachine : MonoBehaviour
 
     void HandleMoveToTarget()
     {
+        //TODO: Create Score/Weight System that factors both input direction and closeness
+        //TODO: Move player over time
+
         if (!isBatman) return;
+        if (!_machine.isGrounded) return;
 
         Vector3 inputDir = IntendedMoveDirection();
 
@@ -157,15 +166,26 @@ public class Player_CombatMachine : MonoBehaviour
 
         if (mostInLineEnemy == null) return;
 
+        _rotation.enabled = false;
+
         Debug.Log("Arkham Combat: Found Most In Line Enemy: " + mostInLineEnemy.transform.name);
 
-        GetComponent<CharacterController>().enabled = false;
+        float enemyDist = Vector3.Distance(mostInLineEnemy.transform.position, transform.position);
 
-        _machine.SetForwardDirection(mostInLineEnemy.transform.position - transform.position);
-        transform.position = mostInLineEnemy.transform.position - (mostInLineEnemy.transform.position - transform.position).normalized * checkRadius;
-        transform.position = new Vector3(transform.position.x, mostInLineEnemy.transform.position.y, transform.position.z);
+        if (enemyDist > minDashDistance)
+        {
+            _machine.DisableAllMovers(GetComponent<Player_Dash>());
+            GetComponent<Player_Dash>().ExternalDash(mostInLineEnemy.transform.position);
+        }
+        else
+        {
+            Vector3 newDir = mostInLineEnemy.transform.position - transform.position;
+            newDir.y = 0;
 
-        GetComponent<CharacterController>().enabled = true;
+            _machine.SetForwardDirection(newDir);
+            _machine.DisableAllMovers(_forceHandler);
+            _forceHandler.AddForce(_machine.ForwardDirection * Vector3.Distance(transform.position, mostInLineEnemy.transform.position - _machine.ForwardDirection * checkRadius) * 5f, ForceMode.VelocityChange);        
+        }
     }
 
     void HandleParticle()
@@ -178,7 +198,7 @@ public class Player_CombatMachine : MonoBehaviour
 
     void HandleRotation()
     {
-        if (currentAttack.lockRotation || isBatman)
+        if (currentAttack.lockRotation)
         {
             _rotation.enabled = false;
         }
@@ -186,14 +206,14 @@ public class Player_CombatMachine : MonoBehaviour
 
     void HandleMovement()
     {
-        if (currentAttack.overrideMotion || isBatman)
+        if (isBatman) return;
+
+        if (currentAttack.overrideMotion)
         {
             if (currentAttack.usesRootMotion) _machine.DisableAllMovers(_rootMotion);
             else _rootMotion.enabled = false;
             _machine.DisableAllMovers(_forceHandler);
         }
-
-        if (isBatman) return;
 
         if (currentAttack.vectorForce.magnitude > 0) // only apply force if necessary
         {
@@ -241,6 +261,7 @@ public class Player_CombatMachine : MonoBehaviour
 
         audioSource.PlayOneShot(clip);
         Destroy(soundObject, clip.length);
+        Debug.Log("Clip length = " + clip.length);
     }
 
     void HandleAnimation()
