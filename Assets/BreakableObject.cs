@@ -11,10 +11,13 @@ public class BreakableObject : MonoBehaviour
     {
         if (heldItem != null)
         {
+            Vector3 spawnPos = transform.position;
+            spawnPos.y += 1;
             int num = Random.Range(1, 101);
             if (num <= itemDropChance)
             {
-                Instantiate(heldItem, transform.position, Quaternion.identity);
+                Rigidbody rb = Instantiate(heldItem, spawnPos, Quaternion.identity).GetComponent<Rigidbody>();
+                rb.AddForce(new Vector3(Random.Range(-100f, 100), 100, Random.Range(-100f, 100f)));
             }
         }
 

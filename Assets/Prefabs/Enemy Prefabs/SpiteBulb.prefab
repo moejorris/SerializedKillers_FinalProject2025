@@ -6368,8 +6368,8 @@ MonoBehaviour:
   attackOccuring: 0
   attackState: neutral
   canAttack: 0
-  meleeAttackCooldown: 3
-  shockwaveAttackCooldown: 5
+  meleeAttackCooldown: 1
+  shockwaveAttackCooldown: 2
   attackCooldownTimer: 0
   longRangeAttackDis: 7.5
   shockwaveAttackChance: 0
@@ -6384,7 +6384,7 @@ MonoBehaviour:
     m_Bits: 9
   laser_lineRenderer: {fileID: 0}
   laser_endSphere: {fileID: 0}
-  laserAttackCooldown: 8
+  laserAttackCooldown: 3
   scaredFollowRange: 8
   scaredAttackTimer: 5
   teleportTimer: 8

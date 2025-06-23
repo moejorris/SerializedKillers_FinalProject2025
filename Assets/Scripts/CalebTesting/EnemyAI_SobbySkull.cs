@@ -32,7 +32,7 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
         rigidBody = transform.GetComponent<Rigidbody>();
         healthBar = transform.parent.Find("Canvas/Bar").GetComponent<RectTransform>();
     }
-    void Update()
+    public override void Update()
     {
         navMeshAgent.destination = playerTarget.position;
         if (behaviorActive) // has the water script

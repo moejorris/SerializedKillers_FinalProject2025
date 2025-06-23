@@ -18,6 +18,8 @@ public class EnemyAI_Overclock : EnemyAI_Base
 
     [SerializeField] private Material redBodyColor;
     [SerializeField] private Material blueBodyColor;
+    [SerializeField] private ParticleSystem flameParticles => transform.Find("NormalFire").GetComponent<ParticleSystem>();
+    [SerializeField] private ParticleSystem smokeParticles => transform.Find("Smoke").GetComponent<ParticleSystem>();
 
     [Header("Overclock Vision")]
     [SerializeField] private float idleAlertRange;
@@ -173,7 +175,7 @@ public class EnemyAI_Overclock : EnemyAI_Base
             }
             else if (movementState == "cooldown")
             {
-
+                
             }
         }
         else
@@ -268,21 +270,29 @@ public class EnemyAI_Overclock : EnemyAI_Base
     public void PerformAttack()
     {
         preparingAttack = true;
-        if (PlayerDistance() > fireDashDist && behaviorActive)
+
+        if (behaviorActive)
         {
-            EnterDashAttack();
-        }
-        else
-        {
-            float ran = Random.Range(0.1f, 99.9f);
-            if (behaviorActive && ran < fireDashChance) // commits fire dash
+            if (PlayerDistance() > fireDashDist)
             {
                 EnterDashAttack();
             }
-            else // commits not
+            else
             {
-                EnterFlamethrowerAttack();
+                float ran = Random.Range(0.1f, 99.9f);
+                if (behaviorActive && ran < fireDashChance) // commits fire dash
+                {
+                    EnterDashAttack();
+                }
+                else // commits not
+                {
+                    EnterFlamethrowerAttack();
+                }
             }
+        }
+        else
+        {
+
         }
     }
 
@@ -303,10 +313,12 @@ public class EnemyAI_Overclock : EnemyAI_Base
     public void ExitFlamethrowerAttack()
     {
         AttackCooldown(flamethrowerAttackCooldown);
-        IncreaseHeatMeter(20);
         navMeshAgent.stoppingDistance = 3.5f;
         navMeshAgent.isStopped = false;
+        spawningFlames = false;
         attackState = "neutral";
+        flamethrowerParticles.Stop();
+        IncreaseHeatMeter(30);
         navMeshAgent.speed = 3;
         preparingAttack = false;
         attackOccuring = false;
@@ -335,10 +347,10 @@ public class EnemyAI_Overclock : EnemyAI_Base
     public void ExitDashAttack()
     {
         AttackCooldown(dashAttackCooldown);
-        IncreaseHeatMeter(30);
         navMeshAgent.stoppingDistance = 3.5f;
         navMeshAgent.isStopped = false;
         attackState = "neutral";
+        IncreaseHeatMeter(40);
         navMeshAgent.speed = 3;
         preparingAttack = false;
         attackOccuring = false;
@@ -389,6 +401,9 @@ public class EnemyAI_Overclock : EnemyAI_Base
 
     IEnumerator CooldownMode()
     {
+
+        smokeParticles.Play();
+        flameParticles.Stop();
         movementState = "cooldown";
         while (heatLevel > 0)
         {
@@ -397,6 +412,8 @@ public class EnemyAI_Overclock : EnemyAI_Base
         }
         heatLevel = 0;
         movementState = "wandering";
+        smokeParticles.Stop();
+        flameParticles.Play();
         navMeshAgent.isStopped = false;
     }
 
@@ -526,9 +543,7 @@ public class EnemyAI_Overclock : EnemyAI_Base
         base.ActivateBehavior();
         navMeshAgent.speed = 3;
         transform.Find("IceSphere").gameObject.SetActive(false);
-        //Material[] newMats = bulbHead.GetComponent<MeshRenderer>().materials;
-        //newMats[0] = redBodyColor;
-        //bulbHead.GetComponent<MeshRenderer>().materials = newMats;
+        transform.Find("TheOverclockPlaceholder").GetComponent<MeshRenderer>().material = redBodyColor;
     }
 
     public override void DeactivateBehavior()
@@ -538,8 +553,6 @@ public class EnemyAI_Overclock : EnemyAI_Base
         base.DeactivateBehavior();
         navMeshAgent.speed = 1;
         transform.Find("IceSphere").gameObject.SetActive(true);
-        //Material[] newMats = bulbHead.GetComponent<MeshRenderer>().materials;
-        //newMats[0] = blueBodyColor;
-        //bulbHead.GetComponent<MeshRenderer>().materials = newMats;
+        transform.Find("TheOverclockPlaceholder").GetComponent<MeshRenderer>().material = blueBodyColor;
     }
 }
