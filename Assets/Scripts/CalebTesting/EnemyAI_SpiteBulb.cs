@@ -8,6 +8,7 @@ using UnityEngine.Splines.Interpolators;
 
 
 [RequireComponent(typeof(Light))]
+[RequireComponent(typeof(NavMeshAgent))]
 public class EnemyAI_SpiteBulb : EnemyAI_Base
 {
     [Header("Bulb General")]
@@ -359,6 +360,7 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
         movementState = "wandering";
         standingUp = false;
         healing = false;
+        navMeshAgent.isStopped = false;
         StopCoroutine("HealTimer");
         Debug.Log("Standing Complete Called");
     }
@@ -877,9 +879,20 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
 
     public override void DeactivateBehavior() // Arise needs to in some way be called so the enemy doesn't get stuck crouched when stealing!!!
     {
+        bool arise = false;
+        if (attackState == "laser" || attackState == "shockwave") arise = true;
+
         ExitLaserAttack();
         ExitShockwaveAttack();
         base.DeactivateBehavior();
+
+        if (arise)
+        {
+            navMeshAgent.isStopped = true;
+            bulbBodyAnimator.SetTrigger("Arise");
+            Invoke("StandingComplete", 1.8f);
+        }
+
         Material[] newMats = newLightBulbHead.materials;
         newMats[0] = unlitBulbColor;
         newLightBulbHead.materials = newMats;

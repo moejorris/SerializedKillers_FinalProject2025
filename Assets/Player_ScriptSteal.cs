@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using System.Collections;
 
 public class Player_ScriptSteal : MonoBehaviour
 {
@@ -31,6 +32,7 @@ public class Player_ScriptSteal : MonoBehaviour
     void Start()
     {
         scriptReturnTimer = scriptReturnTime;
+        StartCoroutine("UpdateTimer");
     }
 
     // Update is called once per frame
@@ -71,7 +73,7 @@ public class Player_ScriptSteal : MonoBehaviour
             scriptReturnTimer = scriptReturnTime;
         }
 
-        UpdateEnemySelection();
+        //UpdateEnemySelection();
     }
 
     public void StealScript()
@@ -87,6 +89,16 @@ public class Player_ScriptSteal : MonoBehaviour
         heldBehavior = null;
         enemyManager.UpdateEnemyBehaviors();
         ApplyScriptEffects();
+    }
+
+    IEnumerator UpdateTimer()
+    {
+        yield return new WaitForSeconds(0.1f);
+        while (true)
+        {
+            UpdateEnemySelection();
+            yield return new WaitForSeconds(0.1f);
+        }
     }
 
     public void UpdateEnemySelection()

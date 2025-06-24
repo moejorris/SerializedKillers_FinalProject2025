@@ -5,7 +5,6 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 
-[RequireComponent(typeof(NavMeshAgent))]
 public class EnemyAI_Base : MonoBehaviour, ITargetable, IDamageable
 {
     [Header("Navigation")]

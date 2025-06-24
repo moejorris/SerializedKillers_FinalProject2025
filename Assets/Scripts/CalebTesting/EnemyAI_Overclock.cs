@@ -4,6 +4,8 @@ using System.Collections;
 using UnityEngine.UI;
 using UnityEditor;
 
+
+[RequireComponent(typeof(NavMeshAgent))]
 public class EnemyAI_Overclock : EnemyAI_Base
 {
     [Range(-1f, 1f)]
