@@ -8,19 +8,35 @@ using System.Collections;
 public class EnemyAI_SobbySkull : EnemyAI_Base
 {
     [Header("Sobby Skull General")]
+    public bool showDuckObjects = false;
     [SerializeField] private string movementState = "idle";
-    [SerializeField] private GameObject waterOrb;
+    [SerializeField] private GameObject waterOrb => skull.Find("WaterOrb").gameObject;
+    [SerializeField] private Transform skull => transform;
     [SerializeField] private NavMeshAgent rollingNavMeshAgent;
-    [SerializeField] private bool followPlayer = false;   
+
+    [SerializeField] private float followTimer = 15;
+    [SerializeField] private bool followingPlayer = false;
 
     [SerializeField] private bool ducking = false;
-    [SerializeField] private Vector3 duckPosition = Vector3.zero;
+    //[SerializeField] private Vector3 duckPosition = Vector3.zero;
     [SerializeField] private float doorframeDist = 5;
     [SerializeField] private float flyingSpeed = 5;
     [SerializeField] private float flyingTurnSpeed = 5;
     [SerializeField] private float flyHeight = 4;
     [SerializeField] private List<Vector3> duckPositions = new List<Vector3>();
-    [SerializeField] Transform skullFollowTarget;
+
+    [Header("Sobby Skull Movement")]
+    [SerializeField] private float gravityLevel = 1;
+    [SerializeField] private float rollSpeed = 1;
+
+    [Header("Sobby Skull Combat")]
+    [SerializeField] private bool attacking = false;
+    [SerializeField] private bool preparingAttack = false;
+    [SerializeField] Vector3 attackDir = Vector3.zero;
+    [SerializeField] bool hitPlayer = false;
+    [SerializeField] private float attackCooldown = 5;
+    private float attackTimer = 0;
+    [SerializeField] private PlayerHealth playerHealth => GameObject.FindGameObjectWithTag("Canvas").GetComponent<PlayerHealth>();
 
     [Header("Sobby Skull Vision")]
     [SerializeField] private float idleAlertRange;
@@ -41,173 +57,160 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
     public override void Start()
     {
         base.Start();
-        navMeshAgent = transform.parent.Find("FlyingAgent").GetComponent<NavMeshAgent>();
-        rollingNavMeshAgent = transform.parent.Find("RollingAgent").GetComponent<NavMeshAgent>();
-        rigidBody = transform.GetComponent<Rigidbody>();
-        healthBar = transform.parent.Find("Canvas/Bar").GetComponent<RectTransform>();
-        selectedIcon = transform.parent.Find("Canvas/SelectedIcon").GetComponent<Image>();
+        navMeshAgent = skull.parent.Find("RollingAgent").GetComponent<NavMeshAgent>();
+        //rollingNavMeshAgent = transform.Find("RollingAgent").GetComponent<NavMeshAgent>();
+        rigidBody = skull.parent.Find("Skull").GetComponent<Rigidbody>();
+        healthBar = skull.parent.Find("Canvas/Bar").GetComponent<RectTransform>();
+        whiteHealthBar = skull.parent.Find("Canvas/Bar/White").GetComponent<RectTransform>();
+        selectedIcon = skull.parent.Find("Canvas/SelectedIcon").GetComponent<Image>();
 
-        //navMeshAgent.isStopped = true;
-        movementState = "flying";
+
+        StartRolling();
         StartCoroutine("DoorCheckTimer");
+
     }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.DrawSphere(new Vector3(skull.position.x, skull.position.y - 0.9f, skull.position.z), 0.2f);
+    }
+
     public override void Update()
     {
-        if (5000 < 1)
+        if (PlayerNearby() || PlayerInLineOfSight())
         {
-            //navMeshAgent.destination = playerTarget.position;
-            //if (behaviorActive) // has the water script
-            //{
-            //    lagPos = transform.position;
-
-            //    if (movementState == "rolling_idle")
-            //    {
-
-            //        if (PlayerInRollRange())
-            //        {
-            //            //StartRolling();
-            //            navMeshAgent.speed = 1;
-            //            movementState = "rolling_pursuit";
-            //            waterOrb.SetActive(true);
-            //            rigidBody.useGravity = true;
-            //        }
-            //        else
-            //        {
-            //            if (rigidBody.useGravity == false)
-            //            {
-            //                navMeshAgent.speed = 1;
-            //                waterOrb.SetActive(true);
-            //                rigidBody.useGravity = true;
-            //            }
-            //            // just chillin
-            //        }
-            //    }
-            //    else if (movementState == "rolling_pursuit")
-            //    {
-            //        if (!PlayerInRollRange())
-            //        {
-            //            //nothing
-            //        }
-            //        else
-            //        {
-            //            navMeshAgent.destination = playerTarget.position;
-            //            RollForward();
-            //        }
-            //    }
-            //}
-            //else // script stolen
-            //{
-            //    if (movementState == "flying_idle")
-            //    {
-            //        if (PlayerVisible())
-            //        {
-            //            movementState = "flying_pursuit";
-            //        }
-            //        else
-            //        {
-            //            //rollCycle += Mathf.PI / rollCycleDivision * Time.deltaTime;
-            //            //rollCycle = rollCycle % (Mathf.PI * 2);
-
-            //            lagPos = Vector3.Lerp(lagPos, new Vector3(navMeshAgent.transform.position.x, lagPos.y, navMeshAgent.transform.position.z), Time.deltaTime);
-            //            lagPos = Vector3.Lerp(lagPos, new Vector3(lagPos.x, navMeshAgent.transform.position.y, lagPos.z), Time.deltaTime / 3);
-
-            //            transform.position = lagPos + new Vector3(0, yOffset + Mathf.Sin(rollCycle * 2) * 0.5f, 0);
-
-            //            // fly in place?
-            //        }
-            //    }
-            //    else if (movementState == "flying_pursuit")
-            //    {
-            //        if (PlayerVisible())
-            //        {
-            //            //rollCycle += Mathf.PI / rollCycleDivision * Time.deltaTime;
-            //            //rollCycle = rollCycle % (Mathf.PI * 2);
-
-            //            lagPos = Vector3.Lerp(lagPos, new Vector3(navMeshAgent.transform.position.x, lagPos.y, navMeshAgent.transform.position.z), Time.deltaTime);
-            //            lagPos = Vector3.Lerp(lagPos, new Vector3(lagPos.x, navMeshAgent.transform.position.y, lagPos.z), Time.deltaTime / 3);
-
-            //            transform.position = lagPos + new Vector3(0, yOffset + Mathf.Sin(rollCycle * 2) * 0.5f, 0);
-
-            //            navMeshAgent.destination = playerTarget.position;
-            //            RotateTowardsPlayer();
-            //        }
-            //        else
-            //        {
-            //            movementState = "flying_idle";
-            //        }
-            //    }
-            //}
+            followTimer = 15;
+            followingPlayer = true;
+        }
+        else if (followingPlayer)
+        {
+            followTimer -= Time.deltaTime;
+            if (followTimer <= 0) followingPlayer = false;
         }
 
-       // navMeshAgent.destination = playerTarget.position;
-
-        if (followPlayer)
+        if (attacking)
         {
-            skullFollowTarget = playerTarget;
+            skull.rotation = Quaternion.Slerp(skull.rotation, Quaternion.LookRotation(attackDir, Vector3.up), Time.deltaTime * flyingTurnSpeed); // always flies to the player
+
+            if (!preparingAttack)
+            {
+                if (Vector3.Distance(skull.position, playerTarget.position) <= 1.5f)
+                {
+                    MeleeHitCheck();
+                }
+                attackDir.y += Time.deltaTime * 20;
+            }
         }
         else
         {
-            skullFollowTarget = navMeshAgent.transform;
-        }
+            if (attackTimer > 0) attackTimer -= Time.deltaTime;
 
-        if (movementState == "flying")
-        {
-            Vector3 TARGET = transform.position;
-
-            //CheckForOverhang();
-
-            if (!ducking)
+            if (movementState == "flying")
             {
-                //Vector3 navPos = navMeshAgent.transform.position;
-                //navPos.y = navMeshAgent.transform.position.y + flyHeight;
-                //Vector3 pos = Vector3.Slerp(transform.position, navPos, Time.deltaTime * flyingSpeed);
-                //transform.position = pos;
+                Vector3 TARGET = skull.position;
 
-                TARGET = skullFollowTarget.transform.position;
-                TARGET.y = Mathf.Lerp(transform.position.y, skullFollowTarget.position.y + flyHeight, flyingTurnSpeed);
-
-                if (duckPositions.Count > 0)
+                if (!ducking) // if the player is flying normally, it goes directly to the player
                 {
-                    ducking = true;
+                    TARGET = playerTarget.transform.position;
+                    TARGET.y = Mathf.Lerp(skull.position.y, playerTarget.position.y + flyHeight, flyingTurnSpeed * (1 + Vector3.Distance(playerTarget.position, skull.position))); // makes sure to set the offset, also faster if player higher
+
+                    if (duckPositions.Count > 0)
+                    {
+                        ducking = true;
+                    }
+                }
+                else // otherwise, the player flies down to a ducked position
+                {
+                    if (duckPositions.Count > 0) // checks if there are any positions in the array
+                    {
+                        TARGET = new Vector3(duckPositions[0].x, duckPositions[0].y + 1f, duckPositions[0].z);
+                        //TARGET.y += flyHeight;
+
+                        if (Vector3.Distance(skull.position, duckPositions[0]) <= 3)
+                        {
+                            duckPositions.RemoveAt(0);
+                        }
+                    }
+                    else
+                    {
+                        ducking = false;
+                    }
+                }
+
+                skull.rotation = Quaternion.Slerp(skull.rotation, Quaternion.LookRotation(TARGET - skull.position, Vector3.up), Time.deltaTime * flyingTurnSpeed); // always flies to the player
+
+                if (Vector3.Distance(playerTarget.position, skull.position) < 7f && attackTimer <= 0 && PlayerInLineOfSight())
+                {
+                    BeginDiveAttack();
                 }
             }
-            else
+            else if (movementState == "rolling")
             {
-                if (duckPositions.Count > 0)
+                
+            }
+        }
+    }
+    private void FixedUpdate()
+    {
+        if (!attacking)
+        {
+            if (movementState == "flying")
+            {
+                rigidBody.angularVelocity = Vector3.zero;
+                if (Vector3.Distance(playerTarget.position, skull.position) < 7f) // close, makes it slow down
                 {
-
-                    TARGET = duckPositions[0];
-
-                    //Vector3 pos = Vector3.Lerp(transform.position, duckPositions[0], Time.deltaTime * flyingSpeed);
-                    //transform.position = pos;
-
-                    if (Vector3.Distance(transform.position, duckPositions[0]) <= 3)
-                    {
-                        duckPositions.RemoveAt(0);
-                    }
+                    rigidBody.maxLinearVelocity -= Time.deltaTime * 25;
+                    rigidBody.linearVelocity = Vector3.Lerp(rigidBody.linearVelocity, Vector3.zero, Time.deltaTime * 10);
                 }
                 else
                 {
-                    ducking = false;
+                    rigidBody.maxLinearVelocity = 5;
+                }
+
+                //transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(TARGET - transform.position, Vector3.up), Time.deltaTime * flyingTurnSpeed); // always flies to the player
+
+                rigidBody.AddForce(skull.forward * flyingSpeed, ForceMode.VelocityChange);
+            }
+            else
+            {
+                rigidBody.AddForce(Physics.gravity * gravityLevel, ForceMode.Acceleration);
+
+                if (IsGrounded())
+                {
+                    rigidBody.maxLinearVelocity = 3;
+                    rigidBody.AddForce((playerTarget.position - skull.position).normalized * rollSpeed, ForceMode.VelocityChange);
+                }
+                else
+                {
+                    rigidBody.maxLinearVelocity = 15;
                 }
             }
-
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(TARGET - transform.position, Vector3.up), Time.deltaTime * flyingTurnSpeed);
-            rigidBody.linearVelocity = transform.forward * flyingSpeed;
+        }
+        else
+        {
+            if (movementState == "flying")
+            {
+                rigidBody.AddForce(skull.forward * flyingSpeed, ForceMode.VelocityChange);
+            }
         }
     }
 
-    public void ConverToSplines()
+    public void MeleeHitCheck()
     {
-        
-    }
+        RaycastHit[] hits = Physics.SphereCastAll(transform.position, 1, transform.forward, 1, playerLayer);
 
-    public void RotateTowardsPlayer()
-    {
-        Vector3 pos = playerTarget.position - transform.position;
-        Quaternion rotation = Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(pos, Vector3.up), Time.deltaTime * 10);
-        //Debug.Log("rotating towards: " + rotation);
-        transform.eulerAngles = new Vector3(0, rotation.eulerAngles.y, 0);
+        //Debug.Log(hits.Length);
+
+        foreach (RaycastHit hit in hits)
+        {
+            if (hit.transform.parent != null && hit.transform.parent.CompareTag("Player") && !hitPlayer)
+            {
+                Debug.Log("Player Hit!");
+                hitPlayer = true;
+                playerHealth.TakeDamage(5);
+                break;
+            }
+        }
     }
 
     IEnumerator DoorCheckTimer()
@@ -216,39 +219,97 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
         {
             yield return new WaitForSeconds(0.1f);
             CheckForOverhang();
+            SpacialAwareness();
         }
+    }
+
+    public void StartRolling()
+    {
+        attacking = false;
+        waterOrb.SetActive(true);
+        rigidBody.useGravity = true;
+        movementState = "rolling";
+    }
+
+    public void StartFlying()
+    {
+        attackTimer = 2;
+        waterOrb.SetActive(false);
+        rigidBody.useGravity = false;
+        movementState = "flying";
+    }
+
+    public void BeginDiveAttack()
+    {
+        attackTimer = attackCooldown;
+        attackDir = playerTarget.position - skull.position;
+        attacking = true;
+        preparingAttack = true;
+        rigidBody.maxLinearVelocity = 0.3f;
+        rigidBody.linearVelocity = Vector3.zero;
+        hitPlayer = false;
+        StartCoroutine("DiveAttack");
+    }
+
+    IEnumerator DiveAttack()
+    {
+        Debug.Log("Performing attack!");
+        yield return new WaitForSeconds(1);
+        preparingAttack = false;
+        rigidBody.maxLinearVelocity = 15;
+        rigidBody.AddForce(skull.forward * 50, ForceMode.Impulse);
+        yield return new WaitForSeconds(1);
+        attacking = false;
     }
 
     public void CheckForOverhang()
     {
         Ray raycast = new Ray();
-        raycast.origin = skullFollowTarget.transform.position;
+        raycast.origin = playerTarget.transform.position;
         raycast.direction = Vector3.up;
         RaycastHit hit;
 
-        if (Physics.Raycast(raycast, out hit, 25, obstacleLayer))
+        if (Physics.Raycast(raycast, out hit, 15, obstacleLayer))
         {
-            if (Vector3.Distance(hit.point, skullFollowTarget.transform.position) > doorframeDist)
+            if (Vector3.Distance(hit.point, playerTarget.transform.position) > doorframeDist)
             {
                 if (duckPositions.Count <= 0)
                 {
-                    duckPositions.Add(skullFollowTarget.transform.position);
+                    duckPositions.Add(playerTarget.transform.position);
+                    if (showDuckObjects) Debug.Log(hit.transform.gameObject.name);
                 }
                 else
                 {
-                    if (Vector3.Distance(duckPositions[duckPositions.Count-1], skullFollowTarget.transform.position) > 3)
+                    if (Vector3.Distance(duckPositions[duckPositions.Count-1], playerTarget.transform.position) > 0.5f)
                     {
-                        duckPositions.Add(skullFollowTarget.transform.position);
+                        duckPositions.Add(playerTarget.transform.position);
+                        if (showDuckObjects) Debug.Log(hit.transform.gameObject.name);
+                    }
+                }
+            }
+            else if (!PlayerNearby() && !PlayerInLineOfSight() && followingPlayer) // TRYING TO MAKE IT ADD POSITIONS WHEN THE PLAYER IS NOT SEEN
+            {
+                if (duckPositions.Count <= 0)
+                {
+                    duckPositions.Add(playerTarget.transform.position);
+                    if (showDuckObjects) Debug.Log(hit.transform.gameObject.name);
+                }
+                else
+                {
+                    if (Vector3.Distance(duckPositions[duckPositions.Count - 1], playerTarget.transform.position) > 3)
+                    {
+                        duckPositions.Add(playerTarget.transform.position);
+                        if (showDuckObjects) Debug.Log(hit.transform.gameObject.name);
                     }
                 }
             }
         }
 
-        if (duckPositions.Count > 0)
+        if (duckPositions.Count > 0 && !attacking)
         {
             Ray raycast2 = new Ray();
-            raycast2.origin = transform.position;
-            raycast2.direction = skullFollowTarget.position - transform.position;
+            raycast2.origin = skull.position;
+            raycast2.direction = playerTarget.position - skull.position;
             RaycastHit hit2;
 
 
@@ -258,7 +319,7 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
 
                 if (hit2.transform.gameObject.name == "PlayerController")
                 {
-                    if (Vector3.Angle(transform.forward, skullFollowTarget.position - transform.position) > 90)
+                    if (Vector3.Angle(skull.forward, playerTarget.position - skull.position) > 70) // they're basically behind the player, no need to go through a door when the player has come back through
                     {
                         duckPositions.Clear();
                     }
@@ -267,28 +328,65 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
         }
     }
 
-
-    public bool PlayerVisible()
+    public override void TakeDamage(float damage)
     {
-        if (Vector3.Distance(playerTarget.position, navMeshAgent.transform.position) <= blindFollowRange) // within the "listen range"
+        if (!healthBar || !whiteHealthBar) return; // in case no thing exists
+
+        health -= damage;
+
+        //StopCoroutine("MaterialFade");
+        //StartCoroutine("MaterialFade");
+
+        UpdateHealth();
+        if (health <= 0)
+        {
+            Destroy(transform.parent.gameObject);
+        }
+    }
+
+    public void SpacialAwareness()
+    {
+        RaycastHit hit;
+        if (Physics.SphereCast(skull.position, 1.5f, skull.forward, out hit, 0, obstacleLayer))
+        {
+            rigidBody.AddForce((hit.point - skull.position).normalized * -15, ForceMode.Impulse);
+        }
+    }
+
+
+    public bool PlayerNearby()
+    {
+        if (Vector3.Distance(playerTarget.position, skull.position) <= blindFollowRange) // within the "listen range"
         {
             return true;
         }
-        else if (Vector3.Distance(playerTarget.position, navMeshAgent.transform.position) <= visionConeLength) // at least within sight range
+        else
         {
-            if (Physics.Raycast(navMeshAgent.transform.position, playerTarget.transform.position - navMeshAgent.transform.position, out RaycastHit rayHit, (Vector3.Distance(playerTarget.position, navMeshAgent.transform.position) - 3), obstacleLayer)) // checks if player behind things?
+            return false;
+        }
+    }
+
+    public bool PlayerInLineOfSight()
+    {
+        if (Vector3.Distance(playerTarget.position, skull.position) <= visionConeLength) // at least within sight range
+        {
+            Debug.Log("Player is within cone length.");
+            if (Physics.Raycast(skull.position, playerTarget.position - skull.position, out RaycastHit rayHit, (Vector3.Distance(playerTarget.position, skull.position) - 3), obstacleLayer)) // checks if player behind things?
             {
+                Debug.Log("Something is in the way.");
                 return false;
             }
             else
             {
-                Vector3 directionToTarget = (playerTarget.position - navMeshAgent.transform.position).normalized;
-                if (Vector3.Angle(navMeshAgent.transform.forward, directionToTarget) < visionConeWidth / 2)
+                Vector3 directionToTarget = (playerTarget.position - skull.position).normalized;
+                if (Vector3.Angle(skull.forward, directionToTarget) < visionConeWidth / 2)
                 {
+                    Debug.Log("IN CONE!");
                     return true;
                 }
                 else
                 {
+                    Debug.Log("NOT IN CONE!");
                     return false;
                 }
             }
@@ -301,7 +399,7 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
 
     public bool PlayerInAttackRange()
     {
-        if (Vector3.Distance(playerTarget.position, transform.position) < attackRange)
+        if (Vector3.Distance(playerTarget.position, skull.position) < attackRange)
         {
             return true;
         }
@@ -314,13 +412,24 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
     public override void ActivateBehavior() // roll mode
     {
         base.ActivateBehavior();
-        waterOrb.SetActive(true);
-        rigidBody.useGravity = true;
-        movementState = "rolling_idle";
+        StartRolling();
+    }
+
+    public bool IsGrounded()
+    {
+        if (Physics.CheckSphere(new Vector3(skull.position.x, skull.position.y - 1f, skull.position.z), 0.2f, obstacleLayer))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
     public override void DeactivateBehavior() // fly mode
     {
         base.DeactivateBehavior();
+        StartFlying();
     }
 }

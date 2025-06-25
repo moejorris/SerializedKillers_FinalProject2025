@@ -48,7 +48,8 @@ public class Player_ScriptSteal : MonoBehaviour
                     StealScript();
                 }
             }
-            else if (!scriptStealing)
+            
+            if (!scriptStealing)
             {
                 returningScript = true;
             }

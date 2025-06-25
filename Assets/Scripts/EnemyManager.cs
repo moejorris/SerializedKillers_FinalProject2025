@@ -13,7 +13,7 @@ public class EnemyManager : MonoBehaviour
         GameObject[] enemyArray = GameObject.FindGameObjectsWithTag("Enemy");
         foreach (GameObject enemy in enemyArray)
         {
-            enemies.Add(enemy.GetComponent<EnemyAI_Base>());
+            if (enemy.GetComponent<EnemyAI_Base>() != null) enemies.Add(enemy.GetComponent<EnemyAI_Base>());
         }
 
         Debug.Log("Update Enemy List called! It has " + enemies.Count);
