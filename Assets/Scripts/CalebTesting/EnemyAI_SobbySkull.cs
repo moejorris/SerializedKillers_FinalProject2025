@@ -101,7 +101,7 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
                     MeleeHitCheck();
                 }
 
-                attackDir.y += Time.deltaTime * 20;
+                attackDir.y += Time.deltaTime * 17;
 
                 skull.rotation = Quaternion.Slerp(skull.rotation, Quaternion.LookRotation(attackDir, Vector3.up), Time.deltaTime * flyingTurnSpeed * 1.5f); // always flies to the player
             }
