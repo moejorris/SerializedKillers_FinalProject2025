@@ -7,38 +7,43 @@ using System.Collections;
 
 public class EnemyAI_SobbySkull : EnemyAI_Base
 {
-    [Header("Sobby Skull General")]
+    private GameObject waterOrb => skull.Find("WaterOrb").gameObject;
+    private Transform skull => transform;
+    private NavMeshAgent rollingNavMeshAgent;
+
+    [Header("Flight Movement")]
     public bool showDuckObjects = false;
     [SerializeField] private string movementState = "idle";
-    [SerializeField] private GameObject waterOrb => skull.Find("WaterOrb").gameObject;
-    [SerializeField] private Transform skull => transform;
-    [SerializeField] private NavMeshAgent rollingNavMeshAgent;
-
     [SerializeField] private float followTimer = 15;
     [SerializeField] private bool followingPlayer = false;
-
     [SerializeField] private bool ducking = false;
-    //[SerializeField] private Vector3 duckPosition = Vector3.zero;
-    [SerializeField] private float doorframeDist = 5;
+    private float doorframeDist = 2;
     [SerializeField] private float flyingSpeed = 5;
+
+    [SerializeField] private float divingSpeed = 5;
+    [SerializeField] private float divingTurnSpeed = 1;
+
     [SerializeField] private float flyingTurnSpeed = 5;
     [SerializeField] private float flyHeight = 4;
     [SerializeField] private List<Vector3> duckPositions = new List<Vector3>();
 
-    [Header("Sobby Skull Movement")]
-    [SerializeField] private float gravityLevel = 1;
-    [SerializeField] private float rollSpeed = 1;
     [SerializeField] private float newMaxVelocity;
     [SerializeField] private float maxVelocityLerpSpeed = 5;
 
+    [Header("Rolling Movement")]
+    [SerializeField] private float gravityLevel = 1;
+    [SerializeField] private float rollSpeed = 1;
+
     [Header("Sobby Skull Combat")]
-    [SerializeField] private bool attacking = false;
-    [SerializeField] private bool preparingAttack = false;
-    [SerializeField] Vector3 attackDir = Vector3.zero;
-    [SerializeField] bool hitPlayer = false;
     [SerializeField] private float attackCooldown = 5;
+    public bool selfDestructing = false;
     private float attackTimer = 0;
-    [SerializeField] private PlayerHealth playerHealth => GameObject.FindGameObjectWithTag("Canvas").GetComponent<PlayerHealth>();
+    private bool hitPlayer = false;
+    private bool attacking = false;
+    private bool preparingAttack = false;
+    private Vector3 attackDir = Vector3.zero;
+    [SerializeField] private GameObject explosionParticle;
+    private PlayerHealth playerHealth => GameObject.FindGameObjectWithTag("Canvas").GetComponent<PlayerHealth>();
 
     [Header("Sobby Skull Vision")]
     [SerializeField] private float idleAlertRange;
@@ -76,7 +81,7 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
 
     private void OnDrawGizmos()
     {
-        Gizmos.DrawSphere(new Vector3(skull.position.x, skull.position.y - 0.8f, skull.position.z), 0.2f);
+        //Gizmos.DrawSphere(skull.position, 2.5f);
     }
 
     public override void Update()
@@ -92,20 +97,29 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
             if (followTimer <= 0) followingPlayer = false;
         }
 
-        if (attacking)
+        if (attacking) // DOING DIVE ATTACK
         {
-            if (!preparingAttack)
+            if (!preparingAttack) // ACTUAL ATTACK -- retains direction, flies towards player and slowly rotates upwards in order for the consistent transform.forward to make it a dive down and back up
             {
-                if (Vector3.Distance(skull.position, playerTarget.position) <= 1.5f)
+                if (Vector3.Distance(skull.position, playerTarget.position) <= 1.5f) // when the attack gets close, it attempts a melee hit. This can only be attempted once per dive
                 {
                     MeleeHitCheck();
                 }
 
-                attackDir.y += Time.deltaTime * 17;
+                if (FloorDistance() > 1.3f) // Dives at a normal speed unless it gets close to the floor. Then rotates quicker and propels from ground some in order to not crash into the floor
+                {
+                    divingTurnSpeed = 1;
+                }
+                else
+                {
+                    divingTurnSpeed = 50;
+                    rigidBody.AddForce(Vector3.up * 15, ForceMode.Acceleration);
+                }
 
+                attackDir.y = Mathf.Lerp(attackDir.y, 14f, Time.deltaTime * divingTurnSpeed);
                 skull.rotation = Quaternion.Slerp(skull.rotation, Quaternion.LookRotation(attackDir, Vector3.up), Time.deltaTime * flyingTurnSpeed * 1.5f); // always flies to the player
             }
-            else
+            else // PREPARING -- rotates in place more or less to face the player
             {
                 attackDir = playerTarget.position - skull.position;
                 skull.rotation = Quaternion.Slerp(skull.rotation, Quaternion.LookRotation(attackDir, Vector3.up), Time.deltaTime * (flyingTurnSpeed / 2)); // always flies to the player
@@ -149,14 +163,14 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
 
                 skull.rotation = Quaternion.Slerp(skull.rotation, Quaternion.LookRotation(TARGET - skull.position, Vector3.up), Time.deltaTime * flyingTurnSpeed); // always flies to the player
 
-                if (Vector3.Distance(playerTarget.position, skull.position) < 7f && attackTimer <= 0 && PlayerInLineOfSight())
+                if (Vector3.Distance(playerTarget.position, skull.position) < 7f && attackTimer <= 0 && PlayerInLineOfSight() && !selfDestructing)
                 {
                     BeginDiveAttack();
                 }
             }
             else if (movementState == "rolling")
             {
-                
+
             }
         }
 
@@ -169,6 +183,7 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
             if (movementState == "flying")
             {
                 rigidBody.angularVelocity = Vector3.zero;
+
                 if (Vector3.Distance(playerTarget.position, skull.position) < 7f) // close, makes it slow down
                 {
                     newMaxVelocity = 1f;
@@ -179,9 +194,6 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
                 {
                     newMaxVelocity = 5;
                 }
-
-                //transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(TARGET - transform.position, Vector3.up), Time.deltaTime * flyingTurnSpeed); // always flies to the player
-
                 rigidBody.AddForce(skull.forward * flyingSpeed, ForceMode.VelocityChange);
             }
             else
@@ -205,14 +217,21 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
         {
             if (movementState == "flying")
             {
-                rigidBody.AddForce(skull.forward * flyingSpeed, ForceMode.VelocityChange);
+                if (Vector3.Distance(skull.position, playerTarget.position) > 3)
+                {
+                    rigidBody.AddForce(skull.forward * (divingSpeed + 2), ForceMode.VelocityChange);
+                }
+                else
+                {
+                    rigidBody.AddForce(skull.forward * divingSpeed, ForceMode.VelocityChange);
+                }
             }
         }
     }
 
     public void MeleeHitCheck()
     {
-        RaycastHit[] hits = Physics.SphereCastAll(transform.position, 1, transform.forward, 1, playerLayer);
+        RaycastHit[] hits = Physics.SphereCastAll(skull.position, 1.5f, skull.forward, 1, playerLayer);
 
         //Debug.Log(hits.Length);
 
@@ -226,6 +245,48 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
                 break;
             }
         }
+    }
+
+    public void EnterSelfDestructMode()
+    {
+        selfDestructing = true;
+        hitPlayer = false;
+        flyHeight = 1;
+        StopCoroutine("SelfDestructTimer");
+        StartCoroutine("SelfDestructTimer");
+    }
+
+    IEnumerator SelfDestructTimer()
+    {
+        Debug.Log("SELF DESTRUCT MODE ACTIVATED!");
+
+        for (int i = 0; i < 3; i++)
+        {
+            Debug.Log("Self Destructing in: " + (3-i));
+            yield return new WaitForSeconds(1);
+        }
+
+        Explode();
+    }
+
+    public void Explode()
+    {
+        Instantiate(explosionParticle, transform.position, Quaternion.identity);
+        RaycastHit[] hits = Physics.SphereCastAll(skull.position, 2f, skull.forward, 0.1f, playerLayer);
+
+        //Debug.Log(hits.Length);
+
+        foreach (RaycastHit hit in hits)
+        {
+            if (hit.transform.parent != null && hit.transform.parent.CompareTag("Player") && !hitPlayer)
+            {
+                hitPlayer = true;
+                playerHealth.TakeDamage(8);
+                break;
+            }
+        }
+
+        Destroy(skull.parent.gameObject);
     }
 
     IEnumerator DoorCheckTimer()
@@ -272,7 +333,7 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
         preparingAttack = false;
         newMaxVelocity = 15;
         rigidBody.maxLinearVelocity = 15;
-        rigidBody.AddForce(skull.forward * 50 * Vector3.Distance(skull.position, playerTarget.position) * 3, ForceMode.Impulse);
+        rigidBody.AddForce(skull.forward * 50 * Vector3.Distance(skull.position, playerTarget.position) * 5, ForceMode.Impulse);
         yield return new WaitForSeconds(1);
         attacking = false;
     }
@@ -280,6 +341,23 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
     public void LerpMaxVelocity()
     {
         rigidBody.maxLinearVelocity = Mathf.Lerp(rigidBody.maxLinearVelocity, newMaxVelocity, Time.deltaTime * maxVelocityLerpSpeed);
+    }
+
+    public float FloorDistance()
+    {
+        Ray raycast = new Ray();
+        raycast.origin = skull.position;
+        raycast.direction = Vector3.down;
+        RaycastHit hit;
+
+        if (Physics.Raycast(raycast, out hit, 5, obstacleLayer))
+        {
+            return Vector3.Distance(skull.position, hit.point);
+        }
+        else
+        {
+            return 6;
+        }
     }
 
     public void CheckForOverhang()
@@ -300,7 +378,7 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
                 }
                 else
                 {
-                    if (Vector3.Distance(duckPositions[duckPositions.Count-1], playerTarget.transform.position) > 0.5f)
+                    if (Vector3.Distance(duckPositions[duckPositions.Count - 1], playerTarget.transform.position) > 0.5f)
                     {
                         duckPositions.Add(playerTarget.transform.position);
                         if (showDuckObjects) Debug.Log(hit.transform.gameObject.name);
@@ -358,6 +436,9 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
         //StartCoroutine("MaterialFade");
 
         UpdateHealth();
+
+        if (health <= maxHealth / 4 && !selfDestructing) EnterSelfDestructMode();
+
         if (health <= 0)
         {
             Destroy(transform.parent.gameObject);

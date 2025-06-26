@@ -30,15 +30,16 @@ public class EnemyAI_Base : MonoBehaviour, ITargetable, IDamageable
     public Behavior heldBehavior;
     public bool behaviorActive = true;
     private bool delayedExit = false;
-    [SerializeField] private Player_ScriptSteal scriptSteal;
-    public Image selectedIcon;
+    private Player_ScriptSteal scriptSteal;
+    [HideInInspector] public Image selectedIcon;
 
     [Header("Health")]
-    public RectTransform healthBar;
-    public RectTransform whiteHealthBar;
     public float maxHealth = 20f;
     public float health = 20f;
     private float healthSpeedMult = 1;
+
+    [HideInInspector] public RectTransform healthBar;
+    [HideInInspector] public RectTransform whiteHealthBar;
 
     public Renderer[] meshes;
     public List<Material> materialList;
