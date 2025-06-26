@@ -108,7 +108,7 @@ public class EnemyAI_Base : MonoBehaviour, ITargetable, IDamageable
         healthBar.localScale = scale;
     }
 
-    public virtual void TakeDamage(float damage)
+    public virtual void TakeDamage(float damage, Player_ScriptSteal scriptSteal)
     {
         if (!healthBar || !whiteHealthBar) return; // in case no thing exists
 

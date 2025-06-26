@@ -348,7 +348,7 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
         }
     }
 
-    public override void TakeDamage(float damage)
+    public override void TakeDamage(float damage, Player_ScriptSteal scriptSteal)
     {
         if (!healthBar || !whiteHealthBar) return; // in case no thing exists
 
