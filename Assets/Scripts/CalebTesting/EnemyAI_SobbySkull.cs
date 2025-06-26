@@ -28,6 +28,8 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
     [Header("Sobby Skull Movement")]
     [SerializeField] private float gravityLevel = 1;
     [SerializeField] private float rollSpeed = 1;
+    [SerializeField] private float newMaxVelocity;
+    [SerializeField] private float maxVelocityLerpSpeed = 5;
 
     [Header("Sobby Skull Combat")]
     [SerializeField] private bool attacking = false;
@@ -64,6 +66,8 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
         whiteHealthBar = skull.parent.Find("Canvas/Bar/White").GetComponent<RectTransform>();
         selectedIcon = skull.parent.Find("Canvas/SelectedIcon").GetComponent<Image>();
 
+        newMaxVelocity = rigidBody.maxLinearVelocity;
+        maxVelocityLerpSpeed = 15;
 
         StartRolling();
         StartCoroutine("DoorCheckTimer");
@@ -72,7 +76,7 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
 
     private void OnDrawGizmos()
     {
-        Gizmos.DrawSphere(new Vector3(skull.position.x, skull.position.y - 0.9f, skull.position.z), 0.2f);
+        Gizmos.DrawSphere(new Vector3(skull.position.x, skull.position.y - 0.8f, skull.position.z), 0.2f);
     }
 
     public override void Update()
@@ -90,15 +94,21 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
 
         if (attacking)
         {
-            skull.rotation = Quaternion.Slerp(skull.rotation, Quaternion.LookRotation(attackDir, Vector3.up), Time.deltaTime * flyingTurnSpeed); // always flies to the player
-
             if (!preparingAttack)
             {
                 if (Vector3.Distance(skull.position, playerTarget.position) <= 1.5f)
                 {
                     MeleeHitCheck();
                 }
+
                 attackDir.y += Time.deltaTime * 20;
+
+                skull.rotation = Quaternion.Slerp(skull.rotation, Quaternion.LookRotation(attackDir, Vector3.up), Time.deltaTime * flyingTurnSpeed * 1.5f); // always flies to the player
+            }
+            else
+            {
+                attackDir = playerTarget.position - skull.position;
+                skull.rotation = Quaternion.Slerp(skull.rotation, Quaternion.LookRotation(attackDir, Vector3.up), Time.deltaTime * (flyingTurnSpeed / 2)); // always flies to the player
             }
         }
         else
@@ -149,6 +159,8 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
                 
             }
         }
+
+        LerpMaxVelocity();
     }
     private void FixedUpdate()
     {
@@ -159,12 +171,13 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
                 rigidBody.angularVelocity = Vector3.zero;
                 if (Vector3.Distance(playerTarget.position, skull.position) < 7f) // close, makes it slow down
                 {
-                    rigidBody.maxLinearVelocity -= Time.deltaTime * 25;
+                    newMaxVelocity = 1f;
+                    maxVelocityLerpSpeed = 5;
                     rigidBody.linearVelocity = Vector3.Lerp(rigidBody.linearVelocity, Vector3.zero, Time.deltaTime * 10);
                 }
                 else
                 {
-                    rigidBody.maxLinearVelocity = 5;
+                    newMaxVelocity = 5;
                 }
 
                 //transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(TARGET - transform.position, Vector3.up), Time.deltaTime * flyingTurnSpeed); // always flies to the player
@@ -177,11 +190,13 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
 
                 if (IsGrounded())
                 {
+                    newMaxVelocity = 3;
                     rigidBody.maxLinearVelocity = 3;
                     rigidBody.AddForce((playerTarget.position - skull.position).normalized * rollSpeed, ForceMode.VelocityChange);
                 }
                 else
                 {
+                    newMaxVelocity = 15;
                     rigidBody.maxLinearVelocity = 15;
                 }
             }
@@ -242,10 +257,9 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
     public void BeginDiveAttack()
     {
         attackTimer = attackCooldown;
-        attackDir = playerTarget.position - skull.position;
         attacking = true;
         preparingAttack = true;
-        rigidBody.maxLinearVelocity = 0.3f;
+        newMaxVelocity = 0.3f;
         rigidBody.linearVelocity = Vector3.zero;
         hitPlayer = false;
         StartCoroutine("DiveAttack");
@@ -256,10 +270,16 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
         Debug.Log("Performing attack!");
         yield return new WaitForSeconds(1);
         preparingAttack = false;
+        newMaxVelocity = 15;
         rigidBody.maxLinearVelocity = 15;
-        rigidBody.AddForce(skull.forward * 50, ForceMode.Impulse);
+        rigidBody.AddForce(skull.forward * 50 * Vector3.Distance(skull.position, playerTarget.position) * 3, ForceMode.Impulse);
         yield return new WaitForSeconds(1);
         attacking = false;
+    }
+
+    public void LerpMaxVelocity()
+    {
+        rigidBody.maxLinearVelocity = Mathf.Lerp(rigidBody.maxLinearVelocity, newMaxVelocity, Time.deltaTime * maxVelocityLerpSpeed);
     }
 
     public void CheckForOverhang()
@@ -417,7 +437,7 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
 
     public bool IsGrounded()
     {
-        if (Physics.CheckSphere(new Vector3(skull.position.x, skull.position.y - 1f, skull.position.z), 0.2f, obstacleLayer))
+        if (Physics.CheckSphere(new Vector3(skull.position.x, skull.position.y - 0.8f, skull.position.z), 0.2f, obstacleLayer))
         {
             return true;
         }
