@@ -8,6 +8,7 @@ public class BreakableObject : MonoBehaviour, ITargetable, IDamageable
     [SerializeField] private Behavior requiredBehavior;
 
     public float TargetScore { get; set;}
+    public float TargetScoreWeight { get => 0.2f; }
 
     public virtual void TakeDamage(float damage, Player_ScriptSteal scriptSteal)
     {

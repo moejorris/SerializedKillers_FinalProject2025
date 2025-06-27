@@ -168,11 +168,11 @@ public class Player_CombatMachine : MonoBehaviour
         }
 
         float highScore = 0;
-        foreach (ITargetable target in potentialTargets)
+        foreach (ITargetable target in potentialTargets) //don't need to iterate over the same list twice, I was tired when I wrote this....
         {
-            if (target.TargetScore > highScore)
+            if (target.TargetScore * target.TargetScoreWeight > highScore)
             {
-                highScore = target.TargetScore;
+                highScore = target.TargetScore * target.TargetScoreWeight;
                 selectedTarget = target;
             }
         }
