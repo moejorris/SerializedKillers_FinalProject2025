@@ -6,6 +6,7 @@ using System.Collections;
 public class Player_ScriptSteal : MonoBehaviour
 {
     public Color scriptEffectColor = Color.white;
+    public Behavior HeldBehavior => heldBehavior;
 
     [SerializeField] private float scriptStealRange = 10;
     [SerializeField] private InputActionReference northButton; // Pressing Y
@@ -21,7 +22,7 @@ public class Player_ScriptSteal : MonoBehaviour
     [SerializeField] private GameObject waterParticles;
 
     [SerializeField] private EnemyAI_Base selectedEnemy;
-    [SerializeField] private Behavior heldBehavior;
+    [SerializeField] public Behavior heldBehavior;
     [SerializeField] private Sprite emptySlot;
     [SerializeField] private Image stolenScriptSlot => GameObject.FindGameObjectWithTag("Canvas").transform.Find("ScriptSlot/HeldScript").GetComponent<Image>();
     [SerializeField] private EnemyManager enemyManager => GameObject.FindGameObjectWithTag("EnemyManager").GetComponent<EnemyManager>();

@@ -7,6 +7,7 @@ public class ThunderStrike : MonoBehaviour
     private Transform target; // Target to move towards
     private bool isChasing = true; // Flag to indicate if the thunder strike is chasing the target
     [SerializeField] private float speed = 5f; // Speed of the thunder strike
+    [SerializeField] private float damage = 10f; // Damage of the thunder strike
 
 
 
@@ -34,10 +35,15 @@ public class ThunderStrike : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player"))
+        if (other.gameObject.layer == LayerMask.NameToLayer("Player"))
         {
-            Debug.Log("Player hit by the thunder strike!");
-            // Damage effect logic can be added here
+            Debug.Log("Player hit!");
+            PlayerHealth playerHealth = GameObject.FindGameObjectWithTag("Canvas").GetComponent<PlayerHealth>();
+            if (playerHealth != null)
+            {
+                Debug.Log("Player hit!");
+                playerHealth.TakeDamage(damage);
+            }
         }
     }
 

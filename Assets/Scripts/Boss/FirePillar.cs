@@ -8,6 +8,9 @@ public class FirePillar : MonoBehaviour
     private bool isChasing = true; // Flag to indicate if the fire pillar is chasing the target
     [SerializeField] private float speed = 5f; // Speed of the fire pillar
     [SerializeField] private float lifeTime = 3f; // Lifetime of the fire pillar
+    [SerializeField] private float damage = 2.5f; // Damage of the fire pillar
+
+    private float damageTimer = 0f;
     #endregion
 
     #region Unity Methods
@@ -32,11 +35,29 @@ public class FirePillar : MonoBehaviour
 
     void OnTriggerStay(Collider other)
     {
-        // Check if the collider is on the Player layer (replace 8 with your actual Player layer number if different)
         if (other.gameObject.layer == LayerMask.NameToLayer("Player"))
         {
-            Debug.Log("Player hit by the fire pillar!");
-            // Here you can add code to apply damage or effects to the player
+            damageTimer += Time.deltaTime;
+            if (damageTimer >= 0.75f)
+            {
+                Debug.Log("Player hit by the fire pillar!");
+                PlayerHealth playerHealth = GameObject.FindGameObjectWithTag("Canvas").GetComponent<PlayerHealth>();
+                if (playerHealth != null)
+                {
+                    Debug.Log("Player hit!");
+                    playerHealth.TakeDamage(damage);
+                }
+
+                damageTimer = 0f; // Reset timer
+            }
+        }
+    }
+
+    void OnTriggerExit(Collider other)
+    {
+        if (other.gameObject.layer == LayerMask.NameToLayer("Player"))
+        {
+            damageTimer = 0f;
         }
     }
     #endregion

@@ -369,7 +369,7 @@ public class Player_CombatMachine : MonoBehaviour
 
                 selectedEnemy = collider.gameObject.GetComponent<EnemyAI_Base>();
 
-                damageable.TakeDamage(currentAttack.damage);
+                damageable.TakeDamage(currentAttack.damage, _scriptSteal);
                 hitSomething = true;
             }
             if (hitSomething) HandleImpactSound();
@@ -397,7 +397,7 @@ public class Player_CombatMachine : MonoBehaviour
                     selectedEnemy = collider.gameObject.GetComponent<EnemyAI_Base>();
 
 
-                    damageable.TakeDamage(currentAttack.damage);
+                    damageable.TakeDamage(currentAttack.damage, _scriptSteal);
                     damageablesHit.Add(damageable);
                     somethingHitThisFrame = true;
                 }

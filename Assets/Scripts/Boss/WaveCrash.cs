@@ -36,9 +36,15 @@ public class WaveCrash : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player"))
+        if (other.gameObject.layer == LayerMask.NameToLayer("Player"))
         {
-            Debug.Log("Player hit by the wave crash! Player takes" + damage + " damage.");
+            Debug.Log("Player hit!");
+            PlayerHealth playerHealth = GameObject.FindGameObjectWithTag("Canvas").GetComponent<PlayerHealth>();
+            if (playerHealth != null)
+            {
+                Debug.Log("Player hit!");
+                playerHealth.TakeDamage(damage);
+            }
         }
     }
 

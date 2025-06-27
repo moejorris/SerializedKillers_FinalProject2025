@@ -8,6 +8,7 @@ TagManager:
   - EnemyManager
   - Canvas
   - PlayerMesh
+  - Ground
   layers:
   - Default
   - TransparentFX
@@ -19,7 +20,7 @@ TagManager:
   - EnemySphere
   - Enemy
   - Hazard
-  - 
+  - Puzzle
   - 
   - 
   - 

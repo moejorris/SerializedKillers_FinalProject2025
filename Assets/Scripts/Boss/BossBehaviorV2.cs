@@ -4,12 +4,14 @@ using System.Collections.Generic;
 
 public enum BossState { None, Fire, Electric, Water } // Enumeration for elemental states
 
-public class BossBehaviorV2 : MonoBehaviour
+public class BossBehaviorV2 : MonoBehaviour, IDamageable
 {
     #region Unity Variables
     [Header("Boss Settings")]
     [Tooltip("Max health of the boss")]
     [SerializeField] private float health = 100f;
+    [Tooltip("Shield Health of the boss")]
+    [SerializeField] private float shieldHealth = 30f;
     [Tooltip("Attack Interval in seconds")]
     [SerializeField] private float attackInterval = 10f;
     private float attackTimer = 0f;
@@ -106,11 +108,11 @@ public class BossBehaviorV2 : MonoBehaviour
             {
                 anim.SetTrigger("Summon");
             }
-            if (Input.GetMouseButtonDown(0))
-            {
-                TakeDamage(5f); // Simulate taking damage when the left mouse button is clicked
-                Debug.Log("Boss took damage from mouse click!");
-            }
+            // if (Input.GetMouseButtonDown(0))
+            // {
+            //     TakeDamage(5f); // Simulate taking damage when the left mouse button is clicked
+            //     Debug.Log("Boss took damage from mouse click!");
+            // }
         }
 
         if (isVulnerable)
@@ -130,9 +132,9 @@ public class BossBehaviorV2 : MonoBehaviour
             {
                 Attack(); // Call the attack method when the attack timer reaches the attack interval
             }
-            else
+            else if (attackTimer == 1f)
             {
-                Debug.Log("Boss is waiting to attack. Time until next attack: " + (attackInterval - attackTimer)); // Log the time until the next attack
+                Debug.Log("Boss is attacking in one seccond");
             }
         }
     }
@@ -213,6 +215,11 @@ public class BossBehaviorV2 : MonoBehaviour
         currentState = BossState.Fire; // Set the current state to Fire
         Debug.Log("Boss changed to Fire State!"); // Log the state change
         bossRenderer.material.color = Color.red; // Change the boss's color to red
+        foreach (GameObject effect in particleEffects)
+        {
+            effect.SetActive(false); // Deactivate all particle effects
+        }
+        particleEffects[0].SetActive(true);
     }
 
     void SpawnFirePillar()
@@ -245,7 +252,7 @@ public class BossBehaviorV2 : MonoBehaviour
     {
         if (attackPrefabs.Length > 0 && player != null)
         {
-            Instantiate(attackPrefabs[1], new Vector3(player.position.x, 150.35f, player.position.z), Quaternion.identity); // Spawn the thunderbolt above the player
+            Instantiate(attackPrefabs[1], new Vector3(player.position.x, player.position.y - 1f, player.position.z), Quaternion.identity); // Spawn the thunderbolt above the player
         }
         else
         {
@@ -260,6 +267,11 @@ public class BossBehaviorV2 : MonoBehaviour
         currentState = BossState.Water; // Set the current state to Water
         Debug.Log("Boss changed to Water State!"); // Log the state change
         bossRenderer.material.color = Color.blue; // Change the boss's color to blue
+        foreach (GameObject effect in particleEffects)
+        {
+            effect.SetActive(false); // Deactivate all particle effects
+        }
+        particleEffects[2].SetActive(true);
     }
 
     void SpawnWaveCrash()
@@ -332,17 +344,27 @@ public class BossBehaviorV2 : MonoBehaviour
         }
     }
 
-    void TakeDamage(float damage)
+    public void TakeDamage(float damage = 5, Player_ScriptSteal scriptSteal = null)
     {
+        if (!isVulnerable)
+        {
+            damage = 5f;
+            shieldHealth -= damage;
+            Debug.Log("Shield took " + damage + " damage! Shield has " + shieldHealth + " health left");
+            if (shieldHealth <= 0)
+            {
+                StartVulnerable();
+            }
+        }
         if (!isVulnerable) return; // Exit if the boss is not vulnerable
-        health -= damage; // Reduce the boss's health by the damage amount
+        damage = 5f;
+        health -=  damage; // Reduce the boss's health by the damage amount
         vulnAttacks++;
         vulnerableTimer = vulnerableDuration; // Reset the vulnerable timer
         Debug.Log("Boss took damage: " + damage + ". Current health: " + health); // Log the damage taken
         anim.SetTrigger("Hit"); // Trigger the hit animation
-        // Increment the attack timer to allow multiple hits until the boss is invincible again
-        anim.SetInteger("Damage", vulnAttacks); // Set the damage integer in the animator to the number of attacks taken
-        if (vulnAttacks >= maxVulnerableAttacks) // IF the boss has taken the maximum number of attacks while vulnerable
+        anim.SetInteger("Damage", vulnAttacks); // Increment the attack timer to allow multiple hits until boss is incivible again
+        if (vulnAttacks >= maxVulnerableAttacks)
         {
             EndVulnerable(); // End the vulnerable state
         }
@@ -364,6 +386,8 @@ public class BossBehaviorV2 : MonoBehaviour
         anim.SetTrigger("EndWeak"); // Trigger the end weak animation
         Debug.Log("Boss is no longer vulnerable!"); // Log the end of the vulnerable state
         anim.SetTrigger("Move"); // Trigger the move animation to teleport the boss after vulnerability ends
+        shieldHealth = 30f; // Reset shield health
+        attacksUsed = 0;
         ChangeState(); // Call State Method
     }
 
