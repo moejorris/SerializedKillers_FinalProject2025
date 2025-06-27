@@ -10,8 +10,8 @@ public class PlayerHealth : MonoBehaviour
     [SerializeField] private AudioClip healSound;
     [SerializeField] private AudioClip damageSound;
     public float speed = 1;
-    private float maxHealth = 20;
-    public float health;
+    //private float maxHealth = 20;
+    //public float health;
 
     private bool whiteHeartDrain = false;
     private float whiteHeartTimer = 1;
@@ -19,8 +19,8 @@ public class PlayerHealth : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        health = maxHealth;
-        UpdateHealth();
+        //health = maxHealth;
+        //UpdateHealth();
     }
 
     void PlaySound(AudioClip clip)
@@ -33,27 +33,27 @@ public class PlayerHealth : MonoBehaviour
         Destroy(soundObject, clip.length);
     }
 
-    public void TakeDamage(float dmg)
+    public void TakeDamage(float newHealth)
     {
         PlaySound(damageSound);
-        health -= dmg;
-        if (health < 0) health = 0;
+        //health -= newHealth;
+        //if (health < 0) health = 0;
 
         whiteHeartDrain = false;
         whiteHeartTimer = 0.2f;
-        UpdateHealth();
+        UpdateHealth(newHealth);
     }
 
-    public void HealDamage(float hp)
+    public void HealDamage(float newHealth)
     {
         PlaySound(healSound);
-        health += hp;
-        if (health > maxHealth) health = maxHealth;
+        //health += newHealth;
+        //if (health > maxHealth) health = maxHealth;
 
-        UpdateHealth();
+        UpdateHealth(newHealth);
     }
 
-    public void UpdateHealth()
+    public void UpdateHealth(float health)
     {
         List<float> heartAmounts = new List<float>();
 
@@ -81,15 +81,15 @@ public class PlayerHealth : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.T))
-        {
-            TakeDamage(8.0f);
-        }
+        //if (Input.GetKeyDown(KeyCode.T))
+        //{
+        //    TakeDamage(8.0f);
+        //}
 
-        if (Input.GetKeyDown(KeyCode.Q))
-        {
-            HealDamage(1.0f);
-        }
+        //if (Input.GetKeyDown(KeyCode.Q))
+        //{
+        //    HealDamage(1.0f);
+        //}
 
         if (whiteHeartTimer > 0)
         {

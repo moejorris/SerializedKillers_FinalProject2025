@@ -365,7 +365,7 @@ public class Player_CombatMachine : MonoBehaviour
 
                 IDamageable damageable = collider.GetComponent<IDamageable>();
 
-                if (damageable == null) continue;
+                if (damageable == null || damageable.GetType() == typeof(Player_HealthComponent)) continue;
 
                 selectedEnemy = collider.gameObject.GetComponent<EnemyAI_Base>();
 
@@ -392,7 +392,7 @@ public class Player_CombatMachine : MonoBehaviour
 
                     IDamageable damageable = collider.GetComponent<IDamageable>();
 
-                    if (damageable == null || damageablesHit.Contains(damageable)) continue;
+                    if (damageable == null || damageablesHit.Contains(damageable) || damageable.GetType() == typeof(Player_HealthComponent)) continue;
 
                     selectedEnemy = collider.gameObject.GetComponent<EnemyAI_Base>();
 

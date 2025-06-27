@@ -14,7 +14,7 @@ public class Heart : MonoBehaviour
     {
         if (other.transform.parent != null && other.transform.parent.CompareTag("Player"))
         {
-            GameObject.FindGameObjectWithTag("Canvas").GetComponent<PlayerHealth>().HealDamage(healAmount);
+            GameObject.FindGameObjectWithTag("Player").transform.Find("PlayerController").GetComponent<Player_HealthComponent>().Heal(healAmount);
             Destroy(gameObject);
         }
     }

@@ -10,21 +10,7 @@ public class EnemyAI_Base : MonoBehaviour, ITargetable, IDamageable
     [Header("Navigation")]
     public Transform playerTarget;
     public float attackRange;
-    //public float followRange;
     public NavMeshAgent navMeshAgent;
-    //private Animator animator;
-    //[SerializeField] private float targetDistance;
-    //[SerializeField] private float circlingRotationSpeed = 1;
-
-    //public float radius = 10f;
-    //public float angleSpeed = 1f; // Degrees per second
-    //public Vector3 center = Vector3.zero;
-
-    //private float currentAngle = 0f;
-    //public bool circlePlayer = false;
-
-    //[SerializeField] private bool flyingEnemy = false;
-    //[SerializeField] private LayerMask flightDetectionLayer;
 
     [Header("Held Behavior")]
     public Behavior heldBehavior;

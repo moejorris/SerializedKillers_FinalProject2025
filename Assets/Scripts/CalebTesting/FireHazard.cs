@@ -66,7 +66,7 @@ public class FireHazard : MonoBehaviour
                     FireDamageEffect damageEffect = other.transform.parent.Find("Meshes").GetComponentInChildren<FireDamageEffect>();
                     if (damageEffect != null)
                     {
-                        damageEffect.fireLifetime = 4;
+                        damageEffect.fireLifetime = 5;
                     }
                     // deals more damage since entering fire while on fire?
                 }

@@ -46,6 +46,7 @@ public class EnemyAI_Overclock : EnemyAI_Base
     [SerializeField] private float dashAttackCooldown = 4;
     [SerializeField] private float flamethrowerAttackCooldown = 3;
     private float attackPrepTimer = 2.3f;
+    private Player_HealthComponent playerHealth => GameObject.FindGameObjectWithTag("Player").transform.Find("PlayerController").GetComponent<Player_HealthComponent>();
 
     [SerializeField] private float attackCooldownTimer = 0;
     [SerializeField] private float fireDashDist = 2;

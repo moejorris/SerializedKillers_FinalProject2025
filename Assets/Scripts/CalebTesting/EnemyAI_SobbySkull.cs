@@ -43,7 +43,7 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
     private bool preparingAttack = false;
     private Vector3 attackDir = Vector3.zero;
     [SerializeField] private GameObject explosionParticle;
-    private PlayerHealth playerHealth => GameObject.FindGameObjectWithTag("Canvas").GetComponent<PlayerHealth>();
+    private Player_HealthComponent playerHealth => GameObject.FindGameObjectWithTag("Player").transform.Find("PlayerController").GetComponent<Player_HealthComponent>();
 
     [Header("Sobby Skull Vision")]
     [SerializeField] private float idleAlertRange;

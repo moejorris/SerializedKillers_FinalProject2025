@@ -55,7 +55,7 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
     
     [SerializeField] private float attackCooldownTimer = 0;
     [SerializeField] private float longRangeAttackDis = 10;
-    [SerializeField] private PlayerHealth playerHealth => GameObject.FindGameObjectWithTag("Canvas").GetComponent<PlayerHealth>();
+    private Player_HealthComponent playerHealth => GameObject.FindGameObjectWithTag("Player").transform.Find("PlayerController").GetComponent<Player_HealthComponent>();
 
     [Range(0f, 100f)]
     [SerializeField] private float shockwaveAttackChance;

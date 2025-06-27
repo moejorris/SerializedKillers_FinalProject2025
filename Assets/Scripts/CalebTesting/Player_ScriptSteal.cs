@@ -185,4 +185,10 @@ public class Player_ScriptSteal : MonoBehaviour
             return false;
         }
     }
+
+    public Behavior GetHeldHebavior()
+    {
+        if (heldBehavior == null) return null;
+        else return heldBehavior;
+    }
 }
