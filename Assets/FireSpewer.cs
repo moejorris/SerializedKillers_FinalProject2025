@@ -1,8 +1,9 @@
 using UnityEngine;
 
-public class FireSpewer : MonoBehaviour, IDamageable, IElemental
+public class FireSpewer : MonoBehaviour, IElemental
 {
-    public ParticleSystem smoke;
+    public bool canBeReignited = true;
+    private ParticleSystem smoke;
     [SerializeField] private Behavior heldBehavior; // just to tell which type of element(?)
     [SerializeField] private GameObject fireStatusEffect;
     private bool fireActive = true;
@@ -11,6 +12,8 @@ public class FireSpewer : MonoBehaviour, IDamageable, IElemental
     private float timeElapsed = 0;
     private float displayTime = 0;
     public float fireDuration = 5;
+
+    private float health = 3;
     private Player_ScriptSteal playerScriptSteal => GameObject.FindGameObjectWithTag("Player").transform.Find("PlayerController").GetComponent<Player_ScriptSteal>();
 
     private void Start()
@@ -22,29 +25,74 @@ public class FireSpewer : MonoBehaviour, IDamageable, IElemental
     public void PutOutFire()
     {
         if (!fireActive) return;
-        fireActive = false;
-        fire.Stop();
+
+        health--;
+
+        Vector3 newPos = smoke.transform.localPosition;
+
+        if (health <= 0)
+        {
+            fireActive = false;
+            //fire.Stop();
+            ParticleSystem.MainModule main = fire.main;
+            main.startLifetime = 0f;
+            fire.loop = false;
+
+            newPos.y = 0.4f;
+        }
+        else if (health <= 1)
+        {
+            ParticleSystem.MainModule main = fire.main;
+            main.startLifetime = 1.3f;
+
+            newPos.y = 1.2f;
+        }
+        else
+        {
+            ParticleSystem.MainModule main = fire.main;
+            main.startLifetime = 1.7f;
+
+            newPos.y = 2;
+        }
+
+        smoke.transform.localPosition = newPos;
         smoke.Play();
     }
 
     public void StartFire()
     {
-        if (fireActive) return;
-        fireActive = true;
-        fire.Play();
-        smoke.Stop();
+        if (canBeReignited)
+        {
+            if (fireActive) return;
+
+            fire.loop = true;
+            health = 3;
+            ParticleSystem.MainModule main = fire.main;
+            main.startLifetime = 2f;
+
+            fireActive = true;
+            fire.Play();
+            smoke.Stop();
+        }
     }
 
     private void LateUpdate()
     {
         timeElapsed += Time.deltaTime;
 
-        if ((timeElapsed - displayTime) > 1f / fps && fireActive)
+        if ((timeElapsed - displayTime) > 1f / fps)
         {
             displayTime = timeElapsed;
             fire.Simulate(0.15f, true, false, false);
             fire.Pause();
         }
+    }
+
+    private void Update()
+    {
+        Debug.Log(smoke.transform.localPosition.y);
+
+        //2, 1.2, 0.4
     }
 
     private void OnTriggerStay(Collider other)
@@ -89,21 +137,6 @@ public class FireSpewer : MonoBehaviour, IDamageable, IElemental
                 {
                     PutOutFire();
                 }
-            }
-        }
-    }
-
-    public void TakeDamage(float damage, Player_ScriptSteal script)
-    {
-        if (playerScriptSteal.GetHeldHebavior())
-        {
-            if (playerScriptSteal.GetHeldHebavior() == heldBehavior)
-            {
-                PutOutFire();
-            }
-            else if (playerScriptSteal.GetHeldHebavior() == heldBehavior)
-            {
-                StartFire();
             }
         }
     }

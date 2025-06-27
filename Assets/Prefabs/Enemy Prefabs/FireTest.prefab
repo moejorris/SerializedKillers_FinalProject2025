@@ -90,12 +90,11 @@ MonoBehaviour:
   navMeshAgent: {fileID: 3646714697739182453}
   heldBehavior: {fileID: 11400000, guid: 459b7ba3e2c104d48b3c3eb892dcff0b, type: 2}
   behaviorActive: 1
-  scriptSteal: {fileID: 0}
   selectedIcon: {fileID: 0}
-  healthBar: {fileID: 0}
-  whiteHealthBar: {fileID: 0}
   maxHealth: 250
   health: 250
+  healthBar: {fileID: 0}
+  whiteHealthBar: {fileID: 0}
   meshes: []
   materialList: []
   highlightableMeshes:
@@ -530,7 +529,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   billboardType: 1
-  followTransform: 1
+  followTransform: 0
   followedTransform: {fileID: 0}
 --- !u!1 &3549331419183326000
 GameObject:

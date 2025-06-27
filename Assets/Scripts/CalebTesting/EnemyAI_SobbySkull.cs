@@ -430,6 +430,8 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
     {
         if (!healthBar || !whiteHealthBar) return; // in case no thing exists
 
+        if (scriptSteal.GetHeldHebavior() != null && scriptSteal.GetHeldHebavior() == heldBehavior.weakness) damage *= 1.5f;
+
         health -= damage;
 
         //StopCoroutine("MaterialFade");

@@ -227,7 +227,7 @@ public class EnemyAI_Overclock : EnemyAI_Base
                 if (spawningFlames)
                 {
                     flameTimer += Time.deltaTime * 100;
-                    Debug.Log(flameTimer);
+                    //Debug.Log(flameTimer);
 
                     Vector3 direction = transform.forward;
                     Vector3 axis = Vector3.up;
@@ -547,6 +547,28 @@ public class EnemyAI_Overclock : EnemyAI_Base
         navMeshAgent.speed = 3;
         transform.Find("IceSphere").gameObject.SetActive(false);
         transform.Find("TheOverclockPlaceholder").GetComponent<MeshRenderer>().material = redBodyColor;
+    }
+
+    public override void TakeDamage(float damage, Player_ScriptSteal scriptSteal)
+    {
+        if (!healthBar || !whiteHealthBar) return; // in case no thing exists
+
+        if (scriptSteal.GetHeldHebavior() != null)
+        {
+            if (scriptSteal.GetHeldHebavior() == heldBehavior.weakness && behaviorActive || scriptSteal.GetHeldHebavior() == heldBehavior && !behaviorActive) damage *= 1.5f;
+        }
+
+            health -= damage;
+
+        //StopCoroutine("MaterialFade");
+        //StartCoroutine("MaterialFade");
+
+        UpdateHealth();
+
+        if (health <= 0)
+        {
+            Destroy(transform.gameObject);
+        }
     }
 
     public override void DeactivateBehavior()

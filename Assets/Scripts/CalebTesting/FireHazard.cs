@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 public class FireHazard : MonoBehaviour
 {
@@ -10,14 +11,22 @@ public class FireHazard : MonoBehaviour
     private float timeElapsed = 0;
     private float displayTime = 0;
     public float fireDuration = 5;
+    Vector3 cube = new Vector3(3.5f, 0.85f, 3.5f);
 
     private void Start()
     {
         particles = transform.Find("Particle System").GetComponent<ParticleSystem>();
+        StartCoroutine("HitCheckTimer");
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.DrawCube(transform.position, cube);
     }
 
     public void PutOutFire()
     {
+        StopCoroutine("HitCheckTimer");
         fireActive = false;
         timeElapsed = fireDuration;
     }
@@ -42,11 +51,33 @@ public class FireHazard : MonoBehaviour
         }
     }
 
+    IEnumerator HitCheckTimer()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(1f);
+            HitCheck();
+        }
+    }
+
+    public void HitCheck()
+    {
+        Collider[] hitObjects = Physics.OverlapBox(transform.position, cube / 2);
+
+        foreach (Collider hitObject in hitObjects)
+        {
+            IElemental elemental = hitObject.GetComponent<IElemental>();
+            if (elemental == null) continue;
+
+            elemental.InteractElement(heldBehavior);
+        }
+    }
+
     private void OnTriggerStay(Collider other)
     {
         if (fireActive)
         {
-            Debug.Log(other.gameObject.name);
+            //Debug.Log(other.gameObject.name);
             if (other.transform.parent != null && other.transform.parent.GetComponent<EnemyAI_Base>() != null)
             {
                 if (other.transform.parent.GetComponent<EnemyAI_Base>().heldBehavior.behaviorName == "water")

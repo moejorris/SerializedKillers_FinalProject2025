@@ -20,9 +20,15 @@ public class FireDamageEffect : MonoBehaviour, IElemental
             {
                 timer = 0;
 
-                if (scriptSteal.GetHeldHebavior() != null && heldBehavior == scriptSteal.GetHeldHebavior()) return; // the script held by player is this, so invincible
+                if (scriptSteal.GetHeldHebavior() != null && heldBehavior == scriptSteal.GetHeldHebavior())
+                {
+                    Debug.Log("Held Script is there and is fire!");
+                }
+                else
+                {
+                    playerHealth.TakeDamage(fireDamage);
+                }
 
-                playerHealth.TakeDamage(fireDamage);
             }
         }
 

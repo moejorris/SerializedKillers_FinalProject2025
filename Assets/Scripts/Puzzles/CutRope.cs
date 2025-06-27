@@ -15,7 +15,7 @@ public class CutRope : MonoBehaviour, IDamageable
 
     public void TakeDamage(float damage = 0, Player_ScriptSteal scriptSteal = null)
     {
-        if (scriptSteal != null && scriptSteal.HeldBehavior != null && scriptSteal.HeldBehavior.behaviorName == requiredBehaviorName)
+        if (scriptSteal != null && scriptSteal.GetHeldHebavior() != null && scriptSteal.GetHeldHebavior().behaviorName == requiredBehaviorName)
         {
             anim.SetTrigger("Cut"); // Trigger the cut animation
             Debug.Log("Rope cut with behavior: " + requiredBehaviorName);
@@ -25,7 +25,7 @@ public class CutRope : MonoBehaviour, IDamageable
         else
         {
             string heldBehaviorName = "none";
-            if (scriptSteal != null && scriptSteal.HeldBehavior != null) heldBehaviorName = scriptSteal.HeldBehavior.behaviorName;
+            if (scriptSteal != null && scriptSteal.GetHeldHebavior() != null) heldBehaviorName = scriptSteal.GetHeldHebavior().behaviorName;
             Debug.Log("Rope cutting failed. Required behavior: " + requiredBehaviorName + ", but held behavior: " + heldBehaviorName);
         }
     }

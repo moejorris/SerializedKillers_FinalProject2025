@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEditor;
 using UnityEngine.XR;
+using System.Linq;
 
 
 //Joe Morris
@@ -11,7 +12,7 @@ using UnityEngine.XR;
 
 public class Player_CombatMachine : MonoBehaviour
 {
-    ScriptStealMenu scriptStealMenu => GameObject.FindGameObjectWithTag("Canvas").transform.Find("ScriptStealMenu").GetComponent<ScriptStealMenu>();
+    Player_ScriptSteal scriptStealMenu => GetComponent<Player_ScriptSteal>();
     Player_MovementMachine _machine => GetComponent<Player_MovementMachine>();
     Player_RootMotion _rootMotion => GetComponent<Player_RootMotion>();
     Player_ForceHandler _forceHandler => GetComponent<Player_ForceHandler>();
@@ -350,6 +351,62 @@ public class Player_CombatMachine : MonoBehaviour
         hitBoxActive = true;
 
         EnemyAI_Base selectedEnemy = null;
+
+        // START OF WHAT I (THE CALEB) ADDED
+
+        if (completionTime == 0)
+        {
+            Collider[] hitObjects = Physics.OverlapSphere(transform.position + _machine.ForwardDirection * distanceForwards, checkRadius, ~0, QueryTriggerInteraction.Collide);
+
+            bool hitSomething = false;
+            foreach (Collider collider in hitObjects)
+            {
+                if (collider.CompareTag("Player")) continue;
+
+                IElemental elemental = collider.GetComponent<IElemental>();
+
+                if (elemental == null || elemental.GetType() == typeof(Player_HealthComponent)) continue;
+
+                elemental.InteractElement(scriptStealMenu.GetHeldHebavior());
+
+                hitSomething = true;
+            }
+            if (hitSomething) HandleImpactSound(); // something different maybe for element interact?
+        }
+        else
+        {
+            List<IElemental> elementalsHit = new();
+
+            float currentTime = 0;
+
+            while (currentTime < completionTime)
+            {
+                Collider[] hitObjects = Physics.OverlapSphere(transform.position + _machine.ForwardDirection * distanceForwards, checkRadius, ~0, QueryTriggerInteraction.Collide);
+
+                bool somethingHitThisFrame = false;
+
+                foreach (Collider collider in hitObjects)
+                {
+                    if (collider.CompareTag("Player")) continue;
+
+                    IElemental elemental = collider.GetComponent<IElemental>();
+
+                    if (elemental == null || elementalsHit.Contains(elemental) || elemental.GetType() == typeof(Player_HealthComponent)) continue;
+
+
+                    elemental.InteractElement(scriptStealMenu.GetHeldHebavior());
+                    elementalsHit.Add(elemental);
+                    somethingHitThisFrame = true;
+                }
+
+                if (somethingHitThisFrame) HandleImpactSound();
+
+                yield return new WaitForEndOfFrame();
+                currentTime += Time.deltaTime;
+            }
+        }
+
+        // END OF WHAT I (THE CALEB) ADDED
 
         //TODO: Refactor this so both long and one frame hit checks use a func since they use much of the same code
         if (completionTime == 0)

@@ -99,6 +99,8 @@ public class EnemyAI_Base : MonoBehaviour, ITargetable, IDamageable
     {
         if (!healthBar || !whiteHealthBar) return; // in case no thing exists
 
+        if (scriptSteal.GetHeldHebavior() != null && scriptSteal.GetHeldHebavior() == heldBehavior.weakness) damage *= 1.5f;
+
         health -= damage;
 
         StopCoroutine("MaterialFade");

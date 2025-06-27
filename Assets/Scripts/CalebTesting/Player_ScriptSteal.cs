@@ -6,7 +6,7 @@ using System.Collections;
 public class Player_ScriptSteal : MonoBehaviour
 {
     public Color scriptEffectColor = Color.white;
-    public Behavior HeldBehavior => heldBehavior;
+    //public Behavior HeldBehavior => heldBehavior;
 
     [SerializeField] private float scriptStealRange = 10;
     [SerializeField] private InputActionReference northButton; // Pressing Y
@@ -17,9 +17,9 @@ public class Player_ScriptSteal : MonoBehaviour
     private float scriptReturnTimer = 2f;
     public float scriptReturnTime = 1;
 
-    [SerializeField] private GameObject electricityParticles;
-    [SerializeField] private GameObject fireParticles;
-    [SerializeField] private GameObject waterParticles;
+    [SerializeField] private ParticleSystem electricityParticles;
+    [SerializeField] private ParticleSystem fireParticles;
+    [SerializeField] private ParticleSystem waterParticles;
 
     [SerializeField] private EnemyAI_Base selectedEnemy;
     [SerializeField] public Behavior heldBehavior;
@@ -129,21 +129,21 @@ public class Player_ScriptSteal : MonoBehaviour
 
             if (heldBehavior.behaviorName == "electric")
             {
-                electricityParticles.SetActive(true);
-                fireParticles.SetActive(false);
-                waterParticles.SetActive(false);
+                electricityParticles.Play();
+                fireParticles.Stop();
+                waterParticles.Stop();
             }
             else if (heldBehavior.behaviorName == "fire")
             {
-                electricityParticles.SetActive(false);
-                fireParticles.SetActive(true);
-                waterParticles.SetActive(false);
+                electricityParticles.Stop();
+                fireParticles.Play();
+                waterParticles.Stop();
             }
             else if (heldBehavior.behaviorName == "water")
             {
-                electricityParticles.SetActive(false);
-                fireParticles.SetActive(false);
-                waterParticles.SetActive(true);
+                electricityParticles.Stop();
+                fireParticles.Stop();
+                waterParticles.Play();
             }
             else
             {
@@ -152,9 +152,9 @@ public class Player_ScriptSteal : MonoBehaviour
         }
         else
         {
-            electricityParticles.SetActive(false);
-            fireParticles.SetActive(false);
-            waterParticles.SetActive(false);
+            electricityParticles.Stop();
+            fireParticles.Stop();
+            waterParticles.Stop();
             scriptEffectColor = Color.white;
         }
         UpdateUI();

@@ -14,7 +14,7 @@ public class Activate : MonoBehaviour, IDamageable
 
     public void TakeDamage(float damage = 0, Player_ScriptSteal scriptSteal = null)
     {
-        if (scriptSteal != null && scriptSteal.HeldBehavior != null && scriptSteal.HeldBehavior.behaviorName == requiredBehaviorName)
+        if (scriptSteal != null && scriptSteal.GetHeldHebavior() != null && scriptSteal.GetHeldHebavior().behaviorName == requiredBehaviorName)
         {
             anim.SetTrigger("Activate"); // Trigger the activation animation
             Debug.Log("Puzzle activated with behavior: " + requiredBehaviorName);
@@ -31,7 +31,7 @@ public class Activate : MonoBehaviour, IDamageable
         else
         {
             string heldBehaviorName = "none";
-            if (scriptSteal != null && scriptSteal.HeldBehavior != null) heldBehaviorName = scriptSteal.HeldBehavior.behaviorName;
+            if (scriptSteal != null && scriptSteal.GetHeldHebavior() != null) heldBehaviorName = scriptSteal.GetHeldHebavior().behaviorName;
             Debug.Log("Puzzle activation failed. Required behavior: " + requiredBehaviorName + ", but held behavior: " + heldBehaviorName);
         }
     }

@@ -2785,7 +2785,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &4774843117836756047
 Transform:
   m_ObjectHideFlags: 0
@@ -2818,7 +2818,7 @@ ParticleSystem:
   emitterVelocityMode: 1
   looping: 1
   prewarm: 0
-  playOnAwake: 1
+  playOnAwake: 0
   useUnscaledTime: 0
   autoRandomSeed: 1
   startDelay:
@@ -9535,7 +9535,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1408966985339648687
 Transform:
   m_ObjectHideFlags: 0
@@ -9568,7 +9568,7 @@ ParticleSystem:
   emitterVelocityMode: 1
   looping: 1
   prewarm: 0
-  playOnAwake: 1
+  playOnAwake: 0
   useUnscaledTime: 0
   autoRandomSeed: 1
   startDelay:
@@ -15076,7 +15076,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &3901690592899528515
 Transform:
   m_ObjectHideFlags: 0
@@ -15109,7 +15109,7 @@ ParticleSystem:
   emitterVelocityMode: 1
   looping: 1
   prewarm: 0
-  playOnAwake: 1
+  playOnAwake: 0
   useUnscaledTime: 0
   autoRandomSeed: 1
   startDelay:
@@ -20863,6 +20863,7 @@ GameObject:
   - component: {fileID: 593785187446799533}
   - component: {fileID: 2845844426926673644}
   - component: {fileID: 5479738073746856657}
+  - component: {fileID: 2006342760427608853}
   - component: {fileID: 3610208228449994613}
   - component: {fileID: 2025574586922971051}
   m_Layer: 3
@@ -21113,7 +21114,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mass: 2
   groundedDrag: 5
-  airDrag: 10
+  airDrag: 0
   forceCurrent: {x: 0, y: 0, z: 0}
 --- !u!114 &1459295906252677131
 MonoBehaviour:
@@ -21188,12 +21189,26 @@ MonoBehaviour:
   northButton: {fileID: 1072171099282455138, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   playerInput: {fileID: 2025574586922971051}
   scriptReturnTime: 0.8
-  electricityParticles: {fileID: 5587509944588032863}
-  fireParticles: {fileID: 4902093319911602789}
-  waterParticles: {fileID: 2851431864684377941}
+  electricityParticles: {fileID: 1064599974616101293}
+  fireParticles: {fileID: 7804011854501368529}
+  waterParticles: {fileID: 5608910413428001789}
   selectedEnemy: {fileID: 0}
   heldBehavior: {fileID: 0}
   emptySlot: {fileID: 0}
+--- !u!114 &2006342760427608853
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6809807624353774444}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 51958328a4548284a87fefc59085af55, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHealth: 20
+  currentHealth: 20
 --- !u!96 &3610208228449994613
 TrailRenderer:
   serializedVersion: 3
