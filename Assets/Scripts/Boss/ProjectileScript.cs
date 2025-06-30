@@ -16,9 +16,9 @@ public class ProjectileScript : MonoBehaviour
             // If the projectile hits the player, destroy the projectile
             Destroy(gameObject);
         }
-        else if (collision.gameObject.CompareTag("Ground"))
+        else
         {
-            Debug.Log("Projectile hit the ground!"); // Log message for debugging
+            Debug.Log("Projectile hit something!"); // Log message for debugging
             // If the projectile hits the ground, destroy it
             Destroy(gameObject);
         }

@@ -18,6 +18,9 @@ public class BossBehaviorV2 : MonoBehaviour, IDamageable
     [Tooltip("Vulnerable Duration in seconds")]
     [SerializeField] private float vulnerableDuration = 5f;
     private float vulnerableTimer = 0f;
+    // [Tooltip("Enemy Spawn Interval in seconds")]
+    // [SerializeField] private float spawnInterval = 15f;
+    // private float spawnTimer = 0f;
     [Tooltip("Max number of attacks the boss can take before becoming invincible")]
     [SerializeField] private int maxVulnerableAttacks = 3; // Maximum number of attacks the boss can take while vulnerable
     [Tooltip("Max number of attacks before the boss can use before becoming vulnerable")]
@@ -45,6 +48,7 @@ public class BossBehaviorV2 : MonoBehaviour, IDamageable
     [SerializeField] private bool secondPhase = false;
     [Tooltip("Elemental State of the boss")]
     [SerializeField] private BossState currentState; // Current elemental state of the boss
+    private bool hasNoMoreAttacks = false;
     private Transform player; // Reference to the player's transform
     private bool lookAtPlayer = true; // Flag to control whether the boss should look at the player
     private Animator anim; // Reference to the boss's animator
@@ -137,6 +141,8 @@ public class BossBehaviorV2 : MonoBehaviour, IDamageable
                 Debug.Log("Boss is attacking in one seccond");
             }
         }
+
+
     }
 
     void LateUpdate()
@@ -176,6 +182,7 @@ public class BossBehaviorV2 : MonoBehaviour, IDamageable
     #region Elemental  Methods
     void ChangeElementalState(BossState newState)
     {
+        SpawnEnemies();
         currentState = newState; // Set the current state to the new state
         switch (currentState)
         {
@@ -374,6 +381,7 @@ public class BossBehaviorV2 : MonoBehaviour, IDamageable
     void StartVulnerable()
     {
         if (isVulnerable) return; // Exit if the boss is already vulnerable
+        isVulnerable = true;
         anim.SetTrigger("Weak"); // Trigger the weak animation
         Debug.Log("Boss is about to become vulnerable!"); // Log the start of the vulnerable state
     }
@@ -383,6 +391,7 @@ public class BossBehaviorV2 : MonoBehaviour, IDamageable
         if (!isVulnerable) return; // Exit if the boss is not vulnerable
         isVulnerable = false; // Set the boss to not vulnerable
         vulnAttacks = 0; // Reset the number of attacks taken
+        vulnerableTimer = vulnerableDuration; // Reset the vulnerable duration
         anim.SetTrigger("EndWeak"); // Trigger the end weak animation
         Debug.Log("Boss is no longer vulnerable!"); // Log the end of the vulnerable state
         anim.SetTrigger("Move"); // Trigger the move animation to teleport the boss after vulnerability ends
@@ -431,7 +440,7 @@ public class BossBehaviorV2 : MonoBehaviour, IDamageable
         attacksUsed++;
         if (attacksUsed >= maxAttacks) // If the maximum number of attacks has been used
         {
-            StartVulnerable(); // Start the vulnerable state
+            hasNoMoreAttacks = true;
             attacksUsed = 0; // Reset the number of attacks used
             return; // Exit the attack method
         }
@@ -463,15 +472,21 @@ public class BossBehaviorV2 : MonoBehaviour, IDamageable
                     break;
             }
         }
-
-        void SpawnEnemies()
+        if (hasNoMoreAttacks)
         {
-            foreach(Transform spawn in enemySpawnPoints)
-            {
-                int randomIndex = Random.Range(0, enemiesToSpawn.Length);
-                Instantiate(enemiesToSpawn[randomIndex], spawn.position, spawn.rotation);
-            }
+            StartVulnerable();
+            hasNoMoreAttacks = false;
         }
+    }
+
+    void SpawnEnemies()
+    {
+        foreach (Transform spawn in enemySpawnPoints)
+        {
+            int randomIndex = Random.Range(0, enemiesToSpawn.Length);
+            Instantiate(enemiesToSpawn[randomIndex], spawn.position, spawn.rotation);
+        }
+        // spawnTimer = 0f;
     }
     #endregion
     #region Animation Events
