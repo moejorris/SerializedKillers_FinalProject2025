@@ -24,6 +24,7 @@ public class Activate : MonoBehaviour, IDamageable
                 ParticleSystem ps = particleEffect.GetComponent<ParticleSystem>();
                 if (ps != null) ps.Stop();
             }
+            Destroy(particleEffect, 0.5f);
 
             Collider col = GetComponent<Collider>();
             if (col != null) col.enabled = false;
