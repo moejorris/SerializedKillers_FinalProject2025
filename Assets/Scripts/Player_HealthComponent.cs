@@ -7,6 +7,8 @@ public class Player_HealthComponent : Health
     {
         base.TakeDamage(damage, scriptSteal);
 
+        if (currentHealth < 0) currentHealth = 0;
+
         playerHealthUI.TakeDamage(currentHealth);
     }
 
