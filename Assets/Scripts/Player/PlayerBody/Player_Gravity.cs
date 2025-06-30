@@ -7,7 +7,6 @@ public class Player_Gravity : MonoBehaviour, IPlayerMover
     Player_MovementMachine _machine => GetComponent<Player_MovementMachine>();
     [SerializeField] float acceleration = -10f;
     [SerializeField] float gravityScale = 1f;
-    [SerializeField] float gravityOnGround = -5f;
     [SerializeField] float _currentGravity;
 
     bool _groundedPreviousFrame; //if the character controller was grounded in the previous frame relative to this script;
@@ -28,11 +27,6 @@ public class Player_Gravity : MonoBehaviour, IPlayerMover
         if (JustLanded()) //if the player just landed
         {
             PlayerJustLanded();
-            _currentGravity = gravityOnGround;
-        }
-        else if (JustLeftGround()) //if the player just left the ground
-        {
-            // _currentGravity = 0f;
         }
         else if (!_machine.isGrounded)
         {

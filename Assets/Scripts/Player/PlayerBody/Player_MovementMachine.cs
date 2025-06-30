@@ -8,6 +8,7 @@ public class Player_MovementMachine : MonoBehaviour
     //References/Dependencies
     CharacterController controller => GetComponent<CharacterController>();
     Player_Animation _animation => GetComponent<Player_Animation>();
+    Player_ChildMover _childMover => GetComponent<Player_ChildMover>();
 
     [Header("Parameters")]
     [SerializeField] TimeStep timeStep = TimeStep.Update;
@@ -65,6 +66,7 @@ public class Player_MovementMachine : MonoBehaviour
 
         controller.Move(movementToMake * currentDeltaTime());
         CurrentMotion = movementToMake;
+
     }
 
     //Get Right Vector
@@ -157,6 +159,16 @@ public class Player_MovementMachine : MonoBehaviour
         if (prevGrounded != _grounded)
         {
             _animation.UpdateGroundedStatus(_grounded);
+
+            if (!_grounded)
+            {
+                _childMover.RemoveParent();
+            }
+        }
+        
+        if (_grounded && _groundInfo.collider.transform != _childMover.Parent)
+        {
+            _childMover.UpdateParent(_groundInfo.collider.transform);
         }
     }
 

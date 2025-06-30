@@ -2,9 +2,6 @@ using System.Collections.Generic;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEditor;
-using UnityEngine.XR;
-using System.Linq;
 
 
 //Joe Morris
@@ -150,7 +147,7 @@ public class Player_CombatMachine : MonoBehaviour
             potentialTargets.Add(target);
         }
 
-        Debug.Log("Arkham Combat: Found " + potentialTargets.Count + " potential targets.");
+        // Debug.Log("Arkham Combat: Found " + potentialTargets.Count + " potential targets.");
 
         if (potentialTargets.Count < 1) return;
 
@@ -178,23 +175,23 @@ public class Player_CombatMachine : MonoBehaviour
             }
         }
 
-        foreach (ITargetable target in potentialTargets)
-        {
-            if (target.TargetScore == highScore)
-            {
-                Handles.color = Color.green;
-            }
-            else if (target.TargetScore >= highScore / 2f)
-            {
-                Handles.color = Color.red;
-            }
-            else
-            {
-                Handles.color = Color.black;
-            }
+        // foreach (ITargetable target in potentialTargets)
+        // {
+        //     if (target.TargetScore == highScore)
+        //     {
+        //         Handles.color = Color.green;
+        //     }
+        //     else if (target.TargetScore >= highScore / 2f)
+        //     {
+        //         Handles.color = Color.red;
+        //     }
+        //     else
+        //     {
+        //         Handles.color = Color.black;
+        //     }
 
-            // Handles.DrawSolidDisc(target.transform.position + Vector3.up, Vector3.up, 1f);
-        }
+        //     // Handles.DrawSolidDisc(target.transform.position + Vector3.up, Vector3.up, 1f);
+        // }
 
         if (selectedTarget == null || highScore == 0) return;
 
@@ -301,7 +298,7 @@ public class Player_CombatMachine : MonoBehaviour
 
         audioSource.PlayOneShot(clip);
         Destroy(soundObject, clip.length);
-        Debug.Log("Clip length = " + clip.length);
+        // Debug.Log("Clip length = " + clip.length);
     }
 
     void HandleAnimation()
