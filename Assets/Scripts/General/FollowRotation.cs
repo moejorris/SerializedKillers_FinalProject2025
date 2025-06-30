@@ -8,19 +8,19 @@ public class FollowRotation : MonoBehaviour
     [SerializeField] Transform targetObject;
     void Update()
     {
-        if (!updateMethod.Equals(UpdateType.Update)) return;
+        if (updateMethod != UpdateType.Update) return;
         Follow();
     }
 
     void FixedUpdate()
     {
-        if (!updateMethod.Equals(UpdateType.FixedUpdate)) return;
+        if (updateMethod != UpdateType.FixedUpdate) return;
         Follow();
     }
 
     void LateUpdate()
     {
-        if (!updateMethod.Equals(UpdateType.LateUpdate)) return;
+        if (updateMethod != UpdateType.LateUpdate) return;
         Follow();
     }
 
