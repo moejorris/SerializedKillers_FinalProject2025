@@ -44,14 +44,19 @@ public class Room : MonoBehaviour
         UpdateList();
         for (int i = 0; i < requiredEnemyTypes.Count; i++)
         {
-            if (EnemyTypeExists(requiredEnemyTypes[i].GetComponent<EnemyAI_Base>().heldBehavior) || requiredEnemyTypes[i].transform.Find("Skull") != null && EnemyTypeExists(requiredEnemyTypes[i].transform.Find("Skull").GetComponent<EnemyAI_Base>().heldBehavior)) return;
-
-            if (respawnPoints[i] == null)
+            if (requiredEnemyTypes[i].transform.Find("Skull") != null)
             {
-                respawnPoints[i] = respawnPoints[i - 1];
+                if (!EnemyTypeExists(requiredEnemyTypes[i].transform.Find("Skull").GetComponent<EnemyAI_Base>().heldBehavior))
+                {
+                    SpawnEnemy(requiredEnemyTypes[i], respawnPoints[i]);
+                }
+            }
+            else if (!EnemyTypeExists(requiredEnemyTypes[i].GetComponent<EnemyAI_Base>().heldBehavior))
+            {
+
+                SpawnEnemy(requiredEnemyTypes[i], respawnPoints[i]);
             }
 
-            SpawnEnemy(requiredEnemyTypes[i], respawnPoints[i]);
         }
     }
 
@@ -86,7 +91,14 @@ public class Room : MonoBehaviour
     {
         foreach (GameObject enemy in currentEnemies)
         {
-            if (enemy.GetComponent<EnemyAI_Base>() && enemy.GetComponent<EnemyAI_Base>().heldBehavior == element || enemy.transform.Find("Skull") != null && enemy.transform.Find("Skull").GetComponent<EnemyAI_Base>().heldBehavior)
+            if (enemy.transform.Find("Skull") != null)
+            {
+                if (enemy.transform.Find("Skull").GetComponent<EnemyAI_Base>().heldBehavior == element)
+                {
+                    return true;
+                }
+            }
+            else if (enemy.GetComponent<EnemyAI_Base>() && enemy.GetComponent<EnemyAI_Base>().heldBehavior == element)
             {
                 return true;
             }
