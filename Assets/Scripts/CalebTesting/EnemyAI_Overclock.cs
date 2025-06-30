@@ -376,17 +376,16 @@ public class EnemyAI_Overclock : EnemyAI_Base
 
     public void SpawnFire(Vector3 location, float fireDur = 5.5f)
     {
-        Ray raycast = new Ray();
-        raycast.origin = location;
-        raycast.direction = Vector3.down;
-
-        //Debug.DrawRay(transform.position, Vector3.down);
-
-        if (!Physics.Raycast(raycast, 5, fireMask))
+        location.y  = transform.position.y + 4;
+        if (!Physics.SphereCast(location, 0.5f, Vector3.down, out RaycastHit hit, 20, fireMask))
         {
+            Ray raycast = new Ray();
+            raycast.origin = location;
+            raycast.direction = Vector3.down;
+
             Vector3 spawnPoint = location;
-            Physics.Raycast(raycast, out RaycastHit hit, 15, 0);
-            spawnPoint.y = hit.point.y + 0.2f;
+            Physics.Raycast(raycast, out RaycastHit hit2, 20, obstacleLayer);
+            spawnPoint.y = hit2.point.y + 0.2f;
             FireHazard fire = Instantiate(firePrefab, spawnPoint, Quaternion.identity).GetComponent<FireHazard>();
             fire.fireDuration = fireDur;
         }

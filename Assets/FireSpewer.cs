@@ -12,6 +12,7 @@ public class FireSpewer : MonoBehaviour, IElemental
     private float timeElapsed = 0;
     private float displayTime = 0;
     public float fireDuration = 5;
+    private float enemyExtinguishTimer = 1;
 
     private float health = 3;
     private Player_ScriptSteal playerScriptSteal => GameObject.FindGameObjectWithTag("Player").transform.Find("PlayerController").GetComponent<Player_ScriptSteal>();
@@ -27,6 +28,8 @@ public class FireSpewer : MonoBehaviour, IElemental
         if (!fireActive) return;
 
         health--;
+
+        enemyExtinguishTimer = 1;
 
         Vector3 newPos = smoke.transform.localPosition;
 
@@ -86,11 +89,16 @@ public class FireSpewer : MonoBehaviour, IElemental
             fire.Simulate(0.15f, true, false, false);
             fire.Pause();
         }
+
+        if (enemyExtinguishTimer > 0)
+        {
+            enemyExtinguishTimer -= Time.deltaTime;
+        }
     }
 
     private void Update()
     {
-        Debug.Log(smoke.transform.localPosition.y);
+        //Debug.Log(smoke.transform.localPosition.y);
 
         //2, 1.2, 0.4
     }
@@ -104,7 +112,10 @@ public class FireSpewer : MonoBehaviour, IElemental
             {
                 if (other.transform.parent.GetComponent<EnemyAI_Base>().heldBehavior.behaviorName == "water" && other.transform.parent.GetComponent<EnemyAI_Base>().behaviorActive)
                 {
-                    PutOutFire();
+                    if (enemyExtinguishTimer <= 0)
+                    {
+                        PutOutFire();
+                    }
                 }
             }
             else if (other.transform.parent != null && other.transform.parent.gameObject.CompareTag("Player"))

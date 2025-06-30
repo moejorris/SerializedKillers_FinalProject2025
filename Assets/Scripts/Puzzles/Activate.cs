@@ -12,6 +12,22 @@ public class Activate : MonoBehaviour, IDamageable
         anim = GetComponent<Animator>();
     }
 
+    private void Update()
+    {
+        if (Input.GetKey(KeyCode.O) && Input.GetKey(KeyCode.P))
+        {
+            anim.SetTrigger("Activate"); // Trigger the activation animationif (particleEffect != null)
+            {
+                ParticleSystem ps = particleEffect.GetComponent<ParticleSystem>();
+                if (ps != null) ps.Stop();
+            }
+            Destroy(particleEffect, 0.5f);
+
+            Collider col = GetComponent<Collider>();
+            if (col != null) col.enabled = false;
+        }
+    }
+
     public void TakeDamage(float damage = 0, Player_ScriptSteal scriptSteal = null)
     {
         if (scriptSteal != null && scriptSteal.GetHeldHebavior() != null && scriptSteal.GetHeldHebavior().behaviorName == requiredBehaviorName)

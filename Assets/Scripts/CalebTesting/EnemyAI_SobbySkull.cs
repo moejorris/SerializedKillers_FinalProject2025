@@ -67,7 +67,7 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
         navMeshAgent = skull.parent.Find("RollingAgent").GetComponent<NavMeshAgent>();
         //rollingNavMeshAgent = transform.Find("RollingAgent").GetComponent<NavMeshAgent>();
         rigidBody = skull.parent.Find("Skull").GetComponent<Rigidbody>();
-        healthBar = skull.parent.Find("Canvas/Bar").GetComponent<RectTransform>();
+        healthBar = skull.parent.Find("Canvas/Bar/Health").GetComponent<RectTransform>();
         whiteHealthBar = skull.parent.Find("Canvas/Bar/White").GetComponent<RectTransform>();
         selectedIcon = skull.parent.Find("Canvas/SelectedIcon").GetComponent<Image>();
 
@@ -175,6 +175,7 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
         }
 
         LerpMaxVelocity();
+        base.Update();
     }
     private void FixedUpdate()
     {
