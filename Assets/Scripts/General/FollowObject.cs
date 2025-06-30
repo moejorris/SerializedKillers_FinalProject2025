@@ -10,19 +10,19 @@ public class FollowObject : MonoBehaviour
     [SerializeField] Vector3 offset = new();
     void Update()
     {
-        if (!updateMethod.Equals(UpdateType.Update)) return;
+        if (updateMethod != UpdateType.Update) return;
         Follow(Time.deltaTime);
     }
 
     void FixedUpdate()
     {
-        if (!updateMethod.Equals(UpdateType.FixedUpdate)) return;
+        if (updateMethod != UpdateType.FixedUpdate) return;
         Follow(Time.fixedDeltaTime);
     }
 
     void LateUpdate()
     {
-        if (!updateMethod.Equals(UpdateType.LateUpdate)) return;
+        if (updateMethod != UpdateType.LateUpdate) return;
         Follow(Time.deltaTime);
     }
 
