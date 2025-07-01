@@ -6,6 +6,7 @@ public class Billboard : MonoBehaviour
     public enum BillboardType { Method_1, Method_2 };
     [SerializeField] private bool followTransform = false;
     [SerializeField] private Transform followedTransform;
+    [SerializeField] private GameObject destroyedObject;
     private float yOffset;
 
     private void Start()
@@ -37,5 +38,11 @@ public class Billboard : MonoBehaviour
         {
             transform.position = new Vector3 (followedTransform.position.x, followedTransform.position.y + yOffset, followedTransform.position.z);
         }
+    }
+
+    public void DestroyThisObject()
+    {
+        if (destroyedObject == null) return;
+        Destroy(destroyedObject);
     }
 }

@@ -45,6 +45,8 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
     [SerializeField] private GameObject explosionParticle;
     private Player_HealthComponent playerHealth => GameObject.FindGameObjectWithTag("Player").transform.Find("PlayerController").GetComponent<Player_HealthComponent>();
 
+    [SerializeField] private GameObject resistantPrefab;
+
     [Header("Sobby Skull Vision")]
     [SerializeField] private float idleAlertRange;
     [SerializeField] private float blindFollowRange;
@@ -205,7 +207,10 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
                 {
                     newMaxVelocity = 3;
                     rigidBody.maxLinearVelocity = 3;
-                    rigidBody.AddForce((playerTarget.position - skull.position).normalized * rollSpeed, ForceMode.VelocityChange);
+                    if (PlayerNearby())
+                    {
+                        rigidBody.AddForce((playerTarget.position - skull.position).normalized * rollSpeed, ForceMode.VelocityChange);
+                    }
                 }
                 else
                 {
@@ -431,7 +436,22 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
     {
         if (!healthBar || !whiteHealthBar) return; // in case no thing exists
 
+
+        if (behaviorActive)
+        {
+            damage /= 3;
+            Player_ForceHandler forceHandler = scriptSteal.gameObject.GetComponent<Player_ForceHandler>();
+
+            if (forceHandler != null)
+            {
+                Vector3 dir = (playerTarget.transform.position - transform.position).normalized + Vector3.up * 0.25f;
+                forceHandler.AddForce(dir * 20f, ForceMode.VelocityChange);
+                Instantiate(resistantPrefab, new Vector3(skull.position.x + Random.Range(-1,1), skull.position.y + 1, skull.position.z + Random.Range(-1, 1)), Quaternion.identity);
+            }
+        }
+
         if (scriptSteal.GetHeldHebavior() != null && scriptSteal.GetHeldHebavior() == heldBehavior.weakness) damage *= 1.5f;
+
 
         health -= damage;
 

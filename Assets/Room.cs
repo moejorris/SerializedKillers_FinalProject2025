@@ -3,14 +3,20 @@ using System.Collections.Generic;
 
 public class Room : MonoBehaviour
 {
-    [Header("Room Config")]
-    [SerializeField] private List<GameObject> requiredEnemyTypes;
-    [SerializeField] private List<Transform> respawnPoints;
-    BoxCollider box => GetComponent<BoxCollider>();
-    [SerializeField] private LayerMask enemyLayer;
-    [SerializeField] private List<GameObject> currentEnemies;
+    [Header("Room Objective")]
+    public List<Animator> exitDoors;
+    public List<Animator> entranceDoors;
+    [SerializeField] private bool challengeStarted = false;
+    [SerializeField] private Transform postCheckpoint;
 
-    [SerializeField] private bool playerInRoom = false;
+    [Header("Room Respawning (If Applicable)")]
+    [SerializeField] private List<GameObject> requiredEnemyTypes;
+    [SerializeField] private List<Transform> requiredEnemyRespawnPoints;
+    private BoxCollider box => GetComponent<BoxCollider>();
+    [SerializeField] private LayerMask enemyLayer;
+    private List<GameObject> respawnEnemies;
+
+    private bool playerInRoom = false;
     private float timer;
 
     private void OnDrawGizmos()
@@ -20,76 +26,76 @@ public class Room : MonoBehaviour
     }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public virtual void Start()
     {
-        Initialize();
-        timer = 5;
+        InitialEnemyPass();
+        timer = 2;
     }
 
-    private void Update()
+    public virtual void Update()
     {
         if (playerInRoom)
         {
             timer -= Time.deltaTime;
             if (timer <= 0)
             {
-                timer = 5;
+                timer = 2;
                 CheckEnemies();
             }
         }
     }
 
-    public void CheckEnemies()
+    public virtual void CheckEnemies()
     {
-        UpdateList();
+        RemoveListNulls(respawnEnemies);
         for (int i = 0; i < requiredEnemyTypes.Count; i++)
         {
             if (requiredEnemyTypes[i].transform.Find("Skull") != null)
             {
                 if (!EnemyTypeExists(requiredEnemyTypes[i].transform.Find("Skull").GetComponent<EnemyAI_Base>().heldBehavior))
                 {
-                    SpawnEnemy(requiredEnemyTypes[i], respawnPoints[i]);
+                    SpawnEnemy(requiredEnemyTypes[i], requiredEnemyRespawnPoints[i]);
                 }
             }
             else if (!EnemyTypeExists(requiredEnemyTypes[i].GetComponent<EnemyAI_Base>().heldBehavior))
             {
 
-                SpawnEnemy(requiredEnemyTypes[i], respawnPoints[i]);
+                SpawnEnemy(requiredEnemyTypes[i], requiredEnemyRespawnPoints[i]);
             }
 
         }
     }
 
-    public void Initialize() // creates list from overlapsphere
+    public void InitialEnemyPass() // creates list from overlapsphere
     {
         Collider[] enems = Physics.OverlapBox(box.bounds.center, box.size / 2, Quaternion.identity, enemyLayer);
         foreach (Collider enemy in enems)
         {
-            currentEnemies.Add(enemy.gameObject);
+            respawnEnemies.Add(enemy.gameObject);
         }
     }
 
     public void SpawnEnemy(GameObject enemy, Transform position)
     {
         GameObject spawnedEnemy = Instantiate(enemy, position);
-        UpdateList();
-        currentEnemies.Add(spawnedEnemy);
+        RemoveListNulls(respawnEnemies);
+        respawnEnemies.Add(spawnedEnemy);
     }
 
-    public void UpdateList() // goes through and clears any null enemies that were killed
+    public void RemoveListNulls(List<GameObject> checkedEnemies) // goes through and clears any null enemies that were killed
     {
-        for (int i = 0; i < currentEnemies.Count; i++)
+        for (int i = 0; i < checkedEnemies.Count; i++)
         {
-            if (currentEnemies[i] == null)
+            if (checkedEnemies[i] == null)
             {
-                currentEnemies.RemoveAt(i);
+                checkedEnemies.RemoveAt(i);
             }
         }
     }
 
     public bool EnemyTypeExists(Behavior element) // checks if this enemy type exists
     {
-        foreach (GameObject enemy in currentEnemies)
+        foreach (GameObject enemy in respawnEnemies)
         {
             if (enemy.transform.Find("Skull") != null)
             {
@@ -111,6 +117,7 @@ public class Room : MonoBehaviour
         if (other.GetComponent<Player_HealthComponent>())
         {
             playerInRoom = true;
+            BeginChallenge();
         }
     }
 
@@ -119,6 +126,33 @@ public class Room : MonoBehaviour
         if (other.GetComponent<Player_HealthComponent>())
         {
             playerInRoom = false;
+        }
+    }
+
+    public virtual void RoomComplete()
+    {
+        
+    }
+
+    public virtual void BeginChallenge()
+    {
+        if (challengeStarted) return;
+        challengeStarted = true;
+    }
+
+    public void OpenDoors(List<Animator> doors)
+    {
+        foreach (Animator door in doors)
+        {
+            door.SetBool("Open", true);
+        }
+    }
+
+    public void CloseDoors(List<Animator> doors)
+    {
+        foreach (Animator door in doors)
+        {
+            door.SetBool("Open", false);
         }
     }
 }

@@ -731,7 +731,7 @@ Transform:
   m_GameObject: {fileID: 5362716430709941361}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 5.2, z: 0}
+  m_LocalPosition: {x: 0, y: 1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children:
@@ -888,6 +888,7 @@ MonoBehaviour:
   attackCooldown: 4
   selfDestructing: 0
   explosionParticle: {fileID: 1774725131798452659, guid: 2d9ee461716b0f6428299c137c5d4ff8, type: 3}
+  resistantPrefab: {fileID: 2628452667085365685, guid: 581a444863b0e904fbbf1287af78da15, type: 3}
   idleAlertRange: 5
   blindFollowRange: 8
   visionConeLength: 25
@@ -1050,7 +1051,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 7.116}
+  m_AnchoredPosition: {x: 0, y: 2.9160004}
   m_SizeDelta: {x: 1, y: 1}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!223 &1599210214098201457
@@ -1131,6 +1132,7 @@ MonoBehaviour:
   billboardType: 1
   followTransform: 1
   followedTransform: {fileID: 2633819556000959380}
+  destroyedObject: {fileID: 0}
 --- !u!1 &8699990096787807731
 GameObject:
   m_ObjectHideFlags: 0
