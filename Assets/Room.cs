@@ -14,7 +14,7 @@ public class Room : MonoBehaviour
     [SerializeField] private List<Transform> requiredEnemyRespawnPoints;
     private BoxCollider box => GetComponent<BoxCollider>();
     [SerializeField] private LayerMask enemyLayer;
-    private List<GameObject> respawnEnemies;
+    private List<GameObject> respawnEnemies = new List<GameObject>();
 
     private bool playerInRoom = false;
     private float timer;
