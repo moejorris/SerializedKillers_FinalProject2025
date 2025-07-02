@@ -79,6 +79,7 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
         StartRolling();
         StartCoroutine("DoorCheckTimer");
 
+        if (scriptSteal.heldBehavior != null && scriptSteal.heldBehavior == heldBehavior) DeactivateBehavior();
     }
 
     private void OnDrawGizmos()

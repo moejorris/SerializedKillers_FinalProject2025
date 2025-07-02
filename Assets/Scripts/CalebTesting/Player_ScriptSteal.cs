@@ -29,6 +29,9 @@ public class Player_ScriptSteal : MonoBehaviour
 
     [SerializeField] private Player_CombatMachine combatMachine => GetComponent<Player_CombatMachine>();
 
+    [Header("Status Effect Prefabs")]
+    [SerializeField] private FireDamageEffect fireStatusEffect;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -190,5 +193,15 @@ public class Player_ScriptSteal : MonoBehaviour
     {
         if (heldBehavior == null) return null;
         else return heldBehavior;
+    }
+
+    public void ApplyStatusEffect(Behavior behavior)
+    {
+        if (behavior == null) return;
+
+        if (behavior.behaviorName == "fire")
+        {
+            fireStatusEffect.StartFire();
+        }
     }
 }

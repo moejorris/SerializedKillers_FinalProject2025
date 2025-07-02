@@ -5,7 +5,7 @@ public class Health : MonoBehaviour, IDamageable
     [SerializeField] protected float maxHealth = 10f;
     [SerializeField] protected float currentHealth = 100f;
 
-    protected virtual void ResetHealth()
+    public virtual void ResetHealth()
     {
         currentHealth = maxHealth;
     }
@@ -27,7 +27,7 @@ public class Health : MonoBehaviour, IDamageable
         if (currentHealth > maxHealth) currentHealth = maxHealth;
     }
 
-    protected virtual void Die()
+    public virtual void Die()
     {
         Debug.Log("Die!");
     }

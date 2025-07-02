@@ -88,6 +88,8 @@ public class EnemyAI_Overclock : EnemyAI_Base
         selectedIcon = transform.Find("Canvas/SelectedIcon").GetComponent<Image>();
         healthBar = transform.Find("Canvas/Bar/Health").GetComponent<RectTransform>();
         whiteHealthBar = transform.Find("Canvas/Bar/White").GetComponent<RectTransform>();
+
+        if (scriptSteal.heldBehavior != null && scriptSteal.heldBehavior == heldBehavior) DeactivateBehavior();
     }
 
     private void OnDrawGizmos()

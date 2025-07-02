@@ -1,46 +1,70 @@
 using UnityEngine;
+using System.Collections;
 
 public class FireDamageEffect : MonoBehaviour, IElemental
 {
     private Player_HealthComponent playerHealth => GameObject.FindGameObjectWithTag("Player").transform.Find("PlayerController").GetComponent<Player_HealthComponent>();
     private Player_ScriptSteal scriptSteal => GameObject.FindGameObjectWithTag("Player").transform.Find("PlayerController").GetComponent<Player_ScriptSteal>();
+
+    public bool fireActive = false;
+
     public float fireLifetime = 5;
     [SerializeField] private float fireDamage = 1;
     [SerializeField] private float timeBetweenDamage = 1;
     [SerializeField] Behavior heldBehavior;
-    private float timer;
+    public float rekindleTimer = 0.5f;
 
     // Update is called once per frame
     void Update()
     {
-        if (playerHealth != null)
+        if (fireActive)
         {
-            timer += Time.deltaTime;
-            if (timer > timeBetweenDamage && fireLifetime > 1)
+            if (rekindleTimer > 0)
             {
-                timer = 0;
-
-                if (scriptSteal.GetHeldHebavior() != null && heldBehavior == scriptSteal.GetHeldHebavior())
+                rekindleTimer -= Time.deltaTime;
+            }
+            else
+            {
+                fireLifetime -= Time.deltaTime;
+                if (fireLifetime <= 0)
                 {
-                    Debug.Log("Held Script is there and is fire!");
+                    StopFire();
                 }
-                else
-                {
-                    playerHealth.TakeDamage(fireDamage);
-                }
-
             }
         }
+    }
 
-        fireLifetime -= Time.deltaTime;
-        if (fireLifetime <= 1)
+    public IEnumerator FireTimer()
+    {
+        while (fireActive)
         {
-            GetComponent<ParticleSystem>().Stop();
-            if (fireLifetime <= 0)
-            {
-                Destroy(gameObject);
-            }
+            if (rekindleTimer > 0) yield return new WaitForSeconds(0.5f);
+            else yield return new WaitForSeconds(timeBetweenDamage);
+
+            if (scriptSteal.GetHeldHebavior() != null && scriptSteal.GetHeldHebavior() == heldBehavior) Debug.Log("Something!");
+            else playerHealth.TakeDamage(fireDamage, scriptSteal); 
         }
+    }
+
+    public void StartFire()
+    {
+        rekindleTimer = 0.3f;
+        fireLifetime = 5;
+
+        if (fireActive) return;
+
+        fireActive = true;
+        GetComponent<ParticleSystem>().Play();
+        StopCoroutine("FireTimer");
+        StartCoroutine("FireTimer");
+    }
+
+    public void StopFire()
+    {
+        fireActive = false;
+        GetComponent<ParticleSystem>().Stop();
+        StopCoroutine("FireTimer");
+        fireLifetime = 0;
     }
 
     public void InteractElement(Behavior behavior)
@@ -48,7 +72,7 @@ public class FireDamageEffect : MonoBehaviour, IElemental
         if (!behavior) return;
         if (behavior == heldBehavior.weakness)
         {
-            fireLifetime = 1; // this essentially causes the fire to go out
+            StopFire(); // this essentially causes the fire to go out
         }
     }
 }

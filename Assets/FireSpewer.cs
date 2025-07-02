@@ -120,23 +120,24 @@ public class FireSpewer : MonoBehaviour, IElemental
             }
             else if (other.transform.parent != null && other.transform.parent.gameObject.CompareTag("Player"))
             {
+                playerScriptSteal.ApplyStatusEffect(heldBehavior);
                 //Vector3 dir = (other.transform.position - transform.position).normalized + Vector3.up * 0.25f;
                 //GameObject.Find("Player").transform.Find("PlayerController").GetComponent<Player_ForceHandler>().AddForce(dir * 20f, ForceMode.VelocityChange);
 
-                if (other.transform.parent.Find("Meshes").childCount < 3)
-                {
-                    GameObject effect = Instantiate(fireStatusEffect, other.transform.parent.Find("Meshes"));
-                    effect.transform.position = other.transform.parent.Find("Meshes").position;
-                }
-                else
-                {
-                    FireDamageEffect damageEffect = other.transform.parent.Find("Meshes").GetComponentInChildren<FireDamageEffect>();
-                    if (damageEffect != null)
-                    {
-                        damageEffect.fireLifetime = 5;
-                    }
-                    // deals more damage since entering fire while on fire?
-                }
+                //if (other.transform.parent.Find("Meshes").childCount < 3)
+                //{
+                //    GameObject effect = Instantiate(fireStatusEffect, other.transform.parent.Find("Meshes"));
+                //    effect.transform.position = other.transform.parent.Find("Meshes").position;
+                //}
+                //else
+                //{
+                //    FireDamageEffect damageEffect = other.transform.parent.Find("Meshes").GetComponentInChildren<FireDamageEffect>();
+                //    if (damageEffect != null)
+                //    {
+                //        damageEffect.fireLifetime = 5;
+                //    }
+                //    // deals more damage since entering fire while on fire?
+                //}
             }
         }
         else

@@ -108,6 +108,8 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
         bulbBodyAnimator = transform.Find("NewBody").GetComponent<Animator>();
         bulbBodyAnimator.Play("Bulb_Sleep", 0, 50);
         selectedIcon = transform.Find("Canvas/SelectedIcon").GetComponent<Image>();
+
+        if (scriptSteal.heldBehavior != null && scriptSteal.heldBehavior == heldBehavior) DeactivateBehavior();
     }
     // Update is called once per frame
     public override void Update()

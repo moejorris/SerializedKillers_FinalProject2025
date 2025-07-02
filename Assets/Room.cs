@@ -8,8 +8,10 @@ public class Room : MonoBehaviour
     public List<Animator> entranceDoors;
     [SerializeField] private bool challengeStarted = false;
     [SerializeField] private Transform postCheckpoint;
+    private Player_Respawn playerRespawn => GameObject.FindGameObjectWithTag("Player").transform.Find("PlayerController").GetComponent<Player_Respawn>();
 
     [Header("Room Respawning (If Applicable)")]
+    [SerializeField] private GameObject smokeSpawnPrefab;
     [SerializeField] private List<GameObject> requiredEnemyTypes;
     [SerializeField] private List<Transform> requiredEnemyRespawnPoints;
     private BoxCollider box => GetComponent<BoxCollider>();
@@ -77,7 +79,8 @@ public class Room : MonoBehaviour
 
     public void SpawnEnemy(GameObject enemy, Transform position)
     {
-        GameObject spawnedEnemy = Instantiate(enemy, position);
+        GameObject spawnedEnemy = Instantiate(enemy, position.position, Quaternion.identity);
+        Instantiate(smokeSpawnPrefab, position.position, Quaternion.identity);
         RemoveListNulls(respawnEnemies);
         respawnEnemies.Add(spawnedEnemy);
     }
@@ -131,7 +134,8 @@ public class Room : MonoBehaviour
 
     public virtual void RoomComplete()
     {
-        
+        if (postCheckpoint == null) return;
+        playerRespawn.respawnPoint = postCheckpoint.position;
     }
 
     public virtual void BeginChallenge()

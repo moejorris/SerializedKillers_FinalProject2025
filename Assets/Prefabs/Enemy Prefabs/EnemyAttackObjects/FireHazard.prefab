@@ -4886,8 +4886,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 2.5, y: 4.816091, z: 2.5}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 2.5, y: 17.774002, z: 2.5}
+  m_Center: {x: 0, y: 6.4789476, z: 0}
 --- !u!114 &7226565915027846956
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4904,4 +4904,3 @@ MonoBehaviour:
   fireEffect: {fileID: 2025842942695824325, guid: f3931ba7fbaa8d04c9d6cb80f828d482, type: 3}
   fps: 14
   fireDuration: 5
-  cube: {x: 3.5, y: 0.85, z: 3.5}

@@ -18,4 +18,14 @@ public class Player_HealthComponent : Health
 
         playerHealthUI.HealDamage(currentHealth);
     }
+
+    public void UpdatePlayerHealth()
+    {
+        playerHealthUI.UpdateHealth(currentHealth);
+    }
+
+    public override void Die()
+    {
+        GetComponent<Player_Respawn>().Respawn();
+    }
 }

@@ -16,7 +16,7 @@ public class EnemyAI_Base : MonoBehaviour, ITargetable, IDamageable
     public Behavior heldBehavior;
     public bool behaviorActive = true;
     private bool delayedExit = false;
-    private Player_ScriptSteal scriptSteal;
+    [HideInInspector] public Player_ScriptSteal scriptSteal => GameObject.FindGameObjectWithTag("Player").transform.Find("PlayerController").GetComponent<Player_ScriptSteal>();
     [HideInInspector] public Image selectedIcon;
 
     [Header("Health")]
@@ -53,7 +53,6 @@ public class EnemyAI_Base : MonoBehaviour, ITargetable, IDamageable
         {
             playerTarget = GameObject.FindGameObjectWithTag("PlayerMesh").transform;
         }
-        scriptSteal = GameObject.FindGameObjectWithTag("Player").transform.Find("PlayerController").GetComponent<Player_ScriptSteal>();
 
         UpdateHealth();
     }

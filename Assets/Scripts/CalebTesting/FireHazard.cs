@@ -1,8 +1,9 @@
 using UnityEngine;
 using System.Collections;
 
-public class FireHazard : MonoBehaviour
+public class FireHazard : MonoBehaviour, IElemental
 {
+    private Player_ScriptSteal scriptSteal => GameObject.FindGameObjectWithTag("Player").transform.Find("PlayerController").GetComponent<Player_ScriptSteal>();
     [SerializeField] private Behavior heldBehavior; // just to tell which type of element(?)
     [SerializeField] private GameObject fireEffect;
     private bool fireActive = true;
@@ -87,21 +88,30 @@ public class FireHazard : MonoBehaviour
             }
             else if (other.transform.parent != null && other.transform.parent.gameObject.CompareTag("Player"))
             {
-                if (other.transform.parent.Find("Meshes").childCount < 3)
-                {
-                    GameObject effect = Instantiate(fireEffect, other.transform.parent.Find("Meshes"));
-                    effect.transform.position = other.transform.parent.Find("Meshes").position;
-                }
-                else
-                {
-                    FireDamageEffect damageEffect = other.transform.parent.Find("Meshes").GetComponentInChildren<FireDamageEffect>();
-                    if (damageEffect != null)
-                    {
-                        damageEffect.fireLifetime = 5;
-                    }
-                    // deals more damage since entering fire while on fire?
-                }
+                scriptSteal.ApplyStatusEffect(heldBehavior);
+
+
+                //if (other.transform.parent.Find("Meshes").childCount < 3)
+                //{
+                //    GameObject effect = Instantiate(fireEffect, other.transform.parent.Find("Meshes"));
+                //    effect.transform.position = other.transform.parent.Find("Meshes").position;
+                //}
+                //else
+                //{
+                //    FireDamageEffect damageEffect = other.transform.parent.Find("Meshes").GetComponentInChildren<FireDamageEffect>();
+                //    if (damageEffect != null)
+                //    {
+                //        damageEffect.fireLifetime = 5;
+                //    }
+                //    // deals more damage since entering fire while on fire?
+                //}
             }
         }
+    }
+
+    public void InteractElement(Behavior behavior)
+    {
+        if (behavior == null) return;
+        if (behavior == heldBehavior.weakness) PutOutFire();
     }
 }
