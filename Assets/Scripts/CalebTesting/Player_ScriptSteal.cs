@@ -24,7 +24,7 @@ public class Player_ScriptSteal : MonoBehaviour
     [SerializeField] private EnemyAI_Base selectedEnemy;
     [SerializeField] public Behavior heldBehavior;
     [SerializeField] private Sprite emptySlot;
-    [SerializeField] private Image stolenScriptSlot => GameObject.FindGameObjectWithTag("Canvas").transform.Find("ScriptSlot/HeldScript").GetComponent<Image>();
+    [SerializeField] private Image stolenScriptSlot => GameObject.FindGameObjectWithTag("Canvas").transform.Find("HUD/HeldScript/Icon").GetComponent<Image>();
     [SerializeField] private EnemyManager enemyManager => GameObject.FindGameObjectWithTag("EnemyManager").GetComponent<EnemyManager>();
 
     [SerializeField] private Player_CombatMachine combatMachine => GetComponent<Player_CombatMachine>();
@@ -167,13 +167,17 @@ public class Player_ScriptSteal : MonoBehaviour
     {
         if (heldBehavior != null)
         {
-            stolenScriptSlot.sprite = heldBehavior.behavioricon;
+            if (stolenScriptSlot.sprite != heldBehavior.behavioricon)
+            {
+                stolenScriptSlot.transform.parent.GetComponent<Animation>().Play();
+                stolenScriptSlot.sprite = heldBehavior.behavioricon; // doesn't do bloop every time
+            }
         }
         else
         {
             stolenScriptSlot.sprite = emptySlot;
         }
-        stolenScriptSlot.transform.parent.GetComponent<Image>().color = scriptEffectColor;
+        //stolenScriptSlot.transform.parent.GetComponent<Image>().color = scriptEffectColor;
     }
 
 

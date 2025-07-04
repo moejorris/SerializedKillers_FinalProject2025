@@ -862,6 +862,7 @@ MonoBehaviour:
   heldBehavior: {fileID: 11400000, guid: 5121a43f96def934084246ff74dd77e3, type: 2}
   behaviorActive: 1
   selectedIcon: {fileID: 0}
+  manaDropAmount: 10
   maxHealth: 70
   health: 70
   healthBar: {fileID: 0}

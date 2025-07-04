@@ -9,23 +9,20 @@ using UnityEngine.InputSystem;
 
 public class Player_CombatMachine : MonoBehaviour
 {
+
+    //References
     Player_ScriptSteal scriptStealMenu => GetComponent<Player_ScriptSteal>();
     Player_MovementMachine _machine => GetComponent<Player_MovementMachine>();
     Player_RootMotion _rootMotion => GetComponent<Player_RootMotion>();
     Player_ForceHandler _forceHandler => GetComponent<Player_ForceHandler>();
     Player_Rotate _rotation => GetComponent<Player_Rotate>();
     Player_ScriptSteal _scriptSteal => GetComponent<Player_ScriptSteal>();
-
-
     [SerializeField] AnimatorOverrideController animatorOverride;
-    int currentAnim = 1;
-
     [SerializeField] Animator animator;
+
+    [Header("Combat Parameters")]
     [SerializeField] List<PlayerAttackSO> defaultAttacks = new List<PlayerAttackSO>();
-
     [SerializeField] float comboResetTime = 0.3f;
-    [SerializeField] int currentComboID = 0;
-
     [SerializeField] InputActionReference attackInput;
 
 
@@ -46,8 +43,13 @@ public class Player_CombatMachine : MonoBehaviour
     //Local Stuff
     bool isAttacking = false;
     bool attackQueued = false;
-
+    int currentAnim = 1;
     PlayerAttackSO currentAttack;
+    int currentComboID = 0;
+
+    [Header("Combo System Parameters")]
+    int currentComboCount = 0;
+    [SerializeField] float comboCountResetTime = 0.5f;
 
     void Update()
     {
@@ -213,7 +215,7 @@ public class Player_CombatMachine : MonoBehaviour
 
             _machine.SetForwardDirection(newDir);
             _machine.DisableAllMovers(_forceHandler);
-            _forceHandler.AddForce(_machine.ForwardDirection * Vector3.Distance(transform.position, selectedTarget.transform.position - _machine.ForwardDirection * checkRadius) * 5f, ForceMode.VelocityChange);        
+            _forceHandler.AddForce(_machine.ForwardDirection * Vector3.Distance(transform.position, selectedTarget.transform.position - _machine.ForwardDirection * checkRadius) * 5f, ForceMode.VelocityChange);
         }
     }
 
@@ -339,6 +341,50 @@ public class Player_CombatMachine : MonoBehaviour
         currentAnim = 1;
     }
 
+    void ColliderIterationBody(ref EnemyAI_Base selectedEnemy, ref List<IDamageable> damageableStorage, ref List<IElemental> elementalStorage) //Refactoring all the repeat code in HitCheck(). All code referencing "elemental" or "elementals" was Caleb. Everything else was me (joe) :)
+    {
+        Collider[] hitObjects = Physics.OverlapSphere(transform.position + _machine.ForwardDirection * distanceForwards, checkRadius, ~0, QueryTriggerInteraction.Collide);
+
+        bool playImpactSound = false;
+        foreach (Collider collider in hitObjects)
+        {
+            if (collider.CompareTag("Player")) continue; //this actually shouldn't fire because the player collider shouldn't be tagged due to caleb's jank requirement that only the root Player parent object is tagged as "Player" but leaving in as a fail-safe
+
+            CheckDamageables(collider, ref damageableStorage, ref selectedEnemy, ref playImpactSound);
+            CheckElementals(collider, ref elementalStorage, ref playImpactSound);
+            UpdateComboCount(hitObjects);
+        }
+
+        if (playImpactSound) HandleImpactSound();
+    }
+
+    void CheckDamageables(Collider collider, ref List<IDamageable> damageableStorage, ref EnemyAI_Base selectedEnemy, ref bool playImpactSound)
+    {
+        IDamageable damageable = collider.GetComponent<IDamageable>();
+
+        if (damageable == null || damageable.GetType() == typeof(Player_HealthComponent) || damageableStorage.Contains(damageable)) return;
+
+        damageableStorage.Add(damageable);
+        damageable.TakeDamage(currentAttack.damage, _scriptSteal);
+        playImpactSound = true;
+
+        if (collider.gameObject.GetComponent<EnemyAI_Base>() != null)
+        {
+            selectedEnemy = collider.gameObject.GetComponent<EnemyAI_Base>();
+        }
+    }
+
+    void CheckElementals(Collider collider, ref List<IElemental> elementalStorage, ref bool playImpactSound)
+    {
+        IElemental elemental = collider.GetComponent<IElemental>();
+
+        if (elemental == null || elemental.GetType() == typeof(Player_HealthComponent) || elementalStorage.Contains(elemental)) return;
+
+        elementalStorage.Add(elemental);
+        elemental.InteractElement(scriptStealMenu.GetHeldHebavior());
+        playImpactSound = true;
+    }
+
     IEnumerator HitCheck()
     {
         yield return new WaitForSeconds(currentAttack.hitboxDelay);
@@ -349,114 +395,22 @@ public class Player_CombatMachine : MonoBehaviour
 
         EnemyAI_Base selectedEnemy = null;
 
-        // START OF WHAT I (THE CALEB) ADDED
+        List<IDamageable> damageablesHit = new();
+        List<IElemental> elementalsHit = new();
 
         if (completionTime == 0)
         {
-            Collider[] hitObjects = Physics.OverlapSphere(transform.position + _machine.ForwardDirection * distanceForwards, checkRadius, ~0, QueryTriggerInteraction.Collide);
-
-            bool hitSomething = false;
-            foreach (Collider collider in hitObjects)
-            {
-                if (collider.CompareTag("Player")) continue;
-
-                IElemental elemental = collider.GetComponent<IElemental>();
-
-                if (elemental == null || elemental.GetType() == typeof(Player_HealthComponent)) continue;
-
-                elemental.InteractElement(scriptStealMenu.GetHeldHebavior());
-
-                hitSomething = true;
-            }
-            if (hitSomething) HandleImpactSound(); // something different maybe for element interact?
+            ColliderIterationBody(ref selectedEnemy, ref damageablesHit, ref elementalsHit);
+            //check hitbox one frame - unfortunate that ref can't be set to null so there's an unnecessary extra execution happening in regards to the list but I can't complain
         }
         else
         {
-            List<IElemental> elementalsHit = new();
 
             float currentTime = 0;
 
             while (currentTime < completionTime)
             {
-                Collider[] hitObjects = Physics.OverlapSphere(transform.position + _machine.ForwardDirection * distanceForwards, checkRadius, ~0, QueryTriggerInteraction.Collide);
-
-                bool somethingHitThisFrame = false;
-
-                foreach (Collider collider in hitObjects)
-                {
-                    if (collider.CompareTag("Player")) continue;
-
-                    IElemental elemental = collider.GetComponent<IElemental>();
-
-                    if (elemental == null || elementalsHit.Contains(elemental) || elemental.GetType() == typeof(Player_HealthComponent)) continue;
-
-
-                    elemental.InteractElement(scriptStealMenu.GetHeldHebavior());
-                    elementalsHit.Add(elemental);
-                    somethingHitThisFrame = true;
-                }
-
-                if (somethingHitThisFrame) HandleImpactSound();
-
-                yield return new WaitForEndOfFrame();
-                currentTime += Time.deltaTime;
-            }
-        }
-
-        // END OF WHAT I (THE CALEB) ADDED
-
-        //TODO: Refactor this so both long and one frame hit checks use a func since they use much of the same code
-        if (completionTime == 0)
-        {
-            //check hitbox one frame
-
-            Collider[] hitObjects = Physics.OverlapSphere(transform.position + _machine.ForwardDirection * distanceForwards, checkRadius, ~0, QueryTriggerInteraction.Ignore);
-
-            bool hitSomething = false;
-            foreach (Collider collider in hitObjects)
-            {
-                if (collider.CompareTag("Player")) continue;
-
-                IDamageable damageable = collider.GetComponent<IDamageable>();
-
-                if (damageable == null || damageable.GetType() == typeof(Player_HealthComponent)) continue;
-
-                selectedEnemy = collider.gameObject.GetComponent<EnemyAI_Base>();
-
-                damageable.TakeDamage(currentAttack.damage, _scriptSteal);
-                hitSomething = true;
-            }
-            if (hitSomething) HandleImpactSound();
-        }
-        else
-        {
-            List<IDamageable> damageablesHit = new();
-
-            float currentTime = 0;
-
-            while (currentTime < completionTime)
-            {
-                Collider[] hitObjects = Physics.OverlapSphere(transform.position + _machine.ForwardDirection * distanceForwards, checkRadius, ~0, QueryTriggerInteraction.Ignore);
-
-                bool somethingHitThisFrame = false;
-
-                foreach (Collider collider in hitObjects)
-                {
-                    if (collider.CompareTag("Player")) continue;
-
-                    IDamageable damageable = collider.GetComponent<IDamageable>();
-
-                    if (damageable == null || damageablesHit.Contains(damageable) || damageable.GetType() == typeof(Player_HealthComponent)) continue;
-
-                    selectedEnemy = collider.gameObject.GetComponent<EnemyAI_Base>();
-
-
-                    damageable.TakeDamage(currentAttack.damage, _scriptSteal);
-                    damageablesHit.Add(damageable);
-                    somethingHitThisFrame = true;
-                }
-
-                if (somethingHitThisFrame) HandleImpactSound();
+                ColliderIterationBody(ref selectedEnemy, ref damageablesHit, ref elementalsHit);
 
                 yield return new WaitForEndOfFrame();
                 currentTime += Time.deltaTime;
@@ -492,7 +446,7 @@ public class Player_CombatMachine : MonoBehaviour
     {
         return _machine.ForwardDirection * vector.z + _machine.RightDirection * vector.x + Vector3.up * vector.y;
     }
-    
+
     Vector3 IntendedMoveDirection()
     {
         Vector3 camForward = Vector3.ProjectOnPlane(Camera.main.transform.forward, Vector3.up);
@@ -501,5 +455,17 @@ public class Player_CombatMachine : MonoBehaviour
         Vector2 moveInput = walkInput.action.ReadValue<Vector2>();
 
         return moveInput.x * camRight.normalized + moveInput.y * camForward.normalized;
+    }
+
+    //Combo Count Functions
+    void UpdateComboCount(Collider[] collidersHit)
+    {
+        bool increaseCombo = false;
+        int i = 0;
+        while (i < collidersHit.Length && !increaseCombo)
+        {
+            increaseCombo = collidersHit[i].GetComponent<IComboTarget>() != null;
+            i++;
+        }
     }
 }
