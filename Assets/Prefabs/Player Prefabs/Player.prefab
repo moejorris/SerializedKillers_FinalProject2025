@@ -20868,6 +20868,7 @@ GameObject:
   - component: {fileID: 2025574586922971051}
   - component: {fileID: 6332013908717637418}
   - component: {fileID: 9132798164434119282}
+  - component: {fileID: 478983599275276974}
   m_Layer: 3
   m_Name: PlayerController
   m_TagString: Untagged
@@ -21159,7 +21160,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: a027612c7a2a8bd4eb96c833ebcc301a, type: 2}
   - {fileID: 11400000, guid: 0cb9248183305aa4696c7bca18584a2f, type: 2}
   comboResetTime: 0.1
-  currentComboID: 0
   attackInput: {fileID: 1120369429361536294, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   showHitboxCollider: 1
   onlyShowHitboxWhenEnabled: 1
@@ -21170,6 +21170,7 @@ MonoBehaviour:
   maxLeapDistance: 13
   minDashDistance: 4
   minDotProduct: 0.85
+  comboCountResetTime: 0.5
 --- !u!114 &2845844426926673644
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -21383,6 +21384,28 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   respawnPoint: {x: 0, y: 0, z: 0}
+--- !u!114 &478983599275276974
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6809807624353774444}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ec2ac2f2e200c4e47aa46a0f2a8535d4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  specialAttacks: 0
+  regularAttacks_req: 0
+  dashAttacks_req: 0
+  damageToPlayer_req: 0
+  manaInUse: 0
+  maxMana: 100
+  currentMana: 100
+  usageType: 1
+  timerToggleKey: 116
+  whiteManaBarMult: 0
 --- !u!1 &6813288641574566132
 GameObject:
   m_ObjectHideFlags: 0

@@ -293,7 +293,7 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
             }
         }
 
-        Destroy(skull.parent.gameObject);
+        Die();
     }
 
     IEnumerator DoorCheckTimer()

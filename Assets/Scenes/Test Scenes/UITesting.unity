@@ -573,33 +573,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 14f52f2412284f14eb0006304443333e, type: 3}
---- !u!1 &189551004 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 6809807624353774444, guid: 221ee92e73c803a42b396c5083667049, type: 3}
-  m_PrefabInstance: {fileID: 1386055727}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &189551025
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 189551004}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ec2ac2f2e200c4e47aa46a0f2a8535d4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  specialAttacks: 0
-  regularAttacks_req: 0
-  dashAttacks_req: 0
-  damageToPlayer_req: 0
-  manaInUse: 0
-  maxMana: 100
-  currentMana: 100
-  usageType: 1
-  timerToggleKey: 116
-  whiteManaBarMult: 0
 --- !u!1 &250514262
 GameObject:
   m_ObjectHideFlags: 0
@@ -4124,10 +4097,7 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 6809807624353774444, guid: 221ee92e73c803a42b396c5083667049, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 189551025}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 221ee92e73c803a42b396c5083667049, type: 3}
 --- !u!1 &1483807372
 GameObject:
