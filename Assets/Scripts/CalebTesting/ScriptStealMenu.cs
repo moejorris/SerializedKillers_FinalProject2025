@@ -320,7 +320,7 @@ public class ScriptStealMenu : MonoBehaviour
         if (centerSlot.heldBehavior != null)
         {
             //Debug.Log("Center slot held behavior != null");
-            movementSlot.transform.Find("Icon").GetComponent<Image>().sprite = centerSlot.heldBehavior.behavioricon;
+            movementSlot.transform.Find("Icon").GetComponent<Image>().sprite = centerSlot.heldBehavior.deactivatedBehaviorIcon;
             //centerSlot.transform.Find("Icon").GetComponent<Image>().sprite = emptySprite; // making center blank?
             selectedBehaviorSlot = movementSlot;
         }
@@ -337,7 +337,7 @@ public class ScriptStealMenu : MonoBehaviour
     {
         if (centerSlot.heldBehavior != null)
         {
-            combatSlot.transform.Find("Icon").GetComponent<Image>().sprite = centerSlot.heldBehavior.behavioricon;
+            combatSlot.transform.Find("Icon").GetComponent<Image>().sprite = centerSlot.heldBehavior.deactivatedBehaviorIcon;
             //centerSlot.transform.Find("Icon").GetComponent<Image>().sprite = emptySprite; // making center blank?
             selectedBehaviorSlot = combatSlot;
         }

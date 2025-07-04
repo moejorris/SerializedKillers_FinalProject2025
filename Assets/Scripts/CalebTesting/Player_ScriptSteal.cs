@@ -25,11 +25,14 @@ public class Player_ScriptSteal : MonoBehaviour
     [SerializeField] public Behavior heldBehavior;
     [SerializeField] private Sprite emptySlot;
     [SerializeField] private Image stolenScriptSlot => GameObject.FindGameObjectWithTag("Canvas").transform.Find("HUD/HeldScript/Icon").GetComponent<Image>();
+    [SerializeField] private Image stolenScriptAnimation => GameObject.FindGameObjectWithTag("Canvas").transform.Find("HUD/HeldScript/Animation").GetComponent<Image>();
+    private int stolenScriptAnimationInt = 0;
+    [SerializeField] private Player_Mana playerMana => GetComponent<Player_Mana>();
     [SerializeField] private EnemyManager enemyManager => GameObject.FindGameObjectWithTag("EnemyManager").GetComponent<EnemyManager>();
 
     [SerializeField] private Player_CombatMachine combatMachine => GetComponent<Player_CombatMachine>();
 
-    [Header("Status Effect Prefabs")]
+    [Header("Status Effects")]
     [SerializeField] private FireDamageEffect fireStatusEffect;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -37,6 +40,7 @@ public class Player_ScriptSteal : MonoBehaviour
     {
         scriptReturnTimer = scriptReturnTime;
         StartCoroutine("UpdateTimer");
+        StartCoroutine("ScriptAnimationTimer");
     }
 
     // Update is called once per frame
@@ -165,19 +169,61 @@ public class Player_ScriptSteal : MonoBehaviour
 
     public void UpdateUI()
     {
+        stolenScriptSlot.transform.parent.GetComponent<Animation>().Play();
         if (heldBehavior != null)
         {
-            if (stolenScriptSlot.sprite != heldBehavior.behavioricon)
+            if (playerMana.manaInUse)
             {
-                stolenScriptSlot.transform.parent.GetComponent<Animation>().Play();
-                stolenScriptSlot.sprite = heldBehavior.behavioricon; // doesn't do bloop every time
+                if (playerMana.scriptActive)
+                {
+                    stolenScriptAnimation.enabled = true;
+                    stolenScriptSlot.sprite = heldBehavior.activatedBehaviorIcon;
+
+                    stolenScriptAnimationInt = 0;
+                    stolenScriptAnimation.sprite = heldBehavior.animation[0];
+                }
+                else
+                {
+                    stolenScriptAnimation.enabled = false;
+                    stolenScriptSlot.sprite = heldBehavior.deactivatedBehaviorIcon;
+                }
             }
         }
         else
         {
+            stolenScriptAnimation.enabled = false;
             stolenScriptSlot.sprite = emptySlot;
         }
+
+
+
+        //if (heldBehavior != null)
+        //{
+        //    if (stolenScriptSlot.sprite != heldBehavior.deactivatedBehaviorIcon)
+        //    {
+        //        stolenScriptSlot.transform.parent.GetComponent<Animation>().Play();
+        //        stolenScriptSlot.sprite = heldBehavior.deactivatedBehaviorIcon; // doesn't do bloop every time
+        //    }
+        //}
+        //else
+        //{
+        //    stolenScriptSlot.sprite = emptySlot;
+        //}
         //stolenScriptSlot.transform.parent.GetComponent<Image>().color = scriptEffectColor;
+    }
+
+    IEnumerator ScriptAnimationTimer()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(0.2f);
+            if (heldBehavior != null)
+            {
+                stolenScriptAnimationInt++;
+                if (stolenScriptAnimationInt > 3) stolenScriptAnimationInt = 0;
+                stolenScriptAnimation.sprite = heldBehavior.animation[stolenScriptAnimationInt];
+            }
+        }
     }
 
 

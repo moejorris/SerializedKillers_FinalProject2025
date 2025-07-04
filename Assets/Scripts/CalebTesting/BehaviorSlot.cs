@@ -47,7 +47,7 @@ public class BehaviorSlot : MonoBehaviour
     {
         if (heldBehavior != null)
         {
-            slotIcon.sprite = heldBehavior.behavioricon;
+            slotIcon.sprite = heldBehavior.deactivatedBehaviorIcon;
         }
         else
         {

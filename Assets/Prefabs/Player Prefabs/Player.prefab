@@ -21206,7 +21206,7 @@ MonoBehaviour:
   waterParticles: {fileID: 5608910413428001789}
   selectedEnemy: {fileID: 0}
   heldBehavior: {fileID: 0}
-  emptySlot: {fileID: 0}
+  emptySlot: {fileID: 21300000, guid: b574f3cfa060084479405e3cd26d0c94, type: 3}
   fireStatusEffect: {fileID: 8131181348710889001}
 --- !u!114 &2006342760427608853
 MonoBehaviour:
@@ -21400,11 +21400,12 @@ MonoBehaviour:
   regularAttacks_req: 0
   dashAttacks_req: 0
   damageToPlayer_req: 0
-  manaInUse: 0
-  maxMana: 100
-  currentMana: 100
+  manaInUse: 1
+  maxMana: 50
+  currentMana: 50
   usageType: 1
   timerToggleKey: 116
+  scriptActive: 0
   whiteManaBarMult: 0
 --- !u!1 &6813288641574566132
 GameObject:

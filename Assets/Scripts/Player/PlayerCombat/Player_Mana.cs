@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Player_Mana : MonoBehaviour
 {
@@ -12,13 +13,13 @@ public class Player_Mana : MonoBehaviour
     [SerializeField] private bool damageToPlayer_req = false;
 
     [Header("Mana Settings")]
-    [SerializeField] private bool manaInUse = false;
+    public bool manaInUse = false;
     [SerializeField] private float maxMana = 100f;
     [SerializeField] private float currentMana = 100f;
     [SerializeField] private UsageType usageType;
     [SerializeField] private KeyCode timerToggleKey = KeyCode.T;
     private enum UsageType {PerUse, Timer}
-    private bool manaTimerActive = false;
+    public bool scriptActive = false;
 
     private RectTransform manaBar => GameObject.FindGameObjectWithTag("Canvas").transform.Find("HUD/Mana/Bar").GetComponent<RectTransform>();
     private RectTransform whiteManaBar => GameObject.FindGameObjectWithTag("Canvas").transform.Find("HUD/Mana/WhiteBar").GetComponent<RectTransform>();
@@ -33,6 +34,15 @@ public class Player_Mana : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (usageType == UsageType.PerUse)
+        {
+            whiteManaBar.GetComponent<Image>().enabled = true;
+        }
+        else
+        {
+            whiteManaBar.GetComponent<Image>().enabled = false;
+        }
+
         if (whiteManaBar.localScale.x > manaBar.localScale.x)
         {
             float lerpScale = Mathf.Lerp(whiteManaBar.localScale.x, manaBar.localScale.x, whiteManaBarMult);
@@ -49,12 +59,12 @@ public class Player_Mana : MonoBehaviour
 
         if (usageType == UsageType.Timer)
         {
-            if (manaTimerActive)
+            if (scriptActive)
             {
                 currentMana -= Time.deltaTime;
                 if (currentMana < 0)
                 {
-                    manaTimerActive = false;
+                    scriptActive = false;
                     currentMana = 0;
                 }
                 UpdateUI();
@@ -63,7 +73,8 @@ public class Player_Mana : MonoBehaviour
 
         if (Input.GetKeyDown(timerToggleKey))
         {
-            manaTimerActive = !manaTimerActive;
+            scriptActive = !scriptActive;
+            scriptSteal.UpdateUI();
         }
     }
 
@@ -89,7 +100,7 @@ public class Player_Mana : MonoBehaviour
     public void UpdateUI()
     {
         Vector3 scale = manaBar.localScale;
-        scale.x = currentMana / 100;
+        scale.x = currentMana / maxMana;
         manaBar.localScale = scale;
     }
 }
