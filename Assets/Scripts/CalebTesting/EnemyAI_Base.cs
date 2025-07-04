@@ -20,6 +20,7 @@ public class EnemyAI_Base : MonoBehaviour, ITargetable, IDamageable, IComboTarge
     [HideInInspector] public Image selectedIcon;
 
     [Header("Health")]
+    public float manaDropAmount = 10;
     public float maxHealth = 20f;
     public float health = 20f;
     private float healthSpeedMult = 1;
@@ -108,8 +109,13 @@ public class EnemyAI_Base : MonoBehaviour, ITargetable, IDamageable, IComboTarge
         UpdateHealth();
         if (health <= 0)
         {
-            Destroy(gameObject);
+            Die();
         }
+    }
+    public virtual void Die()
+    {
+        GameObject.FindGameObjectWithTag("Player").transform.Find("PlayerController").GetComponent<Player_Mana>().GainMana(manaDropAmount);
+        Destroy(gameObject);
     }
 
     public virtual void GainHealth(float amount)

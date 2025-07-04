@@ -465,8 +465,14 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
 
         if (health <= 0)
         {
-            Destroy(transform.parent.gameObject);
+            Die();
         }
+    }
+
+    public override void Die()
+    {
+        GameObject.FindGameObjectWithTag("Player").transform.Find("PlayerController").GetComponent<Player_Mana>().GainMana(manaDropAmount);
+        Destroy(skull.parent.gameObject);
     }
 
     public void SpacialAwareness()
