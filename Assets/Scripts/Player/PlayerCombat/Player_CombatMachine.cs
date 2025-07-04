@@ -48,8 +48,9 @@ public class Player_CombatMachine : MonoBehaviour
     int currentComboID = 0;
 
     [Header("Combo System Parameters")]
-    int currentComboCount = 0;
+    [SerializeField] int currentComboCount = 0;
     [SerializeField] float comboCountResetTime = 0.5f;
+    [SerializeField] bool comboResetOnWhiff = true;
 
     void Update()
     {
@@ -61,18 +62,18 @@ public class Player_CombatMachine : MonoBehaviour
             }
             else
             {
-                Attack();
+                StartCoroutine(Attack());
             }
         }
         else if (!isAttacking && attackQueued)
         {
-            Attack();
+            StartCoroutine(Attack());
         }
     }
 
-    void Attack()
+    IEnumerator Attack()
     {
-        if (OutOfRangeCheck()) return;
+        if (OutOfRangeCheck()) yield break;
 
         //TODO:
         //Also standard targeting method
@@ -90,16 +91,20 @@ public class Player_CombatMachine : MonoBehaviour
 
         float attackTime = currentAttack.animation.length / currentAttack.animationSpeed; // find a way to get the speed of the state and divide the length by that...
 
-        StartCoroutine(HitCheck());
         HandleMovement();
         HandleRotation();
-        HandleMoveToTarget();
 
-        animator.speed = 0;
+        if (HandleMoveToTarget())
+        {
+            animator.speed = 0;
+            yield return new WaitForSeconds(GetComponent<Player_Dash>()._travelTime);
+            animator.speed = currentAttack.animationSpeed;
+        }
+        StartCoroutine(HitCheck());
+
 
         //Wait for dash to finish/player is close to enemy to start attack
 
-        animator.speed = currentAttack.animationSpeed;
 
         HandleSound();
         HandleParticle();
@@ -114,13 +119,13 @@ public class Player_CombatMachine : MonoBehaviour
         GetNextAttack();
     }
 
-    void HandleMoveToTarget()
+    bool HandleMoveToTarget()
     {
         //TODO: Create Score/Weight System that factors both input direction and closeness
         //TODO: Move player over time
 
-        if (!isBatman) return;
-        if (!_machine.isGrounded) return;
+        if (!isBatman) return false;
+        // if (!_machine.isGrounded) return false;
 
         Vector3 inputDir = IntendedMoveDirection();
 
@@ -151,7 +156,7 @@ public class Player_CombatMachine : MonoBehaviour
 
         // Debug.Log("Arkham Combat: Found " + potentialTargets.Count + " potential targets.");
 
-        if (potentialTargets.Count < 1) return;
+        if (potentialTargets.Count < 1) return false;
 
         ITargetable selectedTarget = null;
 
@@ -177,25 +182,7 @@ public class Player_CombatMachine : MonoBehaviour
             }
         }
 
-        // foreach (ITargetable target in potentialTargets)
-        // {
-        //     if (target.TargetScore == highScore)
-        //     {
-        //         Handles.color = Color.green;
-        //     }
-        //     else if (target.TargetScore >= highScore / 2f)
-        //     {
-        //         Handles.color = Color.red;
-        //     }
-        //     else
-        //     {
-        //         Handles.color = Color.black;
-        //     }
-
-        //     // Handles.DrawSolidDisc(target.transform.position + Vector3.up, Vector3.up, 1f);
-        // }
-
-        if (selectedTarget == null || highScore == 0) return;
+        if (selectedTarget == null || highScore == 0) return false;
 
         _rotation.enabled = false;
 
@@ -207,6 +194,7 @@ public class Player_CombatMachine : MonoBehaviour
         {
             _machine.DisableAllMovers(GetComponent<Player_Dash>());
             GetComponent<Player_Dash>().ExternalDash(selectedTarget.transform.position);
+            return true;
         }
         else
         {
@@ -216,6 +204,7 @@ public class Player_CombatMachine : MonoBehaviour
             _machine.SetForwardDirection(newDir);
             _machine.DisableAllMovers(_forceHandler);
             _forceHandler.AddForce(_machine.ForwardDirection * Vector3.Distance(transform.position, selectedTarget.transform.position - _machine.ForwardDirection * checkRadius) * 5f, ForceMode.VelocityChange);
+            return false;
         }
     }
 
@@ -223,7 +212,8 @@ public class Player_CombatMachine : MonoBehaviour
     {
         if (currentAttack.particleEffect)
         {
-            ParticleSystem.MainModule particle = Instantiate(currentAttack.particleEffect, animator.transform).GetComponent<ParticleSystem>().main;
+            GameObject particleGOBJ = Instantiate(currentAttack.particleEffect, animator.transform);
+            ParticleSystem.MainModule particle = particleGOBJ.GetComponent<ParticleSystem>().main;
             if (_scriptSteal)
             {
                 particle.startColor = _scriptSteal.scriptEffectColor;
@@ -232,6 +222,8 @@ public class Player_CombatMachine : MonoBehaviour
             {
                 particle.startColor = Color.white;
             }
+
+            Destroy(particleGOBJ, 1f);
         }
     }
 
@@ -289,7 +281,11 @@ public class Player_CombatMachine : MonoBehaviour
 
     void PlaySound_TEMP(SoundEffectSO sound)
     {
-        GameObject soundObject = Instantiate(new GameObject(), transform);
+        GameObject soundObject = new GameObject();
+
+        soundObject.name = sound.name;
+        soundObject.transform.parent = transform;
+
         AudioSource audioSource = soundObject.AddComponent<AudioSource>();
         AudioClip clip = sound.SoundEffect();
 
@@ -341,7 +337,7 @@ public class Player_CombatMachine : MonoBehaviour
         currentAnim = 1;
     }
 
-    void ColliderIterationBody(ref EnemyAI_Base selectedEnemy, ref List<IDamageable> damageableStorage, ref List<IElemental> elementalStorage) //Refactoring all the repeat code in HitCheck(). All code referencing "elemental" or "elementals" was Caleb. Everything else was me (joe) :)
+    void ColliderIterationBody(ref EnemyAI_Base selectedEnemy, ref List<IDamageable> damageableStorage, ref List<IElemental> elementalStorage, ref bool increaseCombo) //Refactoring all the repeat code in HitCheck(). All code referencing "elemental" or "elementals" was Caleb. Everything else was me (joe) :)
     {
         Collider[] hitObjects = Physics.OverlapSphere(transform.position + _machine.ForwardDirection * distanceForwards, checkRadius, ~0, QueryTriggerInteraction.Collide);
 
@@ -352,7 +348,12 @@ public class Player_CombatMachine : MonoBehaviour
 
             CheckDamageables(collider, ref damageableStorage, ref selectedEnemy, ref playImpactSound);
             CheckElementals(collider, ref elementalStorage, ref playImpactSound);
-            UpdateComboCount(hitObjects);
+
+            if (collider.GetComponent<IComboTarget>() != null && !increaseCombo)
+            {
+                increaseCombo = true;
+                UpdateComboCount();
+            }
         }
 
         if (playImpactSound) HandleImpactSound();
@@ -398,9 +399,11 @@ public class Player_CombatMachine : MonoBehaviour
         List<IDamageable> damageablesHit = new();
         List<IElemental> elementalsHit = new();
 
+        bool increaseCombo = false;
+
         if (completionTime == 0)
         {
-            ColliderIterationBody(ref selectedEnemy, ref damageablesHit, ref elementalsHit);
+            ColliderIterationBody(ref selectedEnemy, ref damageablesHit, ref elementalsHit, ref increaseCombo);
             //check hitbox one frame - unfortunate that ref can't be set to null so there's an unnecessary extra execution happening in regards to the list but I can't complain
         }
         else
@@ -410,16 +413,21 @@ public class Player_CombatMachine : MonoBehaviour
 
             while (currentTime < completionTime)
             {
-                ColliderIterationBody(ref selectedEnemy, ref damageablesHit, ref elementalsHit);
+                ColliderIterationBody(ref selectedEnemy, ref damageablesHit, ref elementalsHit, ref increaseCombo);
 
                 yield return new WaitForEndOfFrame();
                 currentTime += Time.deltaTime;
             }
         }
-
         if (selectedEnemy) _scriptSteal.ChangeSelectedEnemy(selectedEnemy);
 
         hitBoxActive = false;
+
+        if (!increaseCombo && comboResetOnWhiff) //if we attacked and we didn't hit anything combo-able, then reset the combo
+        {
+            CancelInvoke("ResetComboCount");
+            ResetComboCount();
+        }
     }
     void OnDrawGizmos()
     {
@@ -458,14 +466,17 @@ public class Player_CombatMachine : MonoBehaviour
     }
 
     //Combo Count Functions
-    void UpdateComboCount(Collider[] collidersHit)
+    void UpdateComboCount()
     {
-        bool increaseCombo = false;
-        int i = 0;
-        while (i < collidersHit.Length && !increaseCombo)
-        {
-            increaseCombo = collidersHit[i].GetComponent<IComboTarget>() != null;
-            i++;
-        }
+        currentComboCount++;
+        Ui_ComboCounter.instance?.UpdateComboDisplay(currentComboCount);
+        CancelInvoke("ResetComboCount");
+        Invoke("ResetComboCount", comboCountResetTime + currentAttack.animation.length);
+    }
+
+    void ResetComboCount()
+    {
+        currentComboCount = 0;
+        Ui_ComboCounter.instance?.UpdateComboDisplay(0);
     }
 }
