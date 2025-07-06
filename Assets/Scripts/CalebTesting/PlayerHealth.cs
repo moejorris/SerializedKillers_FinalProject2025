@@ -25,7 +25,7 @@ public class PlayerHealth : MonoBehaviour
 
     void PlaySound(AudioClip clip)
     {
-        GameObject soundObject = Instantiate(new GameObject(), transform);
+        GameObject soundObject = new GameObject();
         AudioSource audioSource = soundObject.AddComponent<AudioSource>();
         audioSource.clip = clip;
 
