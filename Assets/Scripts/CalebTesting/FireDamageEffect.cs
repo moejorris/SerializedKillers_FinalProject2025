@@ -40,7 +40,7 @@ public class FireDamageEffect : MonoBehaviour, IElemental
             else yield return new WaitForSeconds(timeBetweenDamage);
 
             if (PlayerController.instance.ScriptSteal.GetHeldHebavior() != null && PlayerController.instance.ScriptSteal.GetHeldHebavior() == heldBehavior) Debug.Log("Something!");
-            else PlayerController.instance.Health.TakeDamage(fireDamage, PlayerController.instance.ScriptSteal); 
+            else PlayerController.instance.Health.TakeDamage(fireDamage); 
         }
     }
 
