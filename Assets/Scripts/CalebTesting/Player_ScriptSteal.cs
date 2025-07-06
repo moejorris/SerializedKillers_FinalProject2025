@@ -58,7 +58,7 @@ public class Player_ScriptSteal : MonoBehaviour
                     StealScript();
                 }
             }
-            
+
             if (!scriptStealing)
             {
                 returningScript = true;
@@ -174,21 +174,19 @@ public class Player_ScriptSteal : MonoBehaviour
         stolenScriptSlot.transform.parent.GetComponent<Animation>().Play();
         if (heldBehavior != null)
         {
-            if (PlayerController.instance.Mana.manaInUse)
-            {
-                if (PlayerController.instance.Mana.scriptActive)
-                {
-                    stolenScriptAnimation.enabled = true;
-                    stolenScriptSlot.sprite = heldBehavior.activatedBehaviorIcon;
 
-                    stolenScriptAnimationInt = 0;
-                    stolenScriptAnimation.sprite = heldBehavior.animation[0];
-                }
-                else
-                {
-                    stolenScriptAnimation.enabled = false;
-                    stolenScriptSlot.sprite = heldBehavior.deactivatedBehaviorIcon;
-                }
+            if (PlayerController.instance.Mana.scriptActive)
+            {
+                stolenScriptAnimation.enabled = true;
+                stolenScriptSlot.sprite = heldBehavior.activatedBehaviorIcon;
+
+                stolenScriptAnimationInt = 0;
+                stolenScriptAnimation.sprite = heldBehavior.animation[0];
+            }
+            else
+            {
+                stolenScriptAnimation.enabled = false;
+                stolenScriptSlot.sprite = heldBehavior.deactivatedBehaviorIcon;
             }
         }
         else

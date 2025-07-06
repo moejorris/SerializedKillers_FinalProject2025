@@ -466,7 +466,7 @@ public class Player_CombatMachine : MonoBehaviour
 
         Vector3 inputDir = IntendedMoveDirection();
 
-        if (inputDir.magnitude < 0.5f) inputDir = PlayerController.instance.MovementMachine.ForwardDirection;
+        if (inputDir.magnitude < 0.5f && PlayerController.instance != null) inputDir = PlayerController.instance.MovementMachine.ForwardDirection;
 
         Gizmos.DrawWireSphere(transform.position + inputDir * (maxLeapDistance / 2f), maxLeapDistance / 2f);
 

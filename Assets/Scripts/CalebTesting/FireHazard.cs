@@ -43,12 +43,12 @@ public class FireHazard : MonoBehaviour, IElemental
             }
         }
 
-        if ((timeElapsed - displayTime) > 1f / fps)
-        {
-            displayTime = timeElapsed;
-            particles.Simulate(0.15f, true, false, false);
-            particles.Pause();
-        }
+        //if ((timeElapsed - displayTime) > 1f / fps)
+        //{
+        //    displayTime = timeElapsed;
+        //    particles.Simulate(0.15f, true, false, false);
+        //    particles.Pause();
+        //}
     }
 
     IEnumerator HitCheckTimer()

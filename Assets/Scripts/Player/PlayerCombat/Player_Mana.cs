@@ -19,7 +19,7 @@ public class Player_Mana : MonoBehaviour
     [SerializeField] private float playerDamageCost = 5f;
 
     [Header("Mana Settings")]
-    public bool manaInUse = false;
+    //public bool manaInUse = false;
     [SerializeField] private float maxMana = 100f;
     public float currentMana = 100f;
     public UsageType usageType;
@@ -29,49 +29,41 @@ public class Player_Mana : MonoBehaviour
 
     private RectTransform manaBar => GameObject.FindGameObjectWithTag("Canvas").transform.Find("HUD/Mana/Bar").GetComponent<RectTransform>();
     private RectTransform whiteManaBar => GameObject.FindGameObjectWithTag("Canvas").transform.Find("HUD/Mana/WhiteBar").GetComponent<RectTransform>();
-    [SerializeField] private float whiteManaBarMult = 0f;
+    [SerializeField] private float manaBarLerpSpeed = 0f;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-
+        UpdateUI();
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (usageType == UsageType.PerUse)
+        if (manaBar.localScale.x < whiteManaBar.localScale.x)
         {
-            whiteManaBar.GetComponent<Image>().enabled = true;
+            float lerpScale = Mathf.Lerp(manaBar.localScale.x, whiteManaBar.localScale.x, manaBarLerpSpeed);
+            Vector3 manaBarScale = manaBar.localScale;
+            manaBarScale.x = lerpScale;
+            manaBar.localScale = manaBarScale;
+            manaBarLerpSpeed += (Time.deltaTime / 25f);
         }
-        else
+        else if (manaBar.localScale.x > whiteManaBar.localScale.x)
         {
-            whiteManaBar.GetComponent<Image>().enabled = false;
-        }
-
-        if (whiteManaBar.localScale.x > manaBar.localScale.x)
-        {
-            float lerpScale = Mathf.Lerp(whiteManaBar.localScale.x, manaBar.localScale.x, whiteManaBarMult);
-            Vector3 whiteBarScale = whiteManaBar.localScale;
-            whiteBarScale.x = lerpScale;
-            whiteManaBar.localScale = whiteBarScale;
-            whiteManaBarMult += (Time.deltaTime / 25f);
-        }
-        else if (whiteManaBar.localScale.x < manaBar.localScale.x)
-        {
-            whiteManaBar.localScale = manaBar.localScale;
-            whiteManaBarMult = 0;
+            manaBar.localScale = whiteManaBar.localScale;
+            manaBarLerpSpeed = 0;
         }
 
         if (usageType == UsageType.Timer)
         {
             if (scriptActive)
             {
-                currentMana -= Time.deltaTime;
+                currentMana -= Time.deltaTime * 2.5f;
                 if (currentMana < 0)
                 {
                     scriptActive = false;
                     currentMana = 0;
+                    PlayerController.instance.ScriptSteal.UpdateUI();
                 }
                 UpdateUI();
             }
@@ -79,8 +71,16 @@ public class Player_Mana : MonoBehaviour
 
         if (Input.GetKeyDown(timerToggleKey))
         {
-            scriptActive = !scriptActive;
-            PlayerController.instance.ScriptSteal.UpdateUI();
+            if (PlayerController.instance.ScriptSteal.heldBehavior != null && currentMana > 0)
+            {
+                scriptActive = !scriptActive;
+                PlayerController.instance.ScriptSteal.UpdateUI();
+            }
+            else
+            {
+                scriptActive = false;
+                PlayerController.instance.ScriptSteal.UpdateUI();
+            }
         }
     }
 
@@ -97,17 +97,22 @@ public class Player_Mana : MonoBehaviour
     {
         currentMana -= mana;
 
-        if (currentMana < 0) currentMana = 0;
+        if (currentMana <= 0)
+        {
+            scriptActive = false;
+            currentMana = 0;
+            PlayerController.instance.ScriptSteal.UpdateUI();
+        }
 
-        whiteManaBarMult = 0;
+        manaBarLerpSpeed = 0;
         UpdateUI();
     }
 
     public void UpdateUI()
     {
-        Vector3 scale = manaBar.localScale;
+        Vector3 scale = whiteManaBar.localScale;
         scale.x = currentMana / maxMana;
-        manaBar.localScale = scale;
+        whiteManaBar.localScale = scale;
     }
 
     public bool ElementActive()

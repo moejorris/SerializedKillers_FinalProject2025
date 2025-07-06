@@ -179,7 +179,7 @@ public class EnemyAI_Overclock : EnemyAI_Base
             }
             else if (movementState == "cooldown")
             {
-                
+
             }
         }
         else
@@ -378,7 +378,8 @@ public class EnemyAI_Overclock : EnemyAI_Base
     public void SpawnFire(Vector3 location, float fireDur = 5.5f)
     {
         location.y = transform.position.y + 2;
-        if (!Physics.SphereCast(location, 0.5f, Vector3.down, out RaycastHit hit, 20, fireMask))
+        RaycastHit[] fireCheck = Physics.SphereCastAll(location, 0.5f, Vector3.down, 20, fireMask);
+        if (fireCheck.Length <= 0)
         {
             Ray raycast = new Ray();
             raycast.origin = location;
@@ -560,6 +561,11 @@ public class EnemyAI_Overclock : EnemyAI_Base
             (PlayerController.instance.ScriptSteal.GetHeldHebavior() == heldBehavior && !behaviorActive)) damage *= 2f;
 
         health -= damage;
+
+        if (!PlayerController.instance.ScriptSteal.BehaviorActive())
+        {
+            PlayerController.instance.Mana.GainMana(manaPerHit);
+        }
 
         //StopCoroutine("MaterialFade");
         //StartCoroutine("MaterialFade");

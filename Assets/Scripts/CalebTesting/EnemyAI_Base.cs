@@ -101,6 +101,11 @@ public class EnemyAI_Base : MonoBehaviour, ITargetable, IDamageable, IComboTarge
 
         if (PlayerController.instance.ScriptSteal.BehaviorActive() && PlayerController.instance.ScriptSteal.GetHeldHebavior() == heldBehavior.weakness) damage *= 2f;
 
+        if (!PlayerController.instance.ScriptSteal.BehaviorActive())
+        {
+            PlayerController.instance.Mana.GainMana(manaPerHit);
+        }
+
         health -= damage;
 
         StopCoroutine("MaterialFade");

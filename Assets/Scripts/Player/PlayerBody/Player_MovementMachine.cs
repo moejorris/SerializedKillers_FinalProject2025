@@ -177,7 +177,7 @@ public class Player_MovementMachine : MonoBehaviour
                 Gizmos.color = Color.red;
                 Gizmos.DrawWireSphere(_groundInfo.point, PlayerController.instance.CharacterController.radius);
             }
-            else
+            else if (PlayerController.instance != null)
             {
                 Gizmos.color = (Color.red + Color.white) / 2f;
                 Gizmos.DrawWireSphere(transform.position - Vector3.up * PlayerController.instance.CharacterController.height / 2f, PlayerController.instance.CharacterController.radius);

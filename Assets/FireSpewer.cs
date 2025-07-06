@@ -82,12 +82,12 @@ public class FireSpewer : MonoBehaviour, IElemental
     {
         timeElapsed += Time.deltaTime;
 
-        if ((timeElapsed - displayTime) > 1f / fps)
-        {
-            displayTime = timeElapsed;
-            fire.Simulate(0.15f, true, false, false);
-            fire.Pause();
-        }
+        //if ((timeElapsed - displayTime) > 1f / fps)
+        //{
+        //    displayTime = timeElapsed;
+        //    fire.Simulate(0.15f, true, false, false);
+        //    fire.Pause();
+        //}
 
         if (enemyExtinguishTimer > 0)
         {
