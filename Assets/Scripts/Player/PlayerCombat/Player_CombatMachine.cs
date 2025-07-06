@@ -393,7 +393,7 @@ public class Player_CombatMachine : MonoBehaviour
         if (damageable == null || damageable.GetType() == typeof(Player_HealthComponent) || damageableStorage.Contains(damageable)) return;
 
         damageableStorage.Add(damageable);
-        damageable.TakeDamage(currentAttack.damage, PlayerController.instance.ScriptSteal);
+        damageable.TakeDamage(currentAttack.damage);
         playImpactSound = true;
 
         if (collider.gameObject.GetComponent<EnemyAI_Base>() != null)
