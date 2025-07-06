@@ -15,6 +15,8 @@ public class FireSpewer : MonoBehaviour, IElemental
     private float enemyExtinguishTimer = 1;
 
     private float health = 3;
+    private float knockbackCooldown = 0;
+    public float knockbackStrength = 10;
 
     private void Start()
     {
@@ -97,6 +99,7 @@ public class FireSpewer : MonoBehaviour, IElemental
 
     private void Update()
     {
+        if (knockbackCooldown > 0) knockbackCooldown -= Time.deltaTime;
         //Debug.Log(smoke.transform.localPosition.y);
 
         //2, 1.2, 0.4
@@ -120,23 +123,18 @@ public class FireSpewer : MonoBehaviour, IElemental
             else if (other.transform.parent != null && other.transform.parent.gameObject.CompareTag("Player"))
             {
                 PlayerController.instance.ScriptSteal.ApplyStatusEffect(heldBehavior);
-                //Vector3 dir = (other.transform.position - transform.position).normalized + Vector3.up * 0.25f;
-                //GameObject.Find("Player").transform.Find("PlayerController").PlayerController.instance.ForceHandler>().AddForce(dir * 20f, ForceMode.VelocityChange);
+                
+                if (knockbackCooldown <= 0)
+                {
+                    knockbackCooldown = 0.5f;
 
-                //if (other.transform.parent.Find("Meshes").childCount < 3)
-                //{
-                //    GameObject effect = Instantiate(fireStatusEffect, other.transform.parent.Find("Meshes"));
-                //    effect.transform.position = other.transform.parent.Find("Meshes").position;
-                //}
-                //else
-                //{
-                //    FireDamageEffect damageEffect = other.transform.parent.Find("Meshes").GetComponentInChildren<FireDamageEffect>();
-                //    if (damageEffect != null)
-                //    {
-                //        damageEffect.fireLifetime = 5;
-                //    }
-                //    // deals more damage since entering fire while on fire?
-                //}
+                    Vector3 dir = (other.transform.position - GetComponent<Collider>().ClosestPointOnBounds(other.transform.position)).normalized;
+                    dir.y = 0.3f;
+                    dir *= 5;
+                    dir *= knockbackStrength;
+
+                    PlayerController.instance.ForceHandler.AddForce(dir, ForceMode.VelocityChange);
+                }
             }
         }
         else

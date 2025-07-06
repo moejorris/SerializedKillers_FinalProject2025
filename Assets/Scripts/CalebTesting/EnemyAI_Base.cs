@@ -44,7 +44,7 @@ public class EnemyAI_Base : MonoBehaviour, ITargetable, IDamageable, IComboTarge
             foreach (Material material in mesh.materials)
             {
                 materialList.Add(material);
-                Debug.Log("added " + material);
+                //Debug.Log("added " + material);
             }
         }
 
