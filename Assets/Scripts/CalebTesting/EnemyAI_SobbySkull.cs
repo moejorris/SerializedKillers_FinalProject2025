@@ -454,7 +454,7 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
             //Stunned()
         }
 
-        if (PlayerController.instance.ScriptSteal.BehaviorActive() && PlayerController.instance.ScriptSteal.GetHeldHebavior() == heldBehavior.weakness) damage *= 2f;
+        if (PlayerController.instance.ScriptSteal.BehaviorActive() && PlayerController.instance.ScriptSteal.GetHeldBehavior() == heldBehavior.weakness) damage *= 2f;
 
         if (!PlayerController.instance.ScriptSteal.BehaviorActive())
         {

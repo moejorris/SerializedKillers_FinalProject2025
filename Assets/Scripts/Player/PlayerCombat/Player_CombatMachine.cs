@@ -413,7 +413,7 @@ public class Player_CombatMachine : MonoBehaviour
         if (elemental == null || elemental.GetType() == typeof(Player_HealthComponent) || elementalStorage.Contains(elemental)) return;
 
         elementalStorage.Add(elemental);
-        elemental.InteractElement(PlayerController.instance.ScriptSteal.GetHeldHebavior());
+        elemental.InteractElement(PlayerController.instance.ScriptSteal.GetHeldBehavior());
         hitSomething = true;
     }
 

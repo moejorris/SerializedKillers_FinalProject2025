@@ -99,7 +99,7 @@ public class EnemyAI_Base : MonoBehaviour, ITargetable, IDamageable, IComboTarge
     {
         if (!healthBar || !whiteHealthBar) return; // in case no thing exists
 
-        if (PlayerController.instance.ScriptSteal.BehaviorActive() && PlayerController.instance.ScriptSteal.GetHeldHebavior() == heldBehavior.weakness) damage *= 2f;
+        if (PlayerController.instance.ScriptSteal.BehaviorActive() && PlayerController.instance.ScriptSteal.GetHeldBehavior() == heldBehavior.weakness) damage *= 2f;
 
         if (!PlayerController.instance.ScriptSteal.BehaviorActive())
         {

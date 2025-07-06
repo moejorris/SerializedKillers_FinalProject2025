@@ -557,8 +557,8 @@ public class EnemyAI_Overclock : EnemyAI_Base
     {
         if (!healthBar || !whiteHealthBar) return; // in case no thing exists
 
-        if ((PlayerController.instance.ScriptSteal.BehaviorActive() && PlayerController.instance.ScriptSteal.GetHeldHebavior() == heldBehavior.weakness) ||
-            (PlayerController.instance.ScriptSteal.GetHeldHebavior() == heldBehavior && !behaviorActive)) damage *= 2f;
+        if ((PlayerController.instance.ScriptSteal.BehaviorActive() && PlayerController.instance.ScriptSteal.GetHeldBehavior() == heldBehavior.weakness) ||
+            (PlayerController.instance.ScriptSteal.GetHeldBehavior() == heldBehavior && !behaviorActive)) damage *= 2f;
 
         health -= damage;
 

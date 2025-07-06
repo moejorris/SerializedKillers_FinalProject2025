@@ -39,7 +39,7 @@ public class FireDamageEffect : MonoBehaviour, IElemental
             if (rekindleTimer > 0) yield return new WaitForSeconds(0.5f);
             else yield return new WaitForSeconds(timeBetweenDamage);
 
-            if (PlayerController.instance.ScriptSteal.BehaviorActive() && PlayerController.instance.ScriptSteal.GetHeldHebavior() == heldBehavior) Debug.Log("Something!");
+            if (PlayerController.instance.ScriptSteal.BehaviorActive() && PlayerController.instance.ScriptSteal.GetHeldBehavior() == heldBehavior) Debug.Log("Something!");
             else PlayerController.instance.Health.TakeDamage(fireDamage); 
         }
     }
