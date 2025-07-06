@@ -351,7 +351,7 @@ public class BossBehaviorV2 : MonoBehaviour, IDamageable
         }
     }
 
-    public void TakeDamage(float damage = 5, Player_ScriptSteal scriptSteal = null)
+    public void TakeDamage(float damage = 5)
     {
         if (!isVulnerable)
         {

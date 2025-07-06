@@ -3,9 +3,9 @@ using UnityEngine;
 public class Player_HealthComponent : Health
 {
     [SerializeField] PlayerHealth playerHealthUI => GameObject.FindGameObjectWithTag("Canvas").GetComponent<PlayerHealth>();
-    public override void TakeDamage(float damage = 0, Player_ScriptSteal scriptSteal = null)
+    public override void TakeDamage(float damage = 0)
     {
-        base.TakeDamage(damage, scriptSteal);
+        base.TakeDamage(damage);
 
         if (currentHealth < 0) currentHealth = 0;
 

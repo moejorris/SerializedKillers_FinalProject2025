@@ -10,16 +10,16 @@ public class Spin : MonoBehaviour, IDamageable
         rotatePuzzle = GetComponentInChildren<RotatePuzzle>();
     }
 
-    public void TakeDamage(float damage = 0, Player_ScriptSteal scriptSteal = null)
+    public void TakeDamage(float damage = 0)
     {
-        if (scriptSteal != null && scriptSteal.GetHeldHebavior() != null && scriptSteal.GetHeldHebavior().behaviorName == requiredBehaviorName)
+        if (PlayerController.instance.ScriptSteal.GetHeldHebavior() != null && PlayerController.instance.ScriptSteal.GetHeldHebavior().behaviorName == requiredBehaviorName)
         {
             rotatePuzzle.RotateThisPuzzle();
         }
         else
         {
             string heldBehaviorName = "none";
-            if (scriptSteal != null && scriptSteal.GetHeldHebavior() != null) heldBehaviorName = scriptSteal.GetHeldHebavior().behaviorName;
+            if (PlayerController.instance.ScriptSteal.GetHeldHebavior() != null) heldBehaviorName = PlayerController.instance.ScriptSteal.GetHeldHebavior().behaviorName;
             Debug.Log("Tile Spin Failed. Required behavior: " + requiredBehaviorName + ", but held behavior: " + heldBehaviorName);
         }
     }

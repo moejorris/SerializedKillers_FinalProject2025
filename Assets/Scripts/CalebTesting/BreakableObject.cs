@@ -10,7 +10,7 @@ public class BreakableObject : MonoBehaviour, ITargetable, IDamageable
     public float TargetScore { get; set;}
     public float TargetScoreWeight { get => 0.2f; }
 
-    public virtual void TakeDamage(float damage, Player_ScriptSteal scriptSteal)
+    public virtual void TakeDamage(float damage)
     {
         if (heldItem != null)
         {

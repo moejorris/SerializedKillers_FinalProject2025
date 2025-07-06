@@ -10,7 +10,7 @@ public class Health : MonoBehaviour, IDamageable
         currentHealth = maxHealth;
     }
 
-    public virtual void TakeDamage(float damage = 0, Player_ScriptSteal scriptSteal = null)
+    public virtual void TakeDamage(float damage = 0)
     {
         currentHealth -= damage;
 
