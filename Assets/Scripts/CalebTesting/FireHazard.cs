@@ -3,7 +3,6 @@ using System.Collections;
 
 public class FireHazard : MonoBehaviour, IElemental
 {
-    private Player_ScriptSteal scriptSteal => GameObject.FindGameObjectWithTag("Player").transform.Find("PlayerController").GetComponent<Player_ScriptSteal>();
     [SerializeField] private Behavior heldBehavior; // just to tell which type of element(?)
     [SerializeField] private GameObject fireEffect;
     private bool fireActive = true;
@@ -37,7 +36,7 @@ public class FireHazard : MonoBehaviour, IElemental
         timeElapsed += Time.deltaTime;
         if (timeElapsed > fireDuration)
         {
-            particles.loop = false;
+            // particles.loop = false;
             if (particles.particleCount <= 0)
             {
                 Destroy(gameObject);
@@ -88,7 +87,7 @@ public class FireHazard : MonoBehaviour, IElemental
             }
             else if (other.transform.parent != null && other.transform.parent.gameObject.CompareTag("Player"))
             {
-                scriptSteal.ApplyStatusEffect(heldBehavior);
+                PlayerController.instance.ScriptSteal.ApplyStatusEffect(heldBehavior);
 
 
                 //if (other.transform.parent.Find("Meshes").childCount < 3)

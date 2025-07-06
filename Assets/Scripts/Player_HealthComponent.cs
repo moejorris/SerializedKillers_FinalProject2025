@@ -26,6 +26,6 @@ public class Player_HealthComponent : Health
 
     public override void Die()
     {
-        GetComponent<Player_Respawn>().Respawn();
+        PlayerController.instance.Respawn.Respawn();
     }
 }

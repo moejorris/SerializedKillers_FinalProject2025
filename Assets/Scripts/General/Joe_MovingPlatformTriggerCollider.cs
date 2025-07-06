@@ -6,7 +6,7 @@ public class Joe_MovingPlatformTriggerCollider : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        if (other.GetComponent<Player_MovementMachine>() && platformMover != null)
+        if (other == PlayerController.instance.Collider && platformMover != null)
         {
             platformMover.StartMoving();
         }   

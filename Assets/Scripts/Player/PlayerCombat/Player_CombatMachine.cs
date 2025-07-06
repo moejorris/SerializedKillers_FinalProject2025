@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System.Net;
 
 
 //Joe Morris
@@ -11,12 +12,6 @@ public class Player_CombatMachine : MonoBehaviour
 {
 
     //References
-    Player_ScriptSteal scriptStealMenu => GetComponent<Player_ScriptSteal>();
-    Player_MovementMachine _machine => GetComponent<Player_MovementMachine>();
-    Player_RootMotion _rootMotion => GetComponent<Player_RootMotion>();
-    Player_ForceHandler _forceHandler => GetComponent<Player_ForceHandler>();
-    Player_Rotate _rotation => GetComponent<Player_Rotate>();
-    Player_ScriptSteal _scriptSteal => GetComponent<Player_ScriptSteal>();
     [SerializeField] AnimatorOverrideController animatorOverride;
     [SerializeField] Animator animator;
 
@@ -39,6 +34,7 @@ public class Player_CombatMachine : MonoBehaviour
     [SerializeField] float maxLeapDistance = 8f;
     [SerializeField] float minDashDistance = 4f;
     [SerializeField] float minDotProduct = 0.75f;
+    float currentAerialAttack = 0;
 
     //Local Stuff
     bool isAttacking = false;
@@ -56,6 +52,11 @@ public class Player_CombatMachine : MonoBehaviour
     {
         if (attackInput.action.WasPressedThisFrame())
         {
+            if (PlayerController.instance.MovementMachine.isGrounded)
+            {
+                currentAerialAttack = 0;    
+            }
+
             if (isAttacking)
             {
                 attackQueued = true;
@@ -97,7 +98,7 @@ public class Player_CombatMachine : MonoBehaviour
         if (HandleMoveToTarget())
         {
             animator.speed = 0;
-            yield return new WaitForSeconds(GetComponent<Player_Dash>()._travelTime);
+            yield return new WaitForSeconds(PlayerController.instance.Dash._travelTime);
             animator.speed = currentAttack.animationSpeed;
         }
         StartCoroutine(HitCheck());
@@ -121,15 +122,12 @@ public class Player_CombatMachine : MonoBehaviour
 
     bool HandleMoveToTarget()
     {
-        //TODO: Create Score/Weight System that factors both input direction and closeness
-        //TODO: Move player over time
-
         if (!isBatman) return false;
-        // if (!_machine.isGrounded) return false;
+        // if (!PlayerController.instance.MovementMachine.isGrounded) return false;
 
         Vector3 inputDir = IntendedMoveDirection();
 
-        if (inputDir.magnitude < 0.5f) inputDir = _machine.ForwardDirection;
+        if (inputDir.magnitude < 0.5f) inputDir = PlayerController.instance.MovementMachine.ForwardDirection;
 
         Collider[] checkSphereColliders = Physics.OverlapSphere(transform.position + inputDir * (maxLeapDistance / 2f), maxLeapDistance / 2f, ~0, QueryTriggerInteraction.Ignore);
 
@@ -145,11 +143,16 @@ public class Player_CombatMachine : MonoBehaviour
 
             if (dist > maxLeapDistance) continue;
 
-            if (dist > checkRadius && walkInput.action.ReadValue<Vector2>().magnitude == 0) continue;
+            if (dist > checkRadius*2f && walkInput.action.ReadValue<Vector2>().magnitude == 0) continue;
+
+            if (target.transform.position.y > transform.position.y && collider.GetComponent<EnemyAI_SobbySkull>() != null && PlayerController.instance.MovementMachine.isGrounded)
+            {
+                continue;
+            }
 
             RaycastHit hit;
 
-            if (!Physics.Raycast(transform.position, target.transform.position - transform.position, out hit, dist + 2, ~0, QueryTriggerInteraction.Ignore) || hit.collider != collider) continue;
+            if (Physics.Raycast(transform.position, target.transform.position - transform.position, out hit, dist + 2, ~0, QueryTriggerInteraction.Ignore) && hit.collider != collider) continue;
 
             potentialTargets.Add(target);
         }
@@ -160,50 +163,80 @@ public class Player_CombatMachine : MonoBehaviour
 
         ITargetable selectedTarget = null;
 
-        foreach (ITargetable target in potentialTargets)
+        if (potentialTargets.Count >= 2)
         {
-            target.TargetScore = 0;
-
-            float testDot = Vector3.Dot(target.transform.position - transform.position, inputDir);
-
-            if (testDot < minDotProduct) continue;
-
-            target.TargetScore += testDot;
-            target.TargetScore += 1 - (Vector3.Distance(transform.position, target.transform.position) / maxLeapDistance);
-        }
-
-        float highScore = 0;
-        foreach (ITargetable target in potentialTargets) //don't need to iterate over the same list twice, I was tired when I wrote this....
-        {
-            if (target.TargetScore * target.TargetScoreWeight > highScore)
+            foreach (ITargetable target in potentialTargets)
             {
-                highScore = target.TargetScore * target.TargetScoreWeight;
-                selectedTarget = target;
+                target.TargetScore = 0;
+
+                Vector3 yLessTargetPosition = target.transform.position;
+                yLessTargetPosition.y = transform.position.y;
+
+                float testDot = Vector3.Dot((yLessTargetPosition - transform.position).normalized, inputDir);
+                // Debug.Log("Arkham Combat: Target Dot Product = " + testDot);
+                if (testDot < minDotProduct) continue;
+
+                target.TargetScore += testDot;
+                target.TargetScore += 1 - (Vector3.Distance(transform.position, target.transform.position) / maxLeapDistance);
+            }
+
+            float highScore = 0;
+            foreach (ITargetable target in potentialTargets) //don't need to iterate over the same list twice, I was tired when I wrote this....
+            {
+                if (target.TargetScore * target.TargetScoreWeight > highScore)
+                {
+                    highScore = target.TargetScore * target.TargetScoreWeight;
+                    selectedTarget = target;
+                }
             }
         }
+        else selectedTarget = potentialTargets[0];
 
-        if (selectedTarget == null || highScore == 0) return false;
+        if (selectedTarget == null) return false;
 
-        _rotation.enabled = false;
+        PlayerController.instance.Rotate.enabled = false;
 
-        Debug.Log("Arkham Combat: Found Most In Line Target: " + selectedTarget.transform.name);
+        // Debug.Log("Arkham Combat: Found Most In Line Target: " + selectedTarget.transform.name);
+
+        ///DEBUG LINES
+        // foreach (ITargetable target in potentialTargets)
+        // {
+        //     Color thisColor;
+        //     if (target.TargetScore == highScore) thisColor = Color.green;
+        //     else if (target.TargetScore >= highScore / 2f) thisColor = Color.blue;
+        //     else thisColor = Color.red;
+
+        //     Debug.DrawLine(transform.position, target.transform.position, thisColor, 10f);
+
+        // }
+        ///END DEBUG LINES
 
         float targetDistance = Vector3.Distance(selectedTarget.transform.position, transform.position);
 
         if (targetDistance > minDashDistance)
         {
-            _machine.DisableAllMovers(GetComponent<Player_Dash>());
-            GetComponent<Player_Dash>().ExternalDash(selectedTarget.transform.position);
+            PlayerController.instance.MovementMachine.DisableAllMovers(PlayerController.instance.Dash);
+            PlayerController.instance.Dash.ExternalDash(selectedTarget.transform.position, true);
+            if (!PlayerController.instance.MovementMachine.isGrounded) currentAerialAttack = currentComboID;
             return true;
         }
         else
         {
-            Vector3 newDir = selectedTarget.transform.position - transform.position;
-            newDir.y = 0;
+            if (!PlayerController.instance.MovementMachine.isGrounded)
+            {
+                currentAerialAttack++;
 
-            _machine.SetForwardDirection(newDir);
-            _machine.DisableAllMovers(_forceHandler);
-            _forceHandler.AddForce(_machine.ForwardDirection * Vector3.Distance(transform.position, selectedTarget.transform.position - _machine.ForwardDirection * checkRadius) * 5f, ForceMode.VelocityChange);
+                if (currentAerialAttack >= defaultAttacks.Count)
+                {
+                    return false;
+                }
+            }
+
+            Vector3 newDir = selectedTarget.transform.position - transform.position;
+            PlayerController.instance.MovementMachine.SetForwardDirection(newDir);
+            PlayerController.instance.MovementMachine.DisableAllMovers(PlayerController.instance.ForceHandler);
+            // PlayerController.instance.ForceHandler.AddForce(PlayerController.instance.MovementMachine.ForwardDirection * Vector3.Distance(transform.position, selectedTarget.transform.position - PlayerController.instance.MovementMachine.ForwardDirection * checkRadius) * 5f, ForceMode.VelocityChange, Player_ForceHandler.OverrideMode.All);
+            PlayerController.instance.ForceHandler.AddForce(newDir, ForceMode.VelocityChange, Player_ForceHandler.OverrideMode.All);
             return false;
         }
     }
@@ -214,14 +247,8 @@ public class Player_CombatMachine : MonoBehaviour
         {
             GameObject particleGOBJ = Instantiate(currentAttack.particleEffect, animator.transform);
             ParticleSystem.MainModule particle = particleGOBJ.GetComponent<ParticleSystem>().main;
-            if (_scriptSteal)
-            {
-                particle.startColor = _scriptSteal.scriptEffectColor;
-            }
-            else
-            {
-                particle.startColor = Color.white;
-            }
+
+            particle.startColor = PlayerController.instance.ScriptSteal.scriptEffectColor;
 
             Destroy(particleGOBJ, 1f);
         }
@@ -231,24 +258,24 @@ public class Player_CombatMachine : MonoBehaviour
     {
         if (currentAttack.lockRotation)
         {
-            _rotation.enabled = false;
+            PlayerController.instance.Rotate.enabled = false;
         }
     }
 
-    void HandleMovement()
+    void HandleMovement() //Old Root Motion/Manual Force Style of Movement
     {
         if (isBatman) return;
 
         if (currentAttack.overrideMotion)
         {
-            if (currentAttack.usesRootMotion) _machine.DisableAllMovers(_rootMotion);
-            else _rootMotion.enabled = false;
-            _machine.DisableAllMovers(_forceHandler);
+            if (currentAttack.usesRootMotion) PlayerController.instance.MovementMachine.DisableAllMovers(PlayerController.instance.RootMotion);
+            else PlayerController.instance.RootMotion.enabled = false;
+            PlayerController.instance.MovementMachine.DisableAllMovers(PlayerController.instance.ForceHandler);
         }
 
         if (currentAttack.vectorForce.magnitude > 0) // only apply force if necessary
         {
-            _forceHandler.AddForce(LocalizeForceVector(currentAttack.vectorForce), ForceMode.VelocityChange, Player_ForceHandler.OverrideMode.All);
+            PlayerController.instance.ForceHandler.AddForce(LocalizeForceVector(currentAttack.vectorForce), ForceMode.VelocityChange, Player_ForceHandler.OverrideMode.All);
         }
     }
 
@@ -313,9 +340,9 @@ public class Player_CombatMachine : MonoBehaviour
         isAttacking = false;
         animator.speed = 1;
 
-        _machine.EnableAllMovers();
-        _rootMotion.enabled = false;
-        _rotation.enabled = true;
+        PlayerController.instance.MovementMachine.EnableAllMovers();
+        PlayerController.instance.RootMotion.enabled = false;
+        PlayerController.instance.Rotate.enabled = true;
 
     }
 
@@ -339,7 +366,7 @@ public class Player_CombatMachine : MonoBehaviour
 
     void ColliderIterationBody(ref EnemyAI_Base selectedEnemy, ref List<IDamageable> damageableStorage, ref List<IElemental> elementalStorage, ref bool increaseCombo) //Refactoring all the repeat code in HitCheck(). All code referencing "elemental" or "elementals" was Caleb. Everything else was me (joe) :)
     {
-        Collider[] hitObjects = Physics.OverlapSphere(transform.position + _machine.ForwardDirection * distanceForwards, checkRadius, ~0, QueryTriggerInteraction.Collide);
+        Collider[] hitObjects = Physics.OverlapSphere(transform.position + PlayerController.instance.MovementMachine.ForwardDirection * distanceForwards, checkRadius, ~0, QueryTriggerInteraction.Collide);
 
         bool playImpactSound = false;
         foreach (Collider collider in hitObjects)
@@ -366,7 +393,7 @@ public class Player_CombatMachine : MonoBehaviour
         if (damageable == null || damageable.GetType() == typeof(Player_HealthComponent) || damageableStorage.Contains(damageable)) return;
 
         damageableStorage.Add(damageable);
-        damageable.TakeDamage(currentAttack.damage, _scriptSteal);
+        damageable.TakeDamage(currentAttack.damage, PlayerController.instance.ScriptSteal);
         playImpactSound = true;
 
         if (collider.gameObject.GetComponent<EnemyAI_Base>() != null)
@@ -382,7 +409,7 @@ public class Player_CombatMachine : MonoBehaviour
         if (elemental == null || elemental.GetType() == typeof(Player_HealthComponent) || elementalStorage.Contains(elemental)) return;
 
         elementalStorage.Add(elemental);
-        elemental.InteractElement(scriptStealMenu.GetHeldHebavior());
+        elemental.InteractElement(PlayerController.instance.ScriptSteal.GetHeldHebavior());
         playImpactSound = true;
     }
 
@@ -419,7 +446,7 @@ public class Player_CombatMachine : MonoBehaviour
                 currentTime += Time.deltaTime;
             }
         }
-        if (selectedEnemy) _scriptSteal.ChangeSelectedEnemy(selectedEnemy);
+        if (selectedEnemy) PlayerController.instance.ScriptSteal.ChangeSelectedEnemy(selectedEnemy);
 
         hitBoxActive = false;
 
@@ -431,11 +458,19 @@ public class Player_CombatMachine : MonoBehaviour
     }
     void OnDrawGizmos()
     {
+        Gizmos.color = Color.red;
+
+        Vector3 inputDir = IntendedMoveDirection();
+
+        if (inputDir.magnitude < 0.5f) inputDir = PlayerController.instance.MovementMachine.ForwardDirection;
+
+        Gizmos.DrawWireSphere(transform.position + inputDir * (maxLeapDistance / 2f), maxLeapDistance / 2f);
+
         if (!showHitboxCollider) return;
 
         if ((hitBoxActive && onlyShowHitboxWhenEnabled) || !onlyShowHitboxWhenEnabled)
         {
-            Vector3 dir = _machine.ForwardDirection == Vector3.zero ? transform.forward : _machine.ForwardDirection;
+            Vector3 dir = PlayerController.instance.MovementMachine.ForwardDirection == Vector3.zero ? transform.forward : PlayerController.instance.MovementMachine.ForwardDirection;
 
             Gizmos.color = Color.yellow;
             Gizmos.DrawWireSphere(transform.position + dir * distanceForwards, checkRadius);
@@ -452,7 +487,7 @@ public class Player_CombatMachine : MonoBehaviour
 
     Vector3 LocalizeForceVector(Vector3 vector)
     {
-        return _machine.ForwardDirection * vector.z + _machine.RightDirection * vector.x + Vector3.up * vector.y;
+        return PlayerController.instance.MovementMachine.ForwardDirection * vector.z + PlayerController.instance.MovementMachine.RightDirection * vector.x + Vector3.up * vector.y;
     }
 
     Vector3 IntendedMoveDirection()

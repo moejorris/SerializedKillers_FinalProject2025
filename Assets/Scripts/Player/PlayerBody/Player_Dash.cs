@@ -4,12 +4,6 @@ using UnityEngine.InputSystem;
 
 public class Player_Dash : MonoBehaviour, IPlayerMover
 {
-    CharacterController _controller;
-    Player_MovementMachine _machine;
-    Player_Rotate rotate;
-    Player_Gravity gravity;
-    Player_Animation animate;
-    Player_ScriptSteal _scriptSteal => GetComponent<Player_ScriptSteal>();
     [SerializeField] InputActionReference dashInput;
     [SerializeField] InputActionReference walkInput;
     [Header("How far the dash should move the player (in Meters/Unity Units)")]
@@ -23,14 +17,10 @@ public class Player_Dash : MonoBehaviour, IPlayerMover
 
     void Awake()
     {
-        _machine = GetComponent<Player_MovementMachine>();
-        rotate = GetComponent<Player_Rotate>();
-        animate = GetComponent<Player_Animation>();
-        gravity = GetComponent<Player_Gravity>();
-        _controller = GetComponent<CharacterController>();
+
     }
-    void OnEnable() => _machine.AddMover(this); //Add itself to the movement machine!
-    void OnDisable() => _machine.RemoveMover(this); //remove itself from the movement machine when no longer active!
+    void OnEnable() => PlayerController.instance.MovementMachine.AddMover(this); //Add itself to the movement machine!
+    void OnDisable() => PlayerController.instance.MovementMachine.RemoveMover(this); //remove itself from the movement machine when no longer active!
 
     void Update()
     {
@@ -42,16 +32,16 @@ public class Player_Dash : MonoBehaviour, IPlayerMover
 
     public Vector3 UpdateForce()
     {
-        return _force / _machine.DeltaTime;
+        return _force / PlayerController.instance.MovementMachine.DeltaTime;
         // return Vector3.zero;
     }
 
-    public void ExternalDash(Vector3 destination)
+    public void ExternalDash(Vector3 destination, bool changeY = false)
     {
-        StartCoroutine(Dash(destination, false));
+        StartCoroutine(Dash(destination, false, 0, changeY));
     }
 
-    IEnumerator Dash(Vector3 destination, bool updateOtherMovers = true, float tTime = 0)
+    IEnumerator Dash(Vector3 destination, bool updateOtherMovers = true, float tTime = 0, bool changeY = false)
     {
         if (tTime == 0) tTime = _travelTime;
 
@@ -60,42 +50,47 @@ public class Player_Dash : MonoBehaviour, IPlayerMover
         EnableTrail();
 
         Vector3 forwardDir = destination - transform.position;
+
         forwardDir.y = 0;
 
-        _machine.SetForwardDirection(forwardDir); //Snaps player to the direction they are trying to dash in so they dash in the correct direction
+        PlayerController.instance.MovementMachine.SetForwardDirection(forwardDir); //Snaps player to the direction they are trying to dash in so they dash in the correct direction
 
         Vector3 startPosition = transform.position;
 
-        Debug.DrawLine(startPosition, destination + startPosition, Color.blue, tTime);
+        // Debug.DrawLine(startPosition, destination, Color.blue, tTime);
 
         // destination.y = 0;
         // startPosition.y = 0;
 
-        animate?.PlayDashAnimation();
+        PlayerController.instance.Animation.PlayDashAnimation();
 
         if (updateOtherMovers) UpdateOtherMoveComponents();
 
         float t = 0;
 
-        if (tTime < _machine.DeltaTime)
+        if (tTime < PlayerController.instance.MovementMachine.DeltaTime)
         {
-            _controller.Move(destination - startPosition);
+            PlayerController.instance.CharacterController.Move(destination - startPosition);
 
-            yield return new WaitForSeconds(_machine.DeltaTime);
+            yield return new WaitForSeconds(PlayerController.instance.MovementMachine.DeltaTime);
 
         }
         else while (t < tTime)
         {
-            destination.y = transform.position.y;
+
+            if (!changeY) destination.y = transform.position.y;
             startPosition.y = transform.position.y;
 
-            _force = Vector3.Lerp(startPosition, destination, t / tTime) - transform.position;
+            _force = Vector3.Slerp(startPosition, destination, t / tTime) - transform.position;
 
-            _force = Vector3.ProjectOnPlane(_force, _machine.GroundInformation.normal);
+            _force = Vector3.ProjectOnPlane(_force, PlayerController.instance.MovementMachine.GroundInformation.normal);
+            // Debug.Log(_force.y);
 
-            yield return new WaitForSeconds(_machine.DeltaTime);
 
-            t = Mathf.Clamp(t + _machine.DeltaTime, 0, tTime);
+            yield return new WaitForSeconds(PlayerController.instance.MovementMachine.DeltaTime);
+
+            t = Mathf.Clamp(t + PlayerController.instance.MovementMachine.DeltaTime, 0, tTime);
+
         }
 
         _force = Vector3.zero;
@@ -109,16 +104,16 @@ public class Player_Dash : MonoBehaviour, IPlayerMover
 
     void UpdateOtherMoveComponents()
     {
-        rotate.enabled = !_isDashing;
-        gravity.enabled = _ignoresGravity ? !_isDashing : true;
+        PlayerController.instance.Rotate.enabled = !_isDashing;
+        PlayerController.instance.Gravity.enabled = _ignoresGravity ? !_isDashing : true;
 
         if (_isDashing)
         {
-            _machine.DisableAllMovers(this, gravity);
+            PlayerController.instance.MovementMachine.DisableAllMovers(this, PlayerController.instance.Gravity);
         }
         else
         {
-            _machine.EnableAllMovers();
+            PlayerController.instance.MovementMachine.EnableAllMovers();
         }
     }
 
@@ -126,7 +121,7 @@ public class Player_Dash : MonoBehaviour, IPlayerMover
     {
         Vector2 moveInput = walkInput.action.ReadValue<Vector2>();
 
-        if (moveInput.magnitude < 0.1f) return _machine.ForwardDirection; //if player is not inputting a direction, then the current forward direction will be used.
+        if (moveInput.magnitude < 0.1f) return PlayerController.instance.MovementMachine.ForwardDirection; //if player is not inputting a direction, then the current forward direction will be used.
 
         Vector3 camForward = Vector3.ProjectOnPlane(Camera.main.transform.forward, Vector3.up);
         Vector3 camRight = Vector3.ProjectOnPlane(Camera.main.transform.right, Vector3.up);
@@ -142,14 +137,7 @@ public class Player_Dash : MonoBehaviour, IPlayerMover
         // tr.time = _travelTime;
         tr.emitting = true;
 
-        if (_scriptSteal)
-        {
-            tr.colorGradient = ColorGradient(_scriptSteal.scriptEffectColor, Color.white);
-        }
-        else
-        {
-            tr.colorGradient = ColorGradient(Color.white, Color.white);
-        }
+        tr.colorGradient = ColorGradient(PlayerController.instance.ScriptSteal.scriptEffectColor, Color.white);
     }
 
     Gradient ColorGradient(Color color1, Color color2)

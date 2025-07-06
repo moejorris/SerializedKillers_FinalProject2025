@@ -3,7 +3,6 @@ using UnityEngine;
 public class Player_Respawn : MonoBehaviour
 {
     public Vector3 respawnPoint;
-    public Player_HealthComponent health => GetComponent<Player_HealthComponent>();
 
     void Start()
     {
@@ -16,8 +15,8 @@ public class Player_Respawn : MonoBehaviour
         if (respawnPoint == null) return;
 
         //Reset Health
-        health.ResetHealth();
-        health.UpdatePlayerHealth();
+        PlayerController.instance.Health.ResetHealth();
+        PlayerController.instance.Health.UpdatePlayerHealth();
 
         //Change Position
         GetComponent<CharacterController>().enabled = false;
@@ -25,6 +24,6 @@ public class Player_Respawn : MonoBehaviour
         GetComponent<CharacterController>().enabled = true;
 
         //Remove Script / Status Effects
-        GetComponent<Player_ScriptSteal>().ReturnScript();
+        PlayerController.instance.ScriptSteal.ReturnScript();
     }
 }

@@ -16,7 +16,6 @@ public class EnemyAI_Base : MonoBehaviour, ITargetable, IDamageable, IComboTarge
     public Behavior heldBehavior;
     public bool behaviorActive = true;
     private bool delayedExit = false;
-    [HideInInspector] public Player_ScriptSteal scriptSteal => GameObject.FindGameObjectWithTag("Player").transform.Find("PlayerController").GetComponent<Player_ScriptSteal>();
     [HideInInspector] public Image selectedIcon;
 
     [Header("Health")]
@@ -114,7 +113,7 @@ public class EnemyAI_Base : MonoBehaviour, ITargetable, IDamageable, IComboTarge
     }
     public virtual void Die()
     {
-        GameObject.FindGameObjectWithTag("Player").transform.Find("PlayerController").GetComponent<Player_Mana>().GainMana(manaDropAmount);
+        PlayerController.instance.Mana.GainMana(manaDropAmount);
         Destroy(gameObject);
     }
 

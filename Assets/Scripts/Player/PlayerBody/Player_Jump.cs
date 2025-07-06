@@ -6,10 +6,6 @@ using UnityEngine.InputSystem;
 public class Player_Jump : MonoBehaviour
 {
     [SerializeField] InputActionReference jumpInput;
-    Player_MovementMachine _machine => GetComponent<Player_MovementMachine>();
-    Player_Animation _animations => GetComponent<Player_Animation>();
-    Player_ForceHandler _forceHandler => GetComponent<Player_ForceHandler>();
-    Player_Gravity _gravity => GetComponent<Player_Gravity>();
 
     enum JumpMode { Force, Height };
     bool useFloorNormal = false;
@@ -40,31 +36,31 @@ public class Player_Jump : MonoBehaviour
 
     void OnEnable()
     {
-        _gravity.PlayerJustLanded += ResetAirJumps;
+        PlayerController.instance.Gravity.PlayerJustLanded += ResetAirJumps;
     }
 
     void OnDisable()
     {
-        _gravity.PlayerJustLanded -= ResetAirJumps;
+        PlayerController.instance.Gravity.PlayerJustLanded -= ResetAirJumps;
     }
 
     void Update()
     {
         if (jumpInput.action.WasPressedThisFrame())
         {
-            if (_machine.isGrounded)
+            if (PlayerController.instance.MovementMachine.isGrounded)
             {
-                Vector3 direction = useFloorNormal ? _machine.GroundInformation.normal : Vector3.up;
+                Vector3 direction = useFloorNormal ? PlayerController.instance.MovementMachine.GroundInformation.normal : Vector3.up;
                 ApplyJump(_value, _jumpMode, overrideCurrentVelocity, direction);
 
-                _animations?.PlayJumpAnimation();
+                PlayerController.instance.Animation.PlayJumpAnimation();
             }
-            else if (_curAirJumps > 0 && !_machine.isGrounded)
+            else if (_curAirJumps > 0 && !PlayerController.instance.MovementMachine.isGrounded)
             {
                 _curAirJumps -= 1;
                 ApplyJump(_airJumpValue, _airJumpMode, overrideCurrentAirVelocity);
 
-                _animations?.PlayAirJumpAnimation();
+                PlayerController.instance.Animation?.PlayAirJumpAnimation();
             }
 
         }
@@ -78,12 +74,12 @@ public class Player_Jump : MonoBehaviour
 
         if (jumpMode == JumpMode.Height) //if the jump mode is set to height, perform calculation to obtain the force needed to reach Height.
         {
-            value = Mathf.Sqrt(-2f * _gravity.GravityAcceleration * value);
+            value = Mathf.Sqrt(-2f * PlayerController.instance.Gravity.GravityAcceleration * value);
         }
 
         Player_ForceHandler.OverrideMode overrideMode = overrideVelocity ? Player_ForceHandler.OverrideMode.OnlyChanged : Player_ForceHandler.OverrideMode.None;
 
-        _forceHandler.AddForce(direction.Value * value, ForceMode.VelocityChange, overrideMode);
+        PlayerController.instance.ForceHandler.AddForce(direction.Value * value, ForceMode.VelocityChange, overrideMode);
 
         if (jumpSmokeParticle)
         {

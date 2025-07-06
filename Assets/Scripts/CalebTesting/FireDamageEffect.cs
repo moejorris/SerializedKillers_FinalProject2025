@@ -3,8 +3,6 @@ using System.Collections;
 
 public class FireDamageEffect : MonoBehaviour, IElemental
 {
-    private Player_HealthComponent playerHealth => GameObject.FindGameObjectWithTag("Player").transform.Find("PlayerController").GetComponent<Player_HealthComponent>();
-    private Player_ScriptSteal scriptSteal => GameObject.FindGameObjectWithTag("Player").transform.Find("PlayerController").GetComponent<Player_ScriptSteal>();
 
     public bool fireActive = false;
 
@@ -41,8 +39,8 @@ public class FireDamageEffect : MonoBehaviour, IElemental
             if (rekindleTimer > 0) yield return new WaitForSeconds(0.5f);
             else yield return new WaitForSeconds(timeBetweenDamage);
 
-            if (scriptSteal.GetHeldHebavior() != null && scriptSteal.GetHeldHebavior() == heldBehavior) Debug.Log("Something!");
-            else playerHealth.TakeDamage(fireDamage, scriptSteal); 
+            if (PlayerController.instance.ScriptSteal.GetHeldHebavior() != null && PlayerController.instance.ScriptSteal.GetHeldHebavior() == heldBehavior) Debug.Log("Something!");
+            else PlayerController.instance.Health.TakeDamage(fireDamage, PlayerController.instance.ScriptSteal); 
         }
     }
 

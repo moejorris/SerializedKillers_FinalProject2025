@@ -2,17 +2,14 @@ using UnityEngine;
 
 public class Player_RootMotion : MonoBehaviour, IPlayerMover
 {
-    Player_MovementMachine machine;
     [SerializeField] RootMotion_Translator rootMotion;
 
-    void Awake() => machine = GetComponent<Player_MovementMachine>();
-
-    void OnEnable() => machine.AddMover(this);
-    void OnDisable() => machine.RemoveMover(this);
+    void OnEnable() => PlayerController.instance.MovementMachine.AddMover(this);
+    void OnDisable() => PlayerController.instance.MovementMachine.RemoveMover(this);
 
     public Vector3 UpdateForce()
     {
-        return rootMotion.RootMovement / machine.DeltaTime;
+        return rootMotion.RootMovement / PlayerController.instance.MovementMachine.DeltaTime;
     }
 
 

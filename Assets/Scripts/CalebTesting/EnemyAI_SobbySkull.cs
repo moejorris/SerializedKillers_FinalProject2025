@@ -43,7 +43,6 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
     private bool preparingAttack = false;
     private Vector3 attackDir = Vector3.zero;
     [SerializeField] private GameObject explosionParticle;
-    private Player_HealthComponent playerHealth => GameObject.FindGameObjectWithTag("Player").transform.Find("PlayerController").GetComponent<Player_HealthComponent>();
 
     [SerializeField] private GameObject resistantPrefab;
 
@@ -79,7 +78,7 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
         StartRolling();
         StartCoroutine("DoorCheckTimer");
 
-        if (scriptSteal.heldBehavior != null && scriptSteal.heldBehavior == heldBehavior) DeactivateBehavior();
+        if (PlayerController.instance.ScriptSteal.heldBehavior != null && PlayerController.instance.ScriptSteal.heldBehavior == heldBehavior) DeactivateBehavior();
     }
 
     private void OnDrawGizmos()
@@ -244,11 +243,11 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
 
         foreach (RaycastHit hit in hits)
         {
-            if (hit.transform.parent != null && hit.transform.parent.CompareTag("Player") && !hitPlayer)
+            if (hit.collider == PlayerController.instance.Collider && !hitPlayer)
             {
-                Debug.Log("Player Hit!");
+                //Debug.Log("Player Hit!");
                 hitPlayer = true;
-                playerHealth.TakeDamage(5);
+                PlayerController.instance.Health.TakeDamage(5);
                 break;
             }
         }
@@ -265,11 +264,11 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
 
     IEnumerator SelfDestructTimer()
     {
-        Debug.Log("SELF DESTRUCT MODE ACTIVATED!");
+        //Debug.Log("SELF DESTRUCT MODE ACTIVATED!");
 
         for (int i = 0; i < 3; i++)
         {
-            Debug.Log("Self Destructing in: " + (3-i));
+            // Debug.Log("Self Destructing in: " + (3-i));
             yield return new WaitForSeconds(1);
         }
 
@@ -288,7 +287,7 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
             if (hit.transform.parent != null && hit.transform.parent.CompareTag("Player") && !hitPlayer)
             {
                 hitPlayer = true;
-                playerHealth.TakeDamage(8);
+                PlayerController.instance.Health.TakeDamage(8);
                 break;
             }
         }
@@ -335,7 +334,7 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
 
     IEnumerator DiveAttack()
     {
-        Debug.Log("Performing attack!");
+        // Debug.Log("Performing attack!");
         yield return new WaitForSeconds(1);
         preparingAttack = false;
         newMaxVelocity = 15;
@@ -381,14 +380,14 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
                 if (duckPositions.Count <= 0)
                 {
                     duckPositions.Add(playerTarget.transform.position);
-                    if (showDuckObjects) Debug.Log(hit.transform.gameObject.name);
+                    // if (showDuckObjects) Debug.Log(hit.transform.gameObject.name);
                 }
                 else
                 {
                     if (Vector3.Distance(duckPositions[duckPositions.Count - 1], playerTarget.transform.position) > 0.5f)
                     {
                         duckPositions.Add(playerTarget.transform.position);
-                        if (showDuckObjects) Debug.Log(hit.transform.gameObject.name);
+                        // if (showDuckObjects) Debug.Log(hit.transform.gameObject.name);
                     }
                 }
             }
@@ -397,14 +396,14 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
                 if (duckPositions.Count <= 0)
                 {
                     duckPositions.Add(playerTarget.transform.position);
-                    if (showDuckObjects) Debug.Log(hit.transform.gameObject.name);
+                    // if (showDuckObjects) Debug.Log(hit.transform.gameObject.name);
                 }
                 else
                 {
                     if (Vector3.Distance(duckPositions[duckPositions.Count - 1], playerTarget.transform.position) > 3)
                     {
                         duckPositions.Add(playerTarget.transform.position);
-                        if (showDuckObjects) Debug.Log(hit.transform.gameObject.name);
+                        // if (showDuckObjects) Debug.Log(hit.transform.gameObject.name);
                     }
                 }
             }
@@ -441,14 +440,18 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
         if (behaviorActive)
         {
             damage /= 3;
-            Player_ForceHandler forceHandler = scriptSteal.gameObject.GetComponent<Player_ForceHandler>();
+            Player_ForceHandler forceHandler = PlayerController.instance.ForceHandler;
 
             if (forceHandler != null)
             {
                 Vector3 dir = (playerTarget.transform.position - transform.position).normalized + Vector3.up * 0.25f;
                 forceHandler.AddForce(dir * 20f, ForceMode.VelocityChange);
-                Instantiate(resistantPrefab, new Vector3(skull.position.x + Random.Range(-1,1), skull.position.y + 1, skull.position.z + Random.Range(-1, 1)), Quaternion.identity);
+                Instantiate(resistantPrefab, new Vector3(skull.position.x + Random.Range(-1, 1), skull.position.y + 1, skull.position.z + Random.Range(-1, 1)), Quaternion.identity);
             }
+        }
+        else if(!PlayerController.instance.MovementMachine.isGrounded)
+        {
+            //Stunned()
         }
 
         if (scriptSteal.GetHeldHebavior() != null && scriptSteal.GetHeldHebavior() == heldBehavior.weakness) damage *= 1.5f;
@@ -469,9 +472,14 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
         }
     }
 
+    void Stunned()
+    {
+        //stun enemy for x seconds while the player attacks it mid-air
+    }
+
     public override void Die()
     {
-        GameObject.FindGameObjectWithTag("Player").transform.Find("PlayerController").GetComponent<Player_Mana>().GainMana(manaDropAmount);
+        PlayerController.instance.Mana.GainMana(manaDropAmount);
         Destroy(skull.parent.gameObject);
     }
 
@@ -501,10 +509,10 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
     {
         if (Vector3.Distance(playerTarget.position, skull.position) <= visionConeLength) // at least within sight range
         {
-            Debug.Log("Player is within cone length.");
+            // Debug.Log("Player is within cone length.");
             if (Physics.Raycast(skull.position, playerTarget.position - skull.position, out RaycastHit rayHit, (Vector3.Distance(playerTarget.position, skull.position) - 3), obstacleLayer)) // checks if player behind things?
             {
-                Debug.Log("Something is in the way.");
+                // Debug.Log("Something is in the way.");
                 return false;
             }
             else
@@ -512,12 +520,12 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
                 Vector3 directionToTarget = (playerTarget.position - skull.position).normalized;
                 if (Vector3.Angle(skull.forward, directionToTarget) < visionConeWidth / 2)
                 {
-                    Debug.Log("IN CONE!");
+                    // Debug.Log("IN CONE!");
                     return true;
                 }
                 else
                 {
-                    Debug.Log("NOT IN CONE!");
+                    // Debug.Log("NOT IN CONE!");
                     return false;
                 }
             }

@@ -15,7 +15,6 @@ public class FireSpewer : MonoBehaviour, IElemental
     private float enemyExtinguishTimer = 1;
 
     private float health = 3;
-    private Player_ScriptSteal playerScriptSteal => GameObject.FindGameObjectWithTag("Player").transform.Find("PlayerController").GetComponent<Player_ScriptSteal>();
 
     private void Start()
     {
@@ -39,7 +38,7 @@ public class FireSpewer : MonoBehaviour, IElemental
             //fire.Stop();
             ParticleSystem.MainModule main = fire.main;
             main.startLifetime = 0f;
-            fire.loop = false;
+            // fire.loop = false;
 
             newPos.y = 0.4f;
         }
@@ -68,7 +67,7 @@ public class FireSpewer : MonoBehaviour, IElemental
         {
             if (fireActive) return;
 
-            fire.loop = true;
+            // fire.loop = true;
             health = 3;
             ParticleSystem.MainModule main = fire.main;
             main.startLifetime = 2f;
@@ -120,9 +119,9 @@ public class FireSpewer : MonoBehaviour, IElemental
             }
             else if (other.transform.parent != null && other.transform.parent.gameObject.CompareTag("Player"))
             {
-                playerScriptSteal.ApplyStatusEffect(heldBehavior);
+                PlayerController.instance.ScriptSteal.ApplyStatusEffect(heldBehavior);
                 //Vector3 dir = (other.transform.position - transform.position).normalized + Vector3.up * 0.25f;
-                //GameObject.Find("Player").transform.Find("PlayerController").GetComponent<Player_ForceHandler>().AddForce(dir * 20f, ForceMode.VelocityChange);
+                //GameObject.Find("Player").transform.Find("PlayerController").PlayerController.instance.ForceHandler>().AddForce(dir * 20f, ForceMode.VelocityChange);
 
                 //if (other.transform.parent.Find("Meshes").childCount < 3)
                 //{

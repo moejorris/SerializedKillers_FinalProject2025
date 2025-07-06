@@ -8,19 +8,17 @@ public class Player_Walk : MonoBehaviour, IPlayerMover
     [SerializeField] float acceleration = 10f;
     [SerializeField] float deccerlation = 30f;
     [SerializeField] AnimationCurve speedUpCurve;
-    Player_MovementMachine _machine;
     [SerializeField] Vector3 _walkVelocity;
 
-    void Awake() => _machine = GetComponent<Player_MovementMachine>(); //Get reference to the player movement machine!
     void OnEnable()
     {
-        _machine.AddMover(this); //Add itself to the movement machine!
+        PlayerController.instance.MovementMachine.AddMover(this); //Add itself to the movement machine!
         _walkVelocity = Vector3.zero;
     }
 
     void OnDisable() 
     {
-        _machine.RemoveMover(this); //remove itself from the movement machine when no longer active!
+        PlayerController.instance.MovementMachine.RemoveMover(this); //remove itself from the movement machine when no longer active!
         _walkVelocity = Vector3.zero;
     }
 
@@ -40,7 +38,7 @@ public class Player_Walk : MonoBehaviour, IPlayerMover
         //Speed Change
         float walkCurveValue = Mathf.Clamp(speedUpCurve.Evaluate(GetNormalizedSpeed()), 0.1f, 1f);
 
-        float tLerp = walkCurveValue * _machine.DeltaTime * lerpSpeed;
+        float tLerp = walkCurveValue * PlayerController.instance.MovementMachine.DeltaTime * lerpSpeed;
         tLerp = Mathf.Clamp(tLerp, 0.1f, 1f);
 
         float newWalkSpeed = Vector3.Slerp(currentWalkVector, moveDir * speed, tLerp).magnitude;
@@ -48,7 +46,7 @@ public class Player_Walk : MonoBehaviour, IPlayerMover
         if (newWalkSpeed < 0.1f) return Vector3.zero;
 
         //Velocity Vector Change
-        return _walkVelocity = Vector3.ProjectOnPlane(_machine.ForwardDirection, _machine.GroundInformation.normal).normalized * newWalkSpeed;
+        return _walkVelocity = Vector3.ProjectOnPlane(PlayerController.instance.MovementMachine.ForwardDirection, PlayerController.instance.MovementMachine.GroundInformation.normal).normalized * newWalkSpeed;
     }
 
     Vector3 IntendedMoveDirection()

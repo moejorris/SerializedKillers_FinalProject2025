@@ -4,9 +4,6 @@ using UnityEngine;
 
 public class Player_ForceHandler : MonoBehaviour, IPlayerMover
 {
-    //if the below methods for get component works, update other scripts to use this!
-    Player_Gravity _gravity => GetComponent<Player_Gravity>();
-    Player_MovementMachine _machine => GetComponent<Player_MovementMachine>();
 
     [SerializeField] float mass = 2;
     [SerializeField] float groundedDrag = 5f;
@@ -16,8 +13,8 @@ public class Player_ForceHandler : MonoBehaviour, IPlayerMover
 
     public enum OverrideMode {None, OnlyChanged, All}
 
-    void OnEnable() => _machine.AddMover(this); //Add itself to the movement machine!
-    void OnDisable() => _machine.RemoveMover(this); //remove itself from the movement machine when no longer active!
+    void OnEnable() => PlayerController.instance.MovementMachine.AddMover(this); //Add itself to the movement machine!
+    void OnDisable() => PlayerController.instance.MovementMachine.RemoveMover(this); //remove itself from the movement machine when no longer active!
 
     public void AddForce(Vector3 forceToAdd, ForceMode forceMode = ForceMode.VelocityChange, OverrideMode overrideMode = OverrideMode.None)
     {
@@ -33,11 +30,11 @@ public class Player_ForceHandler : MonoBehaviour, IPlayerMover
 
             case ForceMode.Force: //Applies over time, using mass
                 forceToAdd /= mass;
-                forceToAdd *= _machine.DeltaTime;
+                forceToAdd *= PlayerController.instance.MovementMachine.DeltaTime;
                 break;
 
             case ForceMode.Acceleration: //Applies over time, ignoring mass.
-                forceToAdd *= _machine.DeltaTime;
+                forceToAdd *= PlayerController.instance.MovementMachine.DeltaTime;
                 break;
         }
 
@@ -50,9 +47,9 @@ public class Player_ForceHandler : MonoBehaviour, IPlayerMover
             case OverrideMode.OnlyChanged: //only changes the axes that force is being applied. Ex: Vector3 (0, 10, 0) the Y axis will be set to 10, but x and z will be left alone.
                 if (forceToAdd.y != 0)
                 {
-                    if (_gravity)
+                    if (PlayerController.instance.Gravity)
                     {
-                        _gravity.OverrideVerticalForce(forceToAdd.y);
+                        PlayerController.instance.Gravity.OverrideVerticalForce(forceToAdd.y);
                     }
                     else
                     {
@@ -64,9 +61,9 @@ public class Player_ForceHandler : MonoBehaviour, IPlayerMover
             break;
 
             case OverrideMode.None: //adds force normally.
-                if (_gravity)
+                if (PlayerController.instance.Gravity)
                 {
-                    _gravity.AddVerticalForce(forceToAdd.y);
+                    PlayerController.instance.Gravity.AddVerticalForce(forceToAdd.y);
                 }
                 else
                 {
@@ -81,8 +78,8 @@ public class Player_ForceHandler : MonoBehaviour, IPlayerMover
 
     public Vector3 UpdateForce()
     {
-        float useDrag = _machine.isGrounded ? groundedDrag : airDrag;
-        if (forceCurrent.magnitude > 0.05f) forceCurrent = Vector3.Lerp(forceCurrent, Vector3.zero, useDrag * _machine.DeltaTime);
+        float useDrag = PlayerController.instance.MovementMachine.isGrounded ? groundedDrag : airDrag;
+        if (forceCurrent.magnitude > 0.05f) forceCurrent = Vector3.Lerp(forceCurrent, Vector3.zero, useDrag * PlayerController.instance.MovementMachine.DeltaTime);
         else forceCurrent = Vector3.zero;
 
         return forceCurrent;

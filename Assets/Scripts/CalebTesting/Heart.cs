@@ -12,9 +12,9 @@ public class Heart : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.transform.parent != null && other.transform.parent.CompareTag("Player"))
+        if (other == PlayerController.instance.Collider)
         {
-            GameObject.FindGameObjectWithTag("Player").transform.Find("PlayerController").GetComponent<Player_HealthComponent>().Heal(healAmount);
+            PlayerController.instance.Health.Heal(healAmount);
             Destroy(gameObject);
         }
     }

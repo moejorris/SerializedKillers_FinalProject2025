@@ -5,11 +5,6 @@ using UnityEngine;
 public class Player_MovementMachine : MonoBehaviour
 {
 
-    //References/Dependencies
-    CharacterController controller => GetComponent<CharacterController>();
-    Player_Animation _animation => GetComponent<Player_Animation>();
-    Player_ChildMover _childMover => GetComponent<Player_ChildMover>();
-
     [Header("Parameters")]
     [SerializeField] TimeStep timeStep = TimeStep.Update;
 
@@ -64,7 +59,7 @@ public class Player_MovementMachine : MonoBehaviour
         }
         else return;
 
-        controller.Move(movementToMake * currentDeltaTime());
+        PlayerController.instance.CharacterController.Move(movementToMake * currentDeltaTime());
         CurrentMotion = movementToMake;
 
     }
@@ -89,6 +84,7 @@ public class Player_MovementMachine : MonoBehaviour
 
     public void SetForwardDirection(Vector3 dir)
     {
+        dir.y = 0;
         _forwardDirection = dir;
     }
 
@@ -127,22 +123,22 @@ public class Player_MovementMachine : MonoBehaviour
         {
 
             case GroundCheckMethod.Raycast:
-                _grounded = Physics.Raycast(transform.position, Vector3.down, out _groundInfo, 0.15f + controller.height / 2f, ~0, QueryTriggerInteraction.Ignore);
+                _grounded = Physics.Raycast(transform.position, Vector3.down, out _groundInfo, 0.15f + PlayerController.instance.CharacterController.height / 2f, ~0, QueryTriggerInteraction.Ignore);
                 break;
 
             case GroundCheckMethod.CapsuleCast:
 
-                Vector3 heightDiff = Vector3.up * controller.height / 2f;
-                Vector3 mod = controller.height * 0.95f * Vector3.up;
+                Vector3 heightDiff = Vector3.up * PlayerController.instance.CharacterController.height / 2f;
+                Vector3 mod = PlayerController.instance.CharacterController.height * 0.95f * Vector3.up;
 
                 _grounded = Physics.CapsuleCast
                 (
                     transform.position - heightDiff + mod,
                     transform.position + heightDiff + mod,
-                    controller.radius,
+                    PlayerController.instance.CharacterController.radius,
                     -Vector3.up,
                     out _groundInfo,
-                    controller.height,
+                    PlayerController.instance.CharacterController.height,
                     ~0,
                     QueryTriggerInteraction.Ignore
                 );
@@ -151,24 +147,24 @@ public class Player_MovementMachine : MonoBehaviour
 
             case GroundCheckMethod.SphereCast:
 
-                _grounded = Physics.SphereCast(transform.position, controller.radius, Vector3.down, out _groundInfo, controller.height / 2f, ~0, QueryTriggerInteraction.Ignore);
+                _grounded = Physics.SphereCast(transform.position, PlayerController.instance.CharacterController.radius, Vector3.down, out _groundInfo, PlayerController.instance.CharacterController.height / 2f, ~0, QueryTriggerInteraction.Ignore);
 
                 break;
         }
 
         if (prevGrounded != _grounded)
         {
-            _animation.UpdateGroundedStatus(_grounded);
+            PlayerController.instance.Animation.UpdateGroundedStatus(_grounded);
 
             if (!_grounded)
             {
-                _childMover.RemoveParent();
+                PlayerController.instance.ChildMover.RemoveParent();
             }
         }
         
-        if (_grounded && _groundInfo.collider.transform != _childMover.Parent)
+        if (_grounded && _groundInfo.collider.transform != PlayerController.instance.ChildMover.Parent)
         {
-            _childMover.UpdateParent(_groundInfo.collider.transform);
+            PlayerController.instance.ChildMover.UpdateParent(_groundInfo.collider.transform);
         }
     }
 
@@ -179,12 +175,12 @@ public class Player_MovementMachine : MonoBehaviour
             if (_groundInfo.point != Vector3.zero)
             {
                 Gizmos.color = Color.red;
-                Gizmos.DrawWireSphere(_groundInfo.point, controller.radius);
+                Gizmos.DrawWireSphere(_groundInfo.point, PlayerController.instance.CharacterController.radius);
             }
             else
             {
                 Gizmos.color = (Color.red + Color.white) / 2f;
-                Gizmos.DrawWireSphere(transform.position - Vector3.up * controller.height / 2f, controller.radius);
+                Gizmos.DrawWireSphere(transform.position - Vector3.up * PlayerController.instance.CharacterController.height / 2f, PlayerController.instance.CharacterController.radius);
             }
         }
     }

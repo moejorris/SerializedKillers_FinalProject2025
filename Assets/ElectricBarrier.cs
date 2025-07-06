@@ -8,7 +8,6 @@ public class ElectricBarrier : MonoBehaviour
     private float timeElapsed = 0;
     private float displayTime = 0;
     public float fireDuration = 5;
-    private Player_ScriptSteal playerScriptSteal => GameObject.FindGameObjectWithTag("Player").transform.Find("PlayerController").GetComponent<Player_ScriptSteal>();
 
     private void Start()
     {
@@ -41,7 +40,7 @@ public class ElectricBarrier : MonoBehaviour
             else if (other.transform.parent != null && other.transform.parent.gameObject.CompareTag("Player"))
             {
                 //Vector3 dir = (other.transform.position - transform.position).normalized + Vector3.up * 0.25f;
-                //GameObject.Find("Player").transform.Find("PlayerController").GetComponent<Player_ForceHandler>().AddForce(dir * 20f, ForceMode.VelocityChange);
+                //PlayerController.instance.ForceHandler.AddForce(dir * 20f, ForceMode.VelocityChange);
 
                 
             }

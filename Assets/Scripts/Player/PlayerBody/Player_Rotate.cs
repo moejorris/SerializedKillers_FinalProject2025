@@ -4,30 +4,28 @@ using UnityEngine.InputSystem;
 public class Player_Rotate : MonoBehaviour
 {
     [SerializeField] InputActionReference walkInput;
-    Player_MovementMachine machine;
-    Player_Walk walk;
+
     [SerializeField] AnimationCurve rotationBySpeed; //how quickly to rotate based on speed
     [SerializeField] float rotationSpeed = 8f; //scalar to adjust how quickly the rotation lerps
 
     void Awake()
     {
-        machine = GetComponent<Player_MovementMachine>();
-        walk = GetComponent<Player_Walk>();   
+
     }
 
     void Update()
     {
         //Walk Rotation
-        Vector3 newDir = machine.ForwardDirection;
+        Vector3 newDir = PlayerController.instance.MovementMachine.ForwardDirection;
         Vector3 desiredDir = IntendedMoveDirection();
-        float rotLerpValue = Mathf.Clamp(rotationBySpeed.Evaluate(walk.GetNormalizedSpeed()), 0, 1f);
+        float rotLerpValue = Mathf.Clamp(rotationBySpeed.Evaluate(PlayerController.instance.Walk.GetNormalizedSpeed()), 0, 1f);
 
-        newDir = Vector3.Slerp(newDir, desiredDir, rotLerpValue * machine.DeltaTime * rotationSpeed);
+        newDir = Vector3.Slerp(newDir, desiredDir, rotLerpValue * PlayerController.instance.MovementMachine.DeltaTime * rotationSpeed);
 
         // Debug.Log("Lerp Value: " + rotLerpValue * machine.DeltaTime * rotationSpeed + " & Delta Time: " + machine.DeltaTime);
 
         if (newDir.magnitude > 0.1f)
-            machine.SetForwardDirection(newDir);
+            PlayerController.instance.MovementMachine.SetForwardDirection(newDir);
     }
     
     Vector3 IntendedMoveDirection()

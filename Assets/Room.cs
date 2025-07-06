@@ -8,7 +8,6 @@ public class Room : MonoBehaviour
     public List<Animator> entranceDoors;
     [SerializeField] private bool challengeStarted = false;
     [SerializeField] private Transform postCheckpoint;
-    private Player_Respawn playerRespawn => GameObject.FindGameObjectWithTag("Player").transform.Find("PlayerController").GetComponent<Player_Respawn>();
 
     [Header("Room Respawning (If Applicable)")]
     [SerializeField] private GameObject smokeSpawnPrefab;
@@ -117,7 +116,7 @@ public class Room : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.GetComponent<Player_HealthComponent>())
+        if (other == PlayerController.instance.Collider)
         {
             playerInRoom = true;
             BeginChallenge();
@@ -126,7 +125,7 @@ public class Room : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.GetComponent<Player_HealthComponent>())
+        if (other == PlayerController.instance.Collider)
         {
             playerInRoom = false;
         }
@@ -135,7 +134,7 @@ public class Room : MonoBehaviour
     public virtual void RoomComplete()
     {
         if (postCheckpoint == null) return;
-        playerRespawn.respawnPoint = postCheckpoint.position;
+        PlayerController.instance.Respawn.respawnPoint = postCheckpoint.position;
     }
 
     public virtual void BeginChallenge()

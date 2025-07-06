@@ -56,8 +56,8 @@ public class Joe_MovingPlatform : MonoBehaviour
         {
             platform.position = Vector3.Lerp(curStart, curEnd, curTime / travelTime);
 
-            yield return new WaitForEndOfFrame();
-            curTime += Time.deltaTime;
+            yield return new WaitForFixedUpdate();
+            curTime += Time.fixedDeltaTime;
         }
 
         platform.position = curEnd;

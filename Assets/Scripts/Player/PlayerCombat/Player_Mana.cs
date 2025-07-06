@@ -3,7 +3,6 @@ using UnityEngine.UI;
 
 public class Player_Mana : MonoBehaviour
 {
-    private Player_ScriptSteal scriptSteal => GetComponent<Player_ScriptSteal>();
 
 
     [Header("Things Requiring Mana")]
@@ -74,7 +73,7 @@ public class Player_Mana : MonoBehaviour
         if (Input.GetKeyDown(timerToggleKey))
         {
             scriptActive = !scriptActive;
-            scriptSteal.UpdateUI();
+            PlayerController.instance.ScriptSteal.UpdateUI();
         }
     }
 

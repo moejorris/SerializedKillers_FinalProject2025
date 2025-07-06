@@ -55,7 +55,6 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
     
     [SerializeField] private float attackCooldownTimer = 0;
     [SerializeField] private float longRangeAttackDis = 10;
-    private Player_HealthComponent playerHealth => GameObject.FindGameObjectWithTag("Player").transform.Find("PlayerController").GetComponent<Player_HealthComponent>();
 
     [Range(0f, 100f)]
     [SerializeField] private float shockwaveAttackChance;
@@ -109,7 +108,7 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
         bulbBodyAnimator.Play("Bulb_Sleep", 0, 50);
         selectedIcon = transform.Find("Canvas/SelectedIcon").GetComponent<Image>();
 
-        if (scriptSteal.heldBehavior != null && scriptSteal.heldBehavior == heldBehavior) DeactivateBehavior();
+        if (PlayerController.instance.ScriptSteal.heldBehavior != null && PlayerController.instance.ScriptSteal.heldBehavior == heldBehavior) DeactivateBehavior();
     }
     // Update is called once per frame
     public override void Update()
@@ -500,7 +499,7 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
             if (hit.transform.parent != null && hit.transform.parent.CompareTag("Player"))
             {
                 Debug.Log("Player Hit!");
-                playerHealth.TakeDamage(meleeDamage);
+                PlayerController.instance.Health.TakeDamage(meleeDamage);
                 break;
             }
         }
@@ -556,14 +555,11 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
             if (hit.transform.parent != null && hit.transform.parent.CompareTag("Player"))
             {
                 Debug.Log("Player Hit!");
-                playerHealth.TakeDamage(6);
-
-                Player_ForceHandler forceHandler = hit.collider.GetComponent<Player_ForceHandler>();
-
-                if(forceHandler != null)
+                PlayerController.instance.Health.TakeDamage(6);
+                if(hit.collider == PlayerController.instance.Collider)
                 {
                     Vector3 dir = (hit.transform.position - transform.position).normalized + Vector3.up * 0.25f;
-                    forceHandler.AddForce(dir * 20f, ForceMode.VelocityChange);
+                    PlayerController.instance.ForceHandler.AddForce(dir * 20f, ForceMode.VelocityChange);
 
                 }
 
@@ -637,7 +633,7 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
             if (hit.transform.parent != null && hit.transform.parent.CompareTag("Player"))
             {
                 Debug.Log("Player Hit!");
-                playerHealth.TakeDamage(8);
+                PlayerController.instance.Health.TakeDamage(8);
                 break;
             }
         }
@@ -656,7 +652,7 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
 
         if (Physics.Raycast(laser_firePosition.position, laser_firePosition.forward, out RaycastHit hit, 100f, laser_targetLayers))
         {
-            if (hit.transform.GetComponent<Player_Walk>() != null)
+            if (hit.collider == PlayerController.instance.Collider)
             {
                 endPosition = hit.point + laser_firePosition.forward * 0.15f;
             }

@@ -27,10 +27,8 @@ public class Player_ScriptSteal : MonoBehaviour
     [SerializeField] private Image stolenScriptSlot => GameObject.FindGameObjectWithTag("Canvas").transform.Find("HUD/HeldScript/Icon").GetComponent<Image>();
     [SerializeField] private Image stolenScriptAnimation => GameObject.FindGameObjectWithTag("Canvas").transform.Find("HUD/HeldScript/Animation").GetComponent<Image>();
     private int stolenScriptAnimationInt = 0;
-    [SerializeField] private Player_Mana playerMana => GetComponent<Player_Mana>();
-    [SerializeField] private EnemyManager enemyManager => GameObject.FindGameObjectWithTag("EnemyManager").GetComponent<EnemyManager>();
+    [SerializeField] private EnemyManager enemyManager;
 
-    [SerializeField] private Player_CombatMachine combatMachine => GetComponent<Player_CombatMachine>();
 
     [Header("Status Effects")]
     [SerializeField] private FireDamageEffect fireStatusEffect;
@@ -38,6 +36,10 @@ public class Player_ScriptSteal : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        enemyManager = GameObject.FindGameObjectWithTag("EnemyManager")?.GetComponent<EnemyManager>();
+
+        if (enemyManager == null) enabled = false;
+
         scriptReturnTimer = scriptReturnTime;
         StartCoroutine("UpdateTimer");
         StartCoroutine("ScriptAnimationTimer");
@@ -172,9 +174,9 @@ public class Player_ScriptSteal : MonoBehaviour
         stolenScriptSlot.transform.parent.GetComponent<Animation>().Play();
         if (heldBehavior != null)
         {
-            if (playerMana.manaInUse)
+            if (PlayerController.instance.Mana.manaInUse)
             {
-                if (playerMana.scriptActive)
+                if (PlayerController.instance.Mana.scriptActive)
                 {
                     stolenScriptAnimation.enabled = true;
                     stolenScriptSlot.sprite = heldBehavior.activatedBehaviorIcon;

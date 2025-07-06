@@ -4,7 +4,6 @@ using UnityEngine;
 //Joe Morris
 public class Player_Gravity : MonoBehaviour, IPlayerMover
 {
-    Player_MovementMachine _machine => GetComponent<Player_MovementMachine>();
     [SerializeField] float acceleration = -10f;
     [SerializeField] float gravityScale = 1f;
     [SerializeField] float _currentGravity;
@@ -17,10 +16,10 @@ public class Player_Gravity : MonoBehaviour, IPlayerMover
 
     void OnEnable()
     {
-        _machine.AddMover(this); //Add itself to the movement machine!
+        PlayerController.instance.MovementMachine.AddMover(this); //Add itself to the movement machine!
         _currentGravity = 0f;
     }
-    void OnDisable() => _machine.RemoveMover(this); //remove itself from the movement machine when no longer active!
+    void OnDisable() => PlayerController.instance.MovementMachine.RemoveMover(this); //remove itself from the movement machine when no longer active!
 
     public Vector3 UpdateForce() //update gravity
     {
@@ -28,12 +27,12 @@ public class Player_Gravity : MonoBehaviour, IPlayerMover
         {
             PlayerJustLanded();
         }
-        else if (!_machine.isGrounded)
+        else if (!PlayerController.instance.MovementMachine.isGrounded)
         {
-            _currentGravity += acceleration * gravityScale * _machine.DeltaTime;
+            _currentGravity += acceleration * gravityScale * PlayerController.instance.MovementMachine.DeltaTime;
         }
 
-        _groundedPreviousFrame = _machine.isGrounded;
+        _groundedPreviousFrame = PlayerController.instance.MovementMachine.isGrounded;
 
         return Vector3.up * _currentGravity;
     }
@@ -43,14 +42,14 @@ public class Player_Gravity : MonoBehaviour, IPlayerMover
     //Consider making these public for animator use?
     public bool JustLanded()
     {
-        return _machine.isGrounded && !_groundedPreviousFrame;
+        return PlayerController.instance.MovementMachine.isGrounded && !_groundedPreviousFrame;
     }
-    public bool JustLeftGround() => !_machine.isGrounded && _groundedPreviousFrame;
+    public bool JustLeftGround() => !PlayerController.instance.MovementMachine.isGrounded && _groundedPreviousFrame;
 
     //External Function Calls
     public void AddVerticalForce(float y)
     {
-        if (_machine.isGrounded) _currentGravity = 0;
+        if (PlayerController.instance.MovementMachine.isGrounded) _currentGravity = 0;
 
         _currentGravity += y;
     }

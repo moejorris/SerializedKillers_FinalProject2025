@@ -16,7 +16,7 @@ public class EnemyManager : MonoBehaviour
             if (enemy.GetComponent<EnemyAI_Base>() != null) enemies.Add(enemy.GetComponent<EnemyAI_Base>());
         }
 
-        Debug.Log("Update Enemy List called! It has " + enemies.Count);
+        // Debug.Log("Update Enemy List called! It has " + enemies.Count);
     }
 
     public void SelectEnemy(EnemyAI_Base enemy)
