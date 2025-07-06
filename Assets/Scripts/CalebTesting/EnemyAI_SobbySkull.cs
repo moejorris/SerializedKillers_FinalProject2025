@@ -432,7 +432,7 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
         }
     }
 
-    public override void TakeDamage(float damage, Player_ScriptSteal scriptSteal)
+    public override void TakeDamage(float damage)
     {
         if (!healthBar || !whiteHealthBar) return; // in case no thing exists
 
@@ -454,7 +454,7 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
             //Stunned()
         }
 
-        if (scriptSteal.GetHeldHebavior() != null && scriptSteal.GetHeldHebavior() == heldBehavior.weakness) damage *= 1.5f;
+        if (PlayerController.instance.ScriptSteal.BehaviorActive() && PlayerController.instance.ScriptSteal.GetHeldHebavior() == heldBehavior.weakness) damage *= 2f;
 
 
         health -= damage;
@@ -479,7 +479,7 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
 
     public override void Die()
     {
-        PlayerController.instance.Mana.GainMana(manaDropAmount);
+        PlayerController.instance.Mana.GainMana(manaOnDeath);
         Destroy(skull.parent.gameObject);
     }
 

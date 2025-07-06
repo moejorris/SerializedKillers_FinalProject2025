@@ -377,7 +377,7 @@ public class EnemyAI_Overclock : EnemyAI_Base
 
     public void SpawnFire(Vector3 location, float fireDur = 5.5f)
     {
-        location.y  = transform.position.y + 4;
+        location.y = transform.position.y + 2;
         if (!Physics.SphereCast(location, 0.5f, Vector3.down, out RaycastHit hit, 20, fireMask))
         {
             Ray raycast = new Ray();
@@ -387,6 +387,9 @@ public class EnemyAI_Overclock : EnemyAI_Base
             Vector3 spawnPoint = location;
             Physics.Raycast(raycast, out RaycastHit hit2, 20, obstacleLayer);
             spawnPoint.y = hit2.point.y + 0.2f;
+
+            if (Mathf.Abs(spawnPoint.y - location.y) > 4f) return; // stops from placing fire too high or too low?
+
             FireHazard fire = Instantiate(firePrefab, spawnPoint, Quaternion.identity).GetComponent<FireHazard>();
             fire.fireDuration = fireDur;
         }
@@ -549,16 +552,14 @@ public class EnemyAI_Overclock : EnemyAI_Base
         transform.Find("TheOverclockPlaceholder").GetComponent<MeshRenderer>().material = redBodyColor;
     }
 
-    public override void TakeDamage(float damage, Player_ScriptSteal scriptSteal)
+    public override void TakeDamage(float damage)
     {
         if (!healthBar || !whiteHealthBar) return; // in case no thing exists
 
-        if (scriptSteal.GetHeldHebavior() != null)
-        {
-            if (scriptSteal.GetHeldHebavior() == heldBehavior.weakness && behaviorActive || scriptSteal.GetHeldHebavior() == heldBehavior && !behaviorActive) damage *= 1.5f;
-        }
+        if ((PlayerController.instance.ScriptSteal.BehaviorActive() && PlayerController.instance.ScriptSteal.GetHeldHebavior() == heldBehavior.weakness) ||
+            (PlayerController.instance.ScriptSteal.GetHeldHebavior() == heldBehavior && !behaviorActive)) damage *= 2f;
 
-            health -= damage;
+        health -= damage;
 
         //StopCoroutine("MaterialFade");
         //StartCoroutine("MaterialFade");
@@ -567,7 +568,7 @@ public class EnemyAI_Overclock : EnemyAI_Base
 
         if (health <= 0)
         {
-            Destroy(transform.gameObject);
+            Die();
         }
     }
 

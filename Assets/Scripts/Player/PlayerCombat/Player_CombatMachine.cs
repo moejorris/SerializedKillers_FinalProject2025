@@ -368,13 +368,13 @@ public class Player_CombatMachine : MonoBehaviour
     {
         Collider[] hitObjects = Physics.OverlapSphere(transform.position + PlayerController.instance.MovementMachine.ForwardDirection * distanceForwards, checkRadius, ~0, QueryTriggerInteraction.Collide);
 
-        bool playImpactSound = false;
+        bool hitSomething = false;
         foreach (Collider collider in hitObjects)
         {
             if (collider.CompareTag("Player")) continue; //this actually shouldn't fire because the player collider shouldn't be tagged due to caleb's jank requirement that only the root Player parent object is tagged as "Player" but leaving in as a fail-safe
 
-            CheckDamageables(collider, ref damageableStorage, ref selectedEnemy, ref playImpactSound);
-            CheckElementals(collider, ref elementalStorage, ref playImpactSound);
+            CheckDamageables(collider, ref damageableStorage, ref selectedEnemy, ref hitSomething);
+            CheckElementals(collider, ref elementalStorage, ref hitSomething);
 
             if (collider.GetComponent<IComboTarget>() != null && !increaseCombo)
             {
@@ -383,10 +383,14 @@ public class Player_CombatMachine : MonoBehaviour
             }
         }
 
-        if (playImpactSound) HandleImpactSound();
+        if (hitSomething)
+        {
+            if (PlayerController.instance.Mana.usageType == Player_Mana.UsageType.PerUse) PlayerController.instance.Mana.UseMana(); // uses mana after hit because internally the enemies will have checked if there was enough mana to take actual damage
+            HandleImpactSound();
+        }
     }
 
-    void CheckDamageables(Collider collider, ref List<IDamageable> damageableStorage, ref EnemyAI_Base selectedEnemy, ref bool playImpactSound)
+    void CheckDamageables(Collider collider, ref List<IDamageable> damageableStorage, ref EnemyAI_Base selectedEnemy, ref bool hitSomething)
     {
         IDamageable damageable = collider.GetComponent<IDamageable>();
 
@@ -394,7 +398,7 @@ public class Player_CombatMachine : MonoBehaviour
 
         damageableStorage.Add(damageable);
         damageable.TakeDamage(currentAttack.damage);
-        playImpactSound = true;
+        hitSomething = true;
 
         if (collider.gameObject.GetComponent<EnemyAI_Base>() != null)
         {
@@ -402,7 +406,7 @@ public class Player_CombatMachine : MonoBehaviour
         }
     }
 
-    void CheckElementals(Collider collider, ref List<IElemental> elementalStorage, ref bool playImpactSound)
+    void CheckElementals(Collider collider, ref List<IElemental> elementalStorage, ref bool hitSomething)
     {
         IElemental elemental = collider.GetComponent<IElemental>();
 
@@ -410,7 +414,7 @@ public class Player_CombatMachine : MonoBehaviour
 
         elementalStorage.Add(elemental);
         elemental.InteractElement(PlayerController.instance.ScriptSteal.GetHeldHebavior());
-        playImpactSound = true;
+        hitSomething = true;
     }
 
     IEnumerator HitCheck()

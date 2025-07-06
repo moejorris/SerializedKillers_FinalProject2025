@@ -247,6 +247,12 @@ public class Player_ScriptSteal : MonoBehaviour
         else return heldBehavior;
     }
 
+    public bool BehaviorActive()
+    {
+        if (heldBehavior != null && PlayerController.instance.Mana.scriptActive) return true;
+        else return false;
+    }
+
     public void ApplyStatusEffect(Behavior behavior)
     {
         if (behavior == null) return;

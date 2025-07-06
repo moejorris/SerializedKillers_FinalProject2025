@@ -6,18 +6,25 @@ public class Player_Mana : MonoBehaviour
 
 
     [Header("Things Requiring Mana")]
-    [SerializeField] private bool specialAttacks = false;
+    [SerializeField] private bool specialAttacks_req = false;
     [SerializeField] private bool regularAttacks_req = false;
     [SerializeField] private bool dashAttacks_req = false;
     [SerializeField] private bool damageToPlayer_req = false;
 
+    [SerializeField] private float generalCost = 10f;
+
+    [SerializeField] private float specialAttackCost = 10f;
+    [SerializeField] private float regularAttackCost = 5f;
+    [SerializeField] private float dashAttackCost = 15f;
+    [SerializeField] private float playerDamageCost = 5f;
+
     [Header("Mana Settings")]
     public bool manaInUse = false;
     [SerializeField] private float maxMana = 100f;
-    [SerializeField] private float currentMana = 100f;
-    [SerializeField] private UsageType usageType;
+    public float currentMana = 100f;
+    public UsageType usageType;
     [SerializeField] private KeyCode timerToggleKey = KeyCode.T;
-    private enum UsageType {PerUse, Timer}
+    public enum UsageType { PerUse, Timer }
     public bool scriptActive = false;
 
     private RectTransform manaBar => GameObject.FindGameObjectWithTag("Canvas").transform.Find("HUD/Mana/Bar").GetComponent<RectTransform>();
@@ -27,7 +34,7 @@ public class Player_Mana : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        
+
     }
 
     // Update is called once per frame
@@ -86,7 +93,7 @@ public class Player_Mana : MonoBehaviour
         UpdateUI();
     }
 
-    public void UseMana(float mana = 5)
+    public void UseMana(float mana = 10)
     {
         currentMana -= mana;
 
@@ -101,5 +108,11 @@ public class Player_Mana : MonoBehaviour
         Vector3 scale = manaBar.localScale;
         scale.x = currentMana / maxMana;
         manaBar.localScale = scale;
+    }
+
+    public bool ElementActive()
+    {
+        if (usageType == UsageType.PerUse && currentMana >= generalCost || usageType == UsageType.Timer && currentMana >= 0) return true;
+        else return false;
     }
 }

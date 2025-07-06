@@ -19,7 +19,8 @@ public class EnemyAI_Base : MonoBehaviour, ITargetable, IDamageable, IComboTarge
     [HideInInspector] public Image selectedIcon;
 
     [Header("Health")]
-    public float manaDropAmount = 10;
+    public float manaOnDeath = 10;
+    public float manaPerHit = 5;
     public float maxHealth = 20f;
     public float health = 20f;
     private float healthSpeedMult = 1;
@@ -94,11 +95,11 @@ public class EnemyAI_Base : MonoBehaviour, ITargetable, IDamageable, IComboTarge
         healthBar.localScale = scale;
     }
 
-    public virtual void TakeDamage(float damage, Player_ScriptSteal scriptSteal)
+    public virtual void TakeDamage(float damage)
     {
         if (!healthBar || !whiteHealthBar) return; // in case no thing exists
 
-        if (scriptSteal.GetHeldHebavior() != null && scriptSteal.GetHeldHebavior() == heldBehavior.weakness) damage *= 1.5f;
+        if (PlayerController.instance.ScriptSteal.BehaviorActive() && PlayerController.instance.ScriptSteal.GetHeldHebavior() == heldBehavior.weakness) damage *= 2f;
 
         health -= damage;
 
@@ -111,9 +112,10 @@ public class EnemyAI_Base : MonoBehaviour, ITargetable, IDamageable, IComboTarge
             Die();
         }
     }
+
     public virtual void Die()
     {
-        PlayerController.instance.Mana.GainMana(manaDropAmount);
+        PlayerController.instance.Mana.GainMana(manaOnDeath);
         Destroy(gameObject);
     }
 
