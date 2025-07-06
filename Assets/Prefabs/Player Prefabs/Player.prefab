@@ -8408,7 +8408,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30c801992ed04264f9582b6fc7924993, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  updateMethod: 0
+  updateMethod: 1
   targetObject: {fileID: 1977146356554255781}
   lerpSpeed: 10
   offset: {x: 0, y: 0, z: 0}
@@ -8430,6 +8430,12 @@ MonoBehaviour:
   cameraInput: {fileID: -5630151704836100654, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   enableCollision: 1
   cameraTargetPosition: {fileID: 8893029056535421088}
+  autoRotateCam: 1
+  defaultCamRotationX: 30
+  autoRotateSpeedY: 1
+  autoRotateAngleThreshold: 15
+  angleDistanceFactor: 1
+  yRot: 0
 --- !u!1 &4057452165994631294
 GameObject:
   m_ObjectHideFlags: 0
@@ -20869,6 +20875,7 @@ GameObject:
   - component: {fileID: 6332013908717637418}
   - component: {fileID: 9132798164434119282}
   - component: {fileID: 478983599275276974}
+  - component: {fileID: 3564040541836418881}
   m_Layer: 3
   m_Name: PlayerController
   m_TagString: Untagged
@@ -20952,7 +20959,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 33e04b20ca5f05d4ba9080fbf968493d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  timeStep: 0
+  timeStep: 1
   groundCheckMethod: 2
   CurrentMotion: {x: 0, y: 0, z: 0}
 --- !u!114 &2948093019468258104
@@ -21057,8 +21064,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerMeshTransform: {fileID: 4093603536675927097}
   playerMeshAnimator: {fileID: 4683993970539970764}
-  machine: {fileID: 7034641171616900721}
-  walk: {fileID: 2948093019468258104}
 --- !u!114 &6249596229226819514
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -21170,7 +21175,9 @@ MonoBehaviour:
   maxLeapDistance: 13
   minDashDistance: 4
   minDotProduct: 0.85
+  currentComboCount: 0
   comboCountResetTime: 0.5
+  comboResetOnWhiff: 1
 --- !u!114 &2845844426926673644
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -21207,6 +21214,7 @@ MonoBehaviour:
   selectedEnemy: {fileID: 0}
   heldBehavior: {fileID: 0}
   emptySlot: {fileID: 21300000, guid: b574f3cfa060084479405e3cd26d0c94, type: 3}
+  enemyManager: {fileID: 0}
   fireStatusEffect: {fileID: 8131181348710889001}
 --- !u!114 &2006342760427608853
 MonoBehaviour:
@@ -21407,6 +21415,19 @@ MonoBehaviour:
   timerToggleKey: 116
   scriptActive: 0
   whiteManaBarMult: 0
+--- !u!114 &3564040541836418881
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6809807624353774444}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe8bf8c0627f5934b89113e6b285468a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  onlyAllowOnePlayer: 1
 --- !u!1 &6813288641574566132
 GameObject:
   m_ObjectHideFlags: 0
