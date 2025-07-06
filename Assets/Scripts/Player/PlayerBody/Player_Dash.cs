@@ -12,6 +12,14 @@ public class Player_Dash : MonoBehaviour, IPlayerMover
     public float _travelTime = 0.25f;
     [Header("Whether or not Gravity is applied while dashing")]
     [SerializeField] bool _ignoresGravity = true;
+
+    [Header("Limits")]
+    [SerializeField] float cooldownOnGround = 0.25f;
+    [SerializeField] int dashesAllowedInAir = 2;
+    int airDashesLeft = 0;
+    bool canDash = true;
+
+
     Vector3 _force;
     bool _isDashing = false;
 
@@ -19,13 +27,24 @@ public class Player_Dash : MonoBehaviour, IPlayerMover
     {
 
     }
-    void OnEnable() => PlayerController.instance.MovementMachine.AddMover(this); //Add itself to the movement machine!
-    void OnDisable() => PlayerController.instance.MovementMachine.RemoveMover(this); //remove itself from the movement machine when no longer active!
+    void OnEnable()
+    {
+        PlayerController.instance.MovementMachine.AddMover(this); //Add itself to the movement machine!
+        PlayerController.instance.Gravity.PlayerJustLanded += ResetDashLimits;
+    }
+
+    void OnDisable()
+    {
+        PlayerController.instance.MovementMachine.RemoveMover(this); //remove itself from the movement machine when no longer active!
+        PlayerController.instance.Gravity.PlayerJustLanded -= ResetDashLimits;
+    }
 
     void Update()
     {
         if (!_isDashing && dashInput.action.WasPerformedThisFrame())
         {
+            if (!PlayerController.instance.MovementMachine.isGrounded && airDashesLeft < 1) return;
+            
             StartCoroutine(Dash(transform.position + (DashDirection() * _distance)));
         }
     }
@@ -38,12 +57,17 @@ public class Player_Dash : MonoBehaviour, IPlayerMover
 
     public void ExternalDash(Vector3 destination, bool changeY = false)
     {
-        StartCoroutine(Dash(destination, false, 0, changeY));
+        StartCoroutine(Dash(destination, false, 0, changeY, true));
     }
 
-    IEnumerator Dash(Vector3 destination, bool updateOtherMovers = true, float tTime = 0, bool changeY = false)
+    IEnumerator Dash(Vector3 destination, bool updateOtherMovers = true, float tTime = 0, bool changeY = false, bool ignoreCooldown = false)
     {
         if (tTime == 0) tTime = _travelTime;
+
+        if (!PlayerController.instance.MovementMachine.isGrounded)
+        {
+            airDashesLeft--;
+        }
 
         _isDashing = true;
 
@@ -76,30 +100,35 @@ public class Player_Dash : MonoBehaviour, IPlayerMover
 
         }
         else while (t < tTime)
-        {
+            {
 
-            if (!changeY) destination.y = transform.position.y;
-            startPosition.y = transform.position.y;
+                if (!changeY) destination.y = transform.position.y;
+                startPosition.y = transform.position.y;
 
-            _force = Vector3.Slerp(startPosition, destination, t / tTime) - transform.position;
+                _force = Vector3.Slerp(startPosition, destination, t / tTime) - transform.position;
 
-            _force = Vector3.ProjectOnPlane(_force, PlayerController.instance.MovementMachine.GroundInformation.normal);
-            // Debug.Log(_force.y);
+                _force = Vector3.ProjectOnPlane(_force, PlayerController.instance.MovementMachine.GroundInformation.normal);
+                // Debug.Log(_force.y);
 
 
-            yield return new WaitForSeconds(PlayerController.instance.MovementMachine.DeltaTime);
+                yield return new WaitForSeconds(PlayerController.instance.MovementMachine.DeltaTime);
 
-            t = Mathf.Clamp(t + PlayerController.instance.MovementMachine.DeltaTime, 0, tTime);
+                t = Mathf.Clamp(t + PlayerController.instance.MovementMachine.DeltaTime, 0, tTime);
 
-        }
+            }
 
         _force = Vector3.zero;
 
-        _isDashing = false;
 
         DisableTrail();
 
-        if(updateOtherMovers) UpdateOtherMoveComponents(); //re-enables walking and turning
+        _isDashing = false;
+        if (updateOtherMovers) UpdateOtherMoveComponents(); //re-enables walking and turning
+
+        _isDashing = true;
+        if (PlayerController.instance.MovementMachine.isGrounded) yield return new WaitForSeconds(cooldownOnGround);
+
+        _isDashing = false;
     }
 
     void UpdateOtherMoveComponents()
@@ -166,6 +195,11 @@ public class Player_Dash : MonoBehaviour, IPlayerMover
         if (!tr) return;
 
         tr.emitting = false;
+    }
+
+    void ResetDashLimits()
+    {
+        airDashesLeft = dashesAllowedInAir;
     }
 
 }
