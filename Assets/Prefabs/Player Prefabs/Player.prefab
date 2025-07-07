@@ -21218,6 +21218,7 @@ MonoBehaviour:
   emptySlot: {fileID: 21300000, guid: b574f3cfa060084479405e3cd26d0c94, type: 3}
   enemyManager: {fileID: 0}
   fireStatusEffect: {fileID: 8131181348710889001}
+  fireHazardColliders: []
 --- !u!114 &2006342760427608853
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -21424,6 +21425,7 @@ MonoBehaviour:
   regularAttackCost: 5
   dashAttackCost: 15
   playerDamageCost: 5
+  scriptToggleButton: {fileID: 1846630082917867649, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   maxMana: 50
   currentMana: 0
   usageType: 1

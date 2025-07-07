@@ -75,7 +75,7 @@ Material:
     - _QueueControl: 0
     - _QueueOffset: 0
     - _ReceiveShadows: 1
-    - _Smoothness: 0.51
+    - _Smoothness: 0.56
     - _SrcBlend: 1
     - _Surface: 0
     - _WorkflowMode: 1
