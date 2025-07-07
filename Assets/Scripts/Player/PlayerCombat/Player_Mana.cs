@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 public class Player_Mana : MonoBehaviour
@@ -20,6 +21,7 @@ public class Player_Mana : MonoBehaviour
 
     [Header("Mana Settings")]
     //public bool manaInUse = false;
+    public InputActionReference scriptToggleButton; // Pressing Q or Top Left Bumper
     [SerializeField] private float maxMana = 100f;
     public float currentMana = 100f;
     public UsageType usageType;
@@ -70,7 +72,7 @@ public class Player_Mana : MonoBehaviour
             }
         }
 
-        if (Input.GetKeyDown(timerToggleKey))
+        if (scriptToggleButton.action.WasPressedThisFrame()) // Checks if the player has pressed Y and toggles menu
         {
             if (PlayerController.instance.ScriptSteal.heldBehavior != null && currentMana > 0)
             {

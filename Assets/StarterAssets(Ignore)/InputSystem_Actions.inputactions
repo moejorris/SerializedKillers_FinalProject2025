@@ -635,6 +635,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "ScriptToggle",
+                    "type": "Button",
+                    "id": "464a89f8-2b94-44c6-9b7b-24c4a724a5f7",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -1119,6 +1128,28 @@
                     "processors": "",
                     "groups": "",
                     "action": "Temp_Attack",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "5cebe867-832b-490f-aa5c-35de922e8076",
+                    "path": "<Gamepad>/leftShoulder",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ScriptToggle",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "9cb56607-de25-451a-8733-d69e3bf5ef7b",
+                    "path": "<Keyboard>/q",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ScriptToggle",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
