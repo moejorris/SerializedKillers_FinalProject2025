@@ -7,8 +7,8 @@ public class Room : MonoBehaviour
     public List<Animator> exitDoors;
     public List<Animator> entranceDoors;
     [SerializeField] private bool challengeStarted = false;
-    [SerializeField] private Transform postCheckpoint;
-    [SerializeField] private Transform preCheckpoint;
+    //[SerializeField] private Transform postCheckpoint;
+    //[SerializeField] private Transform preCheckpoint;
 
     [Header("Room Respawning (If Applicable)")]
     [SerializeField] private GameObject smokeSpawnPrefab;
@@ -134,15 +134,15 @@ public class Room : MonoBehaviour
 
     public virtual void RoomComplete()
     {
-        if (postCheckpoint == null) return;
-        PlayerController.instance.Respawn.respawnPoint = postCheckpoint.position;
+        //if (postCheckpoint == null) return;
+        //PlayerController.instance.Respawn.respawnPoint = postCheckpoint.position;
     }
 
     public virtual void BeginChallenge()
     {
         if (challengeStarted) return;
         challengeStarted = true;
-        PlayerController.instance.Respawn.respawnPoint = postCheckpoint.position;
+        //PlayerController.instance.Respawn.respawnPoint = postCheckpoint.position;
     }
 
     public void OpenDoors(List<Animator> doors)
