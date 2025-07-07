@@ -16,7 +16,7 @@ public class EnemyAI_Base : MonoBehaviour, ITargetable, IDamageable, IComboTarge
     public Behavior heldBehavior;
     public bool behaviorActive = true;
     private bool delayedExit = false;
-    [HideInInspector] public Image selectedIcon;
+    [HideInInspector] public GameObject selectedIcon;
 
     [Header("Health")]
     public float manaOnDeath = 10;
@@ -146,11 +146,17 @@ public class EnemyAI_Base : MonoBehaviour, ITargetable, IDamageable, IComboTarge
 
     public virtual void HighlightEnemy()
     {
+        if (!behaviorActive)
+        {
+            UnHighlightEnemy();
+            return;
+        }
+
         foreach (GameObject highlightPiece in highlightableMeshes) // highlights the pieces in the array
         {
             highlightPiece.layer = 6;
         }
-        selectedIcon.enabled = true;
+        selectedIcon.SetActive(true);
     }
 
     public virtual void UnHighlightEnemy()
@@ -159,6 +165,6 @@ public class EnemyAI_Base : MonoBehaviour, ITargetable, IDamageable, IComboTarge
         {
             highlightPiece.layer = 0;
         }
-        selectedIcon.enabled = false;
+        selectedIcon.SetActive(false);
     }
 }

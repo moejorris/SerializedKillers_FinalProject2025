@@ -106,7 +106,7 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
         whiteHealthBar = transform.Find("Canvas/Bar/White").GetComponent<RectTransform>();
         bulbBodyAnimator = transform.Find("NewBody").GetComponent<Animator>();
         bulbBodyAnimator.Play("Bulb_Sleep", 0, 50);
-        selectedIcon = transform.Find("Canvas/SelectedIcon").GetComponent<Image>();
+        selectedIcon = transform.Find("Canvas/SelectedIcon").gameObject;
 
         if (PlayerController.instance.ScriptSteal.heldBehavior != null && PlayerController.instance.ScriptSteal.heldBehavior == heldBehavior) DeactivateBehavior();
     }

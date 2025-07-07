@@ -286,5 +286,9 @@ public class Player_ScriptSteal : MonoBehaviour
         {
             fireStatusEffect.StartFire();
         }
+        else if (behavior.behaviorName == "water")
+        {
+            fireStatusEffect.StopFire();
+        }
     }
 }

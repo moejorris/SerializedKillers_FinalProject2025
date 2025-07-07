@@ -82,6 +82,11 @@ public class Player_CombatMachine : MonoBehaviour
         //Rotate player towards it (not immediate snap)
         //Make cam look at it... look at avg position of player and target (player.position + target.position / 2f)
 
+        if (PlayerController.instance.ScriptSteal.GetHeldBehavior() != null && PlayerController.instance.ScriptSteal.GetHeldBehavior().behaviorName == "water" && PlayerController.instance.ScriptSteal.BehaviorActive()) // PUTS OUT FIRE ON PLAYER IF THEY ATTACK WITH WATER SCRIPT!
+        {
+            PlayerController.instance.ScriptSteal.ApplyStatusEffect(PlayerController.instance.ScriptSteal.heldBehavior);
+        }
+
         isAttacking = true;
         attackQueued = false;
 

@@ -34,9 +34,9 @@ public class FireHazard : MonoBehaviour, IElemental
     private void LateUpdate()
     {
         timeElapsed += Time.deltaTime;
-        if (timeElapsed > fireDuration)
+        if (timeElapsed >= fireDuration)
         {
-            // particles.loop = false;
+            particles.Stop();
             if (particles.particleCount <= 0)
             {
                 Destroy(gameObject);
@@ -111,6 +111,6 @@ public class FireHazard : MonoBehaviour, IElemental
     public void InteractElement(Behavior behavior)
     {
         if (behavior == null) return;
-        if (behavior == heldBehavior.weakness) PutOutFire();
+        if (behavior == heldBehavior.weakness && PlayerController.instance.ScriptSteal.BehaviorActive()) PutOutFire();
     }
 }

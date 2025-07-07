@@ -70,7 +70,7 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
         rigidBody = skull.parent.Find("Skull").GetComponent<Rigidbody>();
         healthBar = skull.parent.Find("Canvas/Bar/Health").GetComponent<RectTransform>();
         whiteHealthBar = skull.parent.Find("Canvas/Bar/White").GetComponent<RectTransform>();
-        selectedIcon = skull.parent.Find("Canvas/SelectedIcon").GetComponent<Image>();
+        selectedIcon = skull.parent.Find("Canvas/SelectedIcon").gameObject;
 
         newMaxVelocity = rigidBody.maxLinearVelocity;
         maxVelocityLerpSpeed = 15;

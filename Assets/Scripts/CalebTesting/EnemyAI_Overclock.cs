@@ -86,7 +86,7 @@ public class EnemyAI_Overclock : EnemyAI_Base
     {
         base.Start();
         healthBar = transform.Find("Canvas/Bar").GetComponent<RectTransform>();
-        selectedIcon = transform.Find("Canvas/SelectedIcon").GetComponent<Image>();
+        selectedIcon = transform.Find("Canvas/SelectedIcon").gameObject;
         healthBar = transform.Find("Canvas/Bar/Health").GetComponent<RectTransform>();
         whiteHealthBar = transform.Find("Canvas/Bar/White").GetComponent<RectTransform>();
 

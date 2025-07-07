@@ -10,6 +10,10 @@ public class ScriptStealMenu : MonoBehaviour
     public InputActionReference westButton; // Pressing X
     public PlayerInput playerInput;
 
+    public Behavior waterBehavior;
+    public Behavior fireBehavior;
+    public Behavior electricBehavior;
+
     public GameObject player;
     public float attackDistance;
 
