@@ -10476,8 +10476,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1.0526472, y: 6.810173, z: 1.2032149}
-  m_Center: {x: -0.004889342, y: -2.1149855, z: -0.0066521647}
+  m_Size: {x: 1.0526472, y: 54.810173, z: 1.2032149}
+  m_Center: {x: -0.004889342, y: 3.8850136, z: -0.0066521647}
 --- !u!114 &8307154367038906562
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -21672,7 +21672,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0.49999958, y: 7.6549997}
+  m_AnchoredPosition: {x: 0.49999958, y: 9.905}
   m_SizeDelta: {x: 1, y: 1}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!223 &4822373869544248113
