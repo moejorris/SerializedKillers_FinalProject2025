@@ -14,14 +14,26 @@ public class FireSpewer : MonoBehaviour, IElemental
     public float fireDuration = 5;
     private float enemyExtinguishTimer = 1;
 
-    private float health = 3;
+    private float health = 2;
     private float knockbackCooldown = 0;
     public float knockbackStrength = 10;
+
+    private Collider playerCollider;
+    [SerializeField] private LayerMask fireActiveLayer;
+    [SerializeField] private LayerMask fireOutLayer;
 
     private void Start()
     {
         fire = transform.Find("Fire").GetComponent<ParticleSystem>();
         smoke = transform.Find("Smoke").GetComponent<ParticleSystem>();
+
+        Collider[] colliders = GetComponents<Collider>();
+        foreach (Collider collider in colliders)
+        {
+            if (collider.isTrigger) continue;
+
+            playerCollider = collider;
+        }
     }
 
     public void PutOutFire()
@@ -37,10 +49,11 @@ public class FireSpewer : MonoBehaviour, IElemental
         if (health <= 0)
         {
             fireActive = false;
-            //fire.Stop();
+            fire.Stop();
             ParticleSystem.MainModule main = fire.main;
             main.startLifetime = 0f;
-            // fire.loop = false;
+
+            playerCollider.excludeLayers = fireOutLayer;
 
             newPos.y = 0.4f;
         }
@@ -70,9 +83,11 @@ public class FireSpewer : MonoBehaviour, IElemental
             if (fireActive) return;
 
             // fire.loop = true;
-            health = 3;
+            health = 2;
             ParticleSystem.MainModule main = fire.main;
             main.startLifetime = 2f;
+
+            playerCollider.excludeLayers = fireActiveLayer;
 
             fireActive = true;
             fire.Play();
@@ -122,6 +137,8 @@ public class FireSpewer : MonoBehaviour, IElemental
             }
             else if (other.transform.parent != null && other.transform.parent.gameObject.CompareTag("Player"))
             {
+                if (PlayerController.instance.ScriptSteal.GetHeldBehavior() == heldBehavior && PlayerController.instance.ScriptSteal.BehaviorActive()) return;
+
                 PlayerController.instance.ScriptSteal.ApplyStatusEffect(heldBehavior);
                 
                 if (knockbackCooldown <= 0)

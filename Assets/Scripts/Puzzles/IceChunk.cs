@@ -30,8 +30,9 @@ public class IceChunk : MonoBehaviour, IElemental
     private void Update()
     {
         transform.localScale = Vector3.Lerp(transform.localScale, newScale, Time.deltaTime * 15);
-        if (transform.localScale.y <= 0)
+        if (hits <= 0)
         {
+            gameObject.SetActive(false);
             if (room != null) room.RoomComplete();
             Destroy(gameObject);
         }

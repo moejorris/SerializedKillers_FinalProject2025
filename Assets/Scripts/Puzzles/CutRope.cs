@@ -5,7 +5,7 @@ public class CutRope : MonoBehaviour, IDamageable
     private Animator anim;
     [Header("Puzzle Settings")]
     [Tooltip("The name of the behavior required to cut the rope.")]
-    [SerializeField] private string requiredBehaviorName;
+    [SerializeField] private Behavior heldBehavior;
     [SerializeField] private GameObject gateToOpen;
 
     void Start()
@@ -15,10 +15,10 @@ public class CutRope : MonoBehaviour, IDamageable
 
     public void TakeDamage(float damage = 0)
     {
-        if (PlayerController.instance.ScriptSteal.GetHeldBehavior() != null && PlayerController.instance.ScriptSteal.GetHeldBehavior().behaviorName == requiredBehaviorName)
+        if (PlayerController.instance.ScriptSteal.GetHeldBehavior() != null && PlayerController.instance.ScriptSteal.GetHeldBehavior() == heldBehavior && PlayerController.instance.ScriptSteal.BehaviorActive())
         {
             anim.SetTrigger("Cut"); // Trigger the cut animation
-            Debug.Log("Rope cut with behavior: " + requiredBehaviorName);
+            Debug.Log("Rope cut with behavior: " + heldBehavior.name);
             Collider col = GetComponent<Collider>();
             if (col != null) col.enabled = false;
         }
@@ -26,7 +26,7 @@ public class CutRope : MonoBehaviour, IDamageable
         {
             string heldBehaviorName = "none";
             if (PlayerController.instance.ScriptSteal.GetHeldBehavior() != null) heldBehaviorName = PlayerController.instance.ScriptSteal.GetHeldBehavior().behaviorName;
-            Debug.Log("Rope cutting failed. Required behavior: " + requiredBehaviorName + ", but held behavior: " + heldBehaviorName);
+            Debug.Log("Rope cutting failed. Required behavior: " + heldBehavior.name + ", but held behavior: " + heldBehaviorName);
         }
     }
 

@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 7525726599579296161}
   m_Layer: 9
   m_Name: FireHazard
-  m_TagString: Untagged
+  m_TagString: FireHazard
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -110,6 +110,12 @@ MonoBehaviour:
   fps: 14
   fireDuration: 5
   knockbackStrength: 5
+  fireActiveLayer:
+    serializedVersion: 2
+    m_Bits: 384
+  fireOutLayer:
+    serializedVersion: 2
+    m_Bits: 4294967295
 --- !u!65 &3728047271126893495
 BoxCollider:
   m_ObjectHideFlags: 0

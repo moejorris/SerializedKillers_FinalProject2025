@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using System.Collections;
+using System.Collections.Generic;
 
 public class Player_ScriptSteal : MonoBehaviour
 {
@@ -33,6 +34,8 @@ public class Player_ScriptSteal : MonoBehaviour
     [Header("Status Effects")]
     [SerializeField] private FireDamageEffect fireStatusEffect;
 
+    public List<BoxCollider> fireHazardColliders;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -43,6 +46,18 @@ public class Player_ScriptSteal : MonoBehaviour
         scriptReturnTimer = scriptReturnTime;
         StartCoroutine("UpdateTimer");
         StartCoroutine("ScriptAnimationTimer");
+
+        // initial get
+        GameObject[] hazards = GameObject.FindGameObjectsWithTag("FireHazard");
+        foreach (GameObject hazard in hazards)
+        {
+            BoxCollider[] colliders = hazard.GetComponents<BoxCollider>();
+            foreach (BoxCollider collider in colliders) 
+            {
+                if (collider.isTrigger) continue;
+                fireHazardColliders.Add(collider);
+            }
+        }
     }
 
     // Update is called once per frame
@@ -132,27 +147,30 @@ public class Player_ScriptSteal : MonoBehaviour
 
     public void ApplyScriptEffects()
     {
-        if (heldBehavior != null)
+        if (heldBehavior != null && PlayerController.instance.Mana.scriptActive)
         {
-            scriptEffectColor = selectedEnemy.heldBehavior.color;
+            scriptEffectColor = heldBehavior.color;
 
             if (heldBehavior.behaviorName == "electric")
             {
                 electricityParticles.Play();
                 fireParticles.Stop();
                 waterParticles.Stop();
+                FireHazardToggle(true);
             }
             else if (heldBehavior.behaviorName == "fire")
             {
                 electricityParticles.Stop();
                 fireParticles.Play();
                 waterParticles.Stop();
+                FireHazardToggle(false);
             }
             else if (heldBehavior.behaviorName == "water")
             {
                 electricityParticles.Stop();
                 fireParticles.Stop();
                 waterParticles.Play();
+                FireHazardToggle(true);
             }
             else
             {
@@ -164,9 +182,18 @@ public class Player_ScriptSteal : MonoBehaviour
             electricityParticles.Stop();
             fireParticles.Stop();
             waterParticles.Stop();
+            FireHazardToggle(true);
             scriptEffectColor = Color.white;
         }
         UpdateUI();
+    }
+
+    public void FireHazardToggle(bool toggle)
+    {
+        foreach (Collider collider in fireHazardColliders)
+        {
+            collider.enabled = toggle;
+        }
     }
 
     public void UpdateUI()

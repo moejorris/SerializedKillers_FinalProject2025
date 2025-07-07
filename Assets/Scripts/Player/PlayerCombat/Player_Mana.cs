@@ -63,7 +63,8 @@ public class Player_Mana : MonoBehaviour
                 {
                     scriptActive = false;
                     currentMana = 0;
-                    PlayerController.instance.ScriptSteal.UpdateUI();
+                    //PlayerController.instance.ScriptSteal.UpdateUI();
+                    PlayerController.instance.ScriptSteal.ApplyScriptEffects();
                 }
                 UpdateUI();
             }
@@ -74,12 +75,14 @@ public class Player_Mana : MonoBehaviour
             if (PlayerController.instance.ScriptSteal.heldBehavior != null && currentMana > 0)
             {
                 scriptActive = !scriptActive;
-                PlayerController.instance.ScriptSteal.UpdateUI();
+                //PlayerController.instance.ScriptSteal.UpdateUI();
+                PlayerController.instance.ScriptSteal.ApplyScriptEffects();
             }
             else
             {
                 scriptActive = false;
-                PlayerController.instance.ScriptSteal.UpdateUI();
+                //PlayerController.instance.ScriptSteal.UpdateUI();
+                PlayerController.instance.ScriptSteal.ApplyScriptEffects();
             }
         }
     }
@@ -101,7 +104,8 @@ public class Player_Mana : MonoBehaviour
         {
             scriptActive = false;
             currentMana = 0;
-            PlayerController.instance.ScriptSteal.UpdateUI();
+            //PlayerController.instance.ScriptSteal.UpdateUI();
+            PlayerController.instance.ScriptSteal.ApplyScriptEffects();
         }
 
         manaBarLerpSpeed = 0;
