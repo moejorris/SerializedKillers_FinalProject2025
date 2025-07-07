@@ -8,6 +8,8 @@ using UnityEditor;
 [RequireComponent(typeof(NavMeshAgent))]
 public class EnemyAI_Overclock : EnemyAI_Base
 {
+    [SerializeField] GameObject normalBody;
+    [SerializeField] GameObject coldBody;
     [Range(-1f, 1f)]
     [SerializeField] private float rotateThing;
     [Header("Overclock General")]
@@ -550,7 +552,9 @@ public class EnemyAI_Overclock : EnemyAI_Base
         base.ActivateBehavior();
         navMeshAgent.speed = 3;
         transform.Find("IceSphere").gameObject.SetActive(false);
-        transform.Find("TheOverclockPlaceholder").GetComponent<MeshRenderer>().material = redBodyColor;
+        coldBody.SetActive(false);
+        normalBody.SetActive(true);
+        //transform.Find("TheOverclockPlaceholder").GetComponent<MeshRenderer>().material = redBodyColor;
     }
 
     public override void TakeDamage(float damage)
@@ -567,8 +571,8 @@ public class EnemyAI_Overclock : EnemyAI_Base
             PlayerController.instance.Mana.GainMana(manaPerHit);
         }
 
-        //StopCoroutine("MaterialFade");
-        //StartCoroutine("MaterialFade");
+        StopCoroutine("MaterialFade");
+        StartCoroutine("MaterialFade");
 
         UpdateHealth();
 
@@ -585,6 +589,8 @@ public class EnemyAI_Overclock : EnemyAI_Base
         base.DeactivateBehavior();
         navMeshAgent.speed = 1;
         transform.Find("IceSphere").gameObject.SetActive(true);
-        transform.Find("TheOverclockPlaceholder").GetComponent<MeshRenderer>().material = blueBodyColor;
+        coldBody.SetActive(true);
+        normalBody.SetActive(false);
+        //transform.Find("TheOverclockPlaceholder").GetComponent<MeshRenderer>().material = blueBodyColor;
     }
 }
