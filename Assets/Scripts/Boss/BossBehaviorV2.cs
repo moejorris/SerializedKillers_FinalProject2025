@@ -125,6 +125,7 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental
             Debug.LogError("No Attack Prefabs assigned! Please assign attack prefabs in the inspector.");
             return;
         }
+        bossRenderer = GetComponent<Renderer>();
     }
 
     void Update()
