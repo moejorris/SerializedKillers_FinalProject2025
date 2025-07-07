@@ -4,23 +4,22 @@ using System.Collections.Generic;
 
 public enum BossState { None, Fire, Electric, Water } // Enumeration for elemental states
 
-public class BossBehaviorV2 : MonoBehaviour, IDamageable
+public class BossBehaviorV2 : MonoBehaviour, IElemental
 {
     #region Unity Variables
     [Header("Boss Settings")]
     [Tooltip("Max health of the boss")]
     [SerializeField] private float health = 100f;
     [Tooltip("Shield Health of the boss")]
-    [SerializeField] private float shieldHealth = 30f;
+    [SerializeField] private float maxShieldHealth = 30f;
+    private const float shieldDamage = 5f;
+    private float shieldHealth = 30f;
     [Tooltip("Attack Interval in seconds")]
     [SerializeField] private float attackInterval = 10f;
     private float attackTimer = 0f;
     [Tooltip("Vulnerable Duration in seconds")]
     [SerializeField] private float vulnerableDuration = 5f;
     private float vulnerableTimer = 0f;
-    // [Tooltip("Enemy Spawn Interval in seconds")]
-    // [SerializeField] private float spawnInterval = 15f;
-    // private float spawnTimer = 0f;
     [Tooltip("Max number of attacks the boss can take before becoming invincible")]
     [SerializeField] private int maxVulnerableAttacks = 3; // Maximum number of attacks the boss can take while vulnerable
     [Tooltip("Max number of attacks before the boss can use before becoming vulnerable")]
@@ -28,6 +27,42 @@ public class BossBehaviorV2 : MonoBehaviour, IDamageable
     [Header("Boss Components")]
     [Tooltip("Reference to the boss health bar RectTransform.")]
     [SerializeField] private RectTransform healthBar; // Assign this in the inspector
+    [Header("Shield Flash Effect")]
+    [Tooltip("Shield Materials")]
+    [SerializeField] private Material originalShieldMaterial;
+    [SerializeField] private Material redFlashMaterial;
+    [SerializeField] private Renderer shieldRenderer; // Assign the shield's renderer
+    [SerializeField] private float flashDuration = 0.2f;
+    private Coroutine currentFlashCoroutine;
+
+    // Call this when the shield takes damage
+    private void FlashShieldRed()
+    {
+        if (shieldRenderer == null) return;
+        
+        // Stop any existing flash coroutine
+        if (currentFlashCoroutine != null)
+        {
+            StopCoroutine(currentFlashCoroutine);
+        }
+        
+        // Start new flash coroutine
+        currentFlashCoroutine = StartCoroutine(FlashShieldCoroutine());
+    }
+
+    private IEnumerator FlashShieldCoroutine()
+    {
+        // Change to red material
+        shieldRenderer.material = redFlashMaterial;
+        
+        // Wait for flash duration
+        yield return new WaitForSeconds(flashDuration);
+        
+        // Change back to original material
+        shieldRenderer.material = originalShieldMaterial;
+        
+        currentFlashCoroutine = null;
+    }
     [Tooltip("Prefabs for enemies the boss will spawn in periodically")]
     [SerializeField] private GameObject[] enemiesToSpawn; // Array of enemies for the boss to spawn in
     [Tooltip("Spawn Points for enemies to spawn into")]
@@ -57,6 +92,8 @@ public class BossBehaviorV2 : MonoBehaviour, IDamageable
     private bool isVulnerable = false; // Flag to control whether the boss is vulnerable
     private int vulnAttacks = 0; // Number of attacks the boss has taken while vulnerable
     private int attacksUsed = 0; // Number of attacks used by the boss
+    private bool canTakeDamage = true;
+    private bool isTransitioning = false;
     private Renderer bossRenderer; // Reference to the boss's renderer for color changes
     private List<BossState> availableStates = new List<BossState>(); // List of available states for the boss
     private List<BossState> unusedStates = new List<BossState>(); // List of unused states for the boss
@@ -88,7 +125,6 @@ public class BossBehaviorV2 : MonoBehaviour, IDamageable
             Debug.LogError("No Attack Prefabs assigned! Please assign attack prefabs in the inspector.");
             return;
         }
-        bossRenderer = GetComponent<Renderer>(); // Get the boss's renderer component
     }
 
     void Update()
@@ -112,11 +148,6 @@ public class BossBehaviorV2 : MonoBehaviour, IDamageable
             {
                 anim.SetTrigger("Summon");
             }
-            // if (Input.GetMouseButtonDown(0))
-            // {
-            //     TakeDamage(5f); // Simulate taking damage when the left mouse button is clicked
-            //     Debug.Log("Boss took damage from mouse click!");
-            // }
         }
 
         if (isVulnerable)
@@ -131,6 +162,7 @@ public class BossBehaviorV2 : MonoBehaviour, IDamageable
 
         if (health > 0f)
         {
+            if (isVulnerable) return; // Exit if the boss is vulnerable
             attackTimer += Time.deltaTime; // Increment the attack timer
             if (attackTimer >= attackInterval)
             {
@@ -259,7 +291,7 @@ public class BossBehaviorV2 : MonoBehaviour, IDamageable
     {
         if (attackPrefabs.Length > 0 && player != null)
         {
-            Instantiate(attackPrefabs[1], new Vector3(player.position.x, player.position.y - 1f, player.position.z), Quaternion.identity); // Spawn the thunderbolt above the player
+            Instantiate(attackPrefabs[1], new Vector3(player.position.x + Random.Range(-10f, 10f), player.position.y - 1f, player.position.z), Quaternion.identity); // Spawn the thunderbolt above the player
         }
         else
         {
@@ -351,37 +383,162 @@ public class BossBehaviorV2 : MonoBehaviour, IDamageable
         }
     }
 
-    public void TakeDamage(float damage = 5)
+    // public void TakeDamage(float damage = 5, Player_ScriptSteal scriptSteal = null)
+    // {
+    //     bool isWeakness = false;
+    //     if (scriptSteal != null && scriptSteal.GetHeldBehavior() != null)
+    //     {
+    //         string playerBehavior = scriptSteal.GetHeldBehavior().behaviorName;
+    //         switch (currentState)
+    //         {
+    //             case BossState.Fire:
+    //                 if (playerBehavior == "water") isWeakness = true;
+    //                 break;
+    //             case BossState.Water:
+    //                 if (playerBehavior == "electric") isWeakness = true;
+    //                 break;
+    //             case BossState.Electric:
+    //                 if (playerBehavior == "fire") isWeakness = true;
+    //                 break;
+    //         }
+    //     }
+
+    //     if (shieldHealth > 0)
+    //     {
+    //         damage = 5f;
+    //         if (isWeakness)
+    //         {
+    //             Debug.Log("Counter element used! Shield breaks immediatly.");
+    //             shieldHealth = 0;
+    //             StartVulnerable();
+    //             return;
+    //         }
+    //         shieldHealth -= damage;
+    //         Debug.Log("Shield took " + damage + " damage! Shield has " + shieldHealth + " health left!");
+    //         if (shieldHealth <= 0)
+    //         {
+    //             StartVulnerable();
+    //         }
+    //     }
+
+    //     if (!isVulnerable) return; // Exit if the boss is not vulnerable
+
+    //     damage = 2.5f;
+    //     if (isWeakness) damage *= 2f;
+    //     health -= damage; // Reduce the boss's health by the damage amount
+    //     vulnAttacks++;
+    //     vulnerableTimer = vulnerableDuration; // Reset the vulnerable timer
+    //     Debug.Log("Boss took damage: " + damage + ". Current health: " + health); // Log the damage taken
+    //     anim.SetTrigger("Hit"); // Trigger the hit animation
+    //     anim.SetInteger("Damage", vulnAttacks); // Increment the attack timer to match the number of vulnerableAttacks
+    //     if (vulnAttacks >= maxVulnerableAttacks)
+    //     {
+    //         EndVulnerable();
+    //     }
+    //     UpdateUI();
+    // }
+
+    void Die()
     {
-        if (!isVulnerable)
+        Debug.Log("Boss died!");
+        anim.SetTrigger("Die");
+        Destroy(gameObject, 2f); // Destroy the boss after 2 seconds
+    }
+
+    public void InteractElement(Behavior behavior)
+    {
+        if (!canTakeDamage || isTransitioning)
         {
-            damage = 5f;
-            shieldHealth -= damage;
-            Debug.Log("Shield took " + damage + " damage! Shield has " + shieldHealth + " health left");
+            Debug.Log("Boss is transitioning or cannot take damage.");
+            return;
+        }
+
+        bool isWeakness = CheckElementalWeakness(behavior);
+        float damageAmount = 0f;
+
+        // Handle shield damage first
+        if (shieldHealth > 0)
+        {
+            damageAmount = shieldDamage;
+            FlashShieldRed();
+
+            if (isWeakness)
+            {
+                Debug.Log("Counter element used! Shield breaks immediatly.");
+                shieldHealth = 0;
+                StartVulnerable();
+                return;
+            }
+
+            shieldHealth -= damageAmount;
+            Debug.Log("Shield took " + damageAmount + " damage! Shield has " + shieldHealth + " health left!");
             if (shieldHealth <= 0)
             {
+                Debug.Log("Shield destroyed! Boss becoming vulnerable.");
                 StartVulnerable();
             }
+            damageAmount = 0f; // Reset the damage amount for the next check
+            return;
         }
-        if (!isVulnerable) return; // Exit if the boss is not vulnerable
-        damage = 5f;
-        health -=  damage; // Reduce the boss's health by the damage amount
+
+        if (!isVulnerable)
+        {
+            Debug.Log("Boss is not vulnerable. Attack had no effect to health.");
+            return;
+        }
+
+        damageAmount = 2.5f;
+        if (isWeakness)
+        {
+            damageAmount *= 2f;
+            Debug.Log("Weakness detected! Damage doubled.");
+        }
+
+        health -= damageAmount;
         vulnAttacks++;
-        vulnerableTimer = vulnerableDuration; // Reset the vulnerable timer
-        Debug.Log("Boss took damage: " + damage + ". Current health: " + health); // Log the damage taken
+        vulnerableTimer = vulnerableDuration; // Reset vulnerable timer
+
+        Debug.Log("Boss took damage: " + damageAmount + ". Current health: " + health); // Log the damage taken
+
+        // Trigger Animations
         anim.SetTrigger("Hit"); // Trigger the hit animation
-        anim.SetInteger("Damage", vulnAttacks); // Increment the attack timer to allow multiple hits until boss is incivible again
+        anim.SetInteger("Damage", vulnAttacks); // Increment the attack timer to match the number of vulnerableAttacks
+
+        // Check if max vulnerable attack reached
         if (vulnAttacks >= maxVulnerableAttacks)
         {
-            EndVulnerable(); // End the vulnerable state
+            Debug.Log("Boss has taken maximum vulnerable attacks! Ending vulnerable state.");
+            EndVulnerable();
         }
+
         UpdateUI();
+
+        if (health <= 0)
+        {
+            Debug.Log("Boss has been defeated!");
+            Die();
+        }
+    }
+
+    private bool CheckElementalWeakness(Behavior behavior)
+    {
+        // Fix: Check behavior first, then behaviorName
+        if (behavior == null || string.IsNullOrEmpty(behavior.behaviorName)) 
+            return false;
+        
+        return currentState switch
+        {
+            BossState.Fire => behavior.behaviorName.ToLower() == "water",
+            BossState.Water => behavior.behaviorName.ToLower() == "electric", 
+            BossState.Electric => behavior.behaviorName.ToLower() == "fire",
+            BossState.None => false,
+            _ => false
+        };
     }
 
     void StartVulnerable()
     {
         if (isVulnerable) return; // Exit if the boss is already vulnerable
-        isVulnerable = true;
         anim.SetTrigger("Weak"); // Trigger the weak animation
         Debug.Log("Boss is about to become vulnerable!"); // Log the start of the vulnerable state
     }
@@ -389,13 +546,14 @@ public class BossBehaviorV2 : MonoBehaviour, IDamageable
     void EndVulnerable()
     {
         if (!isVulnerable) return; // Exit if the boss is not vulnerable
+        BlockDamage(); // Block damage during transition
         isVulnerable = false; // Set the boss to not vulnerable
         vulnAttacks = 0; // Reset the number of attacks taken
         vulnerableTimer = vulnerableDuration; // Reset the vulnerable duration
         anim.SetTrigger("EndWeak"); // Trigger the end weak animation
         Debug.Log("Boss is no longer vulnerable!"); // Log the end of the vulnerable state
         anim.SetTrigger("Move"); // Trigger the move animation to teleport the boss after vulnerability ends
-        shieldHealth = 30f; // Reset shield health
+        shieldHealth = maxShieldHealth; // Reset shield health
         attacksUsed = 0;
         ChangeState(); // Call State Method
     }
@@ -490,6 +648,44 @@ public class BossBehaviorV2 : MonoBehaviour, IDamageable
     }
     #endregion
     #region Animation Events
+    void BlockDamage()
+    {
+        canTakeDamage = false;
+        isTransitioning = true;
+        Debug.Log("Boss damage blocked - transition started");
+    }
+
+    void AllowDamage()
+    {
+        canTakeDamage = true;
+        isTransitioning = false;
+        Debug.Log("Boss damage allowed - transition ended");
+    }
+
+    void StartVulnerableTransition()
+    {
+        BlockDamage(); // Block damage during transition
+        Debug.Log("Starting vulnerable transition - damage blocked");
+    }
+
+    void CompleteVulnerableTransition()
+    {
+        AllowDamage();
+        Debug.Log("Vulnerable transition complete - damage allowed");
+    }
+
+    void StartInvulnerableTransition()
+    {
+        BlockDamage(); // Block damage during transition
+        Debug.Log("Starting invulnerable transition - damage blocked");
+    }
+
+    void CompleteInvulnerableTransition()
+    {
+        AllowDamage();
+        Debug.Log("Invulnerable transition complete - damage allowed");
+    }
+
     void StopLooking()
     {
         lookAtPlayer = false; // Set the flag to stop looking at the player
@@ -509,6 +705,17 @@ public class BossBehaviorV2 : MonoBehaviour, IDamageable
         isVulnerable = true; // Set the boss to vulnerable
         vulnerableTimer = vulnerableDuration; // Reset the vulnerable timer
         vulnAttacks = 0; // Reset the number of attacks taken
+        AllowDamage(); // Allow the boss to take damage
+        Debug.Log("Boss is now vulnerable!");
+    }
+
+    void StopVulnerable()
+    {
+        isVulnerable = false;
+        vulnAttacks = 0;
+        shieldHealth = maxShieldHealth; // Reset shield if needed
+        AllowDamage(); // Allow damage now that transition is complete
+        Debug.Log("Boss is no longer vulnearble!");
     }
     #endregion
 }

@@ -8,7 +8,6 @@ public class ElectricWater : MonoBehaviour
     private float shockTimer = 0f;
     [Tooltip("Damage dealt to player on shock")]
     [SerializeField] private float damage = 5f;
-    [SerializeField] private Behavior requiredBehavior;
 
     private bool playerHasElectric = false;
 
@@ -37,7 +36,7 @@ public class ElectricWater : MonoBehaviour
         if (playerController != null && other == playerController.Collider)
         {
             var heldBehavior = playerController.ScriptSteal.GetHeldBehavior();
-            playerHasElectric = (heldBehavior != null && heldBehavior == requiredBehavior && PlayerController.instance.ScriptSteal.BehaviorActive());
+            playerHasElectric = (heldBehavior != null && heldBehavior.behaviorName == "electric");
 
             if (playerHasElectric) return;
 
