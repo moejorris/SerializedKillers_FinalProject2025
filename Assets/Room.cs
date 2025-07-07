@@ -8,6 +8,7 @@ public class Room : MonoBehaviour
     public List<Animator> entranceDoors;
     [SerializeField] private bool challengeStarted = false;
     [SerializeField] private Transform postCheckpoint;
+    [SerializeField] private Transform preCheckpoint;
 
     [Header("Room Respawning (If Applicable)")]
     [SerializeField] private GameObject smokeSpawnPrefab;
