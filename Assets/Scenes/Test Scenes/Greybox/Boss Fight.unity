@@ -119,11 +119,6 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!23 &12494984 stripped
-MeshRenderer:
-  m_CorrespondingSourceObject: {fileID: 8902761865993362216, guid: 23464843f6af0a2418f29f645574e5bf, type: 3}
-  m_PrefabInstance: {fileID: 349273825686075171}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &105641582
 GameObject:
   m_ObjectHideFlags: 0
@@ -7505,33 +7500,9 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 1132903339147245590, guid: 23464843f6af0a2418f29f645574e5bf, type: 3}
-      propertyPath: shieldRenderer
-      value: 
-      objectReference: {fileID: 12494984}
-    - target: {fileID: 1132903339147245590, guid: 23464843f6af0a2418f29f645574e5bf, type: 3}
-      propertyPath: redFlashMaterial
-      value: 
-      objectReference: {fileID: 2100000, guid: e94629539b49a8e4ba800a3e15c3c773, type: 2}
-    - target: {fileID: 1132903339147245590, guid: 23464843f6af0a2418f29f645574e5bf, type: 3}
-      propertyPath: originalShieldMaterial
-      value: 
-      objectReference: {fileID: 2100000, guid: 650a24a553aa482478c91723cfeef5dc, type: 2}
     - target: {fileID: 4568253867351399053, guid: 23464843f6af0a2418f29f645574e5bf, type: 3}
       propertyPath: m_Name
       value: Boss Parent V2
-      objectReference: {fileID: 0}
-    - target: {fileID: 7881579624651839202, guid: 23464843f6af0a2418f29f645574e5bf, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 0.7692307
-      objectReference: {fileID: 0}
-    - target: {fileID: 7881579624651839202, guid: 23464843f6af0a2418f29f645574e5bf, type: 3}
-      propertyPath: m_LocalScale.y
-      value: 14.077999
-      objectReference: {fileID: 0}
-    - target: {fileID: 7881579624651839202, guid: 23464843f6af0a2418f29f645574e5bf, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: 15.31
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
