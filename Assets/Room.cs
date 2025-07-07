@@ -142,6 +142,7 @@ public class Room : MonoBehaviour
     {
         if (challengeStarted) return;
         challengeStarted = true;
+        PlayerController.instance.Respawn.respawnPoint = postCheckpoint.position;
     }
 
     public void OpenDoors(List<Animator> doors)

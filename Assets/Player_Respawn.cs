@@ -17,6 +17,9 @@ public class Player_Respawn : MonoBehaviour
         //Reset Health
         PlayerController.instance.Health.ResetHealth();
         PlayerController.instance.Health.UpdatePlayerHealth();
+        PlayerController.instance.ScriptSteal.ReturnScript();
+        PlayerController.instance.Mana.UseMana(100);
+        transform.Find("FireStatusEffect").GetComponent<FireDamageEffect>().StopFire();
 
         //Change Position
         GetComponent<CharacterController>().enabled = false;

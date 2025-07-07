@@ -376,35 +376,38 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
 
     IEnumerator RandomTeleport()
     {
-        bool teleportSpotFound = false;
-        Vector3 teleportPosition = transform.position;
-        int failureAttempts = 0;
-        while (!teleportSpotFound)
+        if (Vector3.Distance(playerTarget.position, transform.position) < 14)
         {
-            failureAttempts++;
-            //Debug.Log("Attempt Number " + failureAttempts + "!");
-            teleportPosition = new Vector3(Random.Range(-teleportRange, teleportRange), Random.Range(-teleportRange, teleportRange), Random.Range(-teleportRange, teleportRange));
-            NavMeshHit hit;
-            if (NavMesh.FindClosestEdge(teleportPosition, out hit, NavMesh.AllAreas))
+            bool teleportSpotFound = false;
+            Vector3 teleportPosition = transform.position;
+            int failureAttempts = 0;
+            while (!teleportSpotFound)
             {
-                //Debug.Log("HIT FOUND!");
-                teleportPosition = hit.position;
-                teleportSpotFound = true;
+                failureAttempts++;
+                //Debug.Log("Attempt Number " + failureAttempts + "!");
+                teleportPosition = new Vector3(Random.Range(-teleportRange, teleportRange), Random.Range(-teleportRange, teleportRange), Random.Range(-teleportRange, teleportRange));
+                NavMeshHit hit;
+                if (NavMesh.FindClosestEdge(teleportPosition, out hit, NavMesh.AllAreas))
+                {
+                    //Debug.Log("HIT FOUND!");
+                    teleportPosition = hit.position;
+                    teleportSpotFound = true;
+                }
+                if (failureAttempts == 10)
+                {
+                    //Debug.Log("FAILURE!");
+                    teleportSpotFound = true;
+                }
             }
-            if (failureAttempts == 10)
-            {
-                //Debug.Log("FAILURE!");
-                teleportSpotFound = true;
-            }
+
+            Instantiate(teleportLocationIndicator, teleportPosition, Quaternion.identity);
+            yield return new WaitForSeconds(3);
+
+            //navMeshAgent.updatePosition = false;
+            transform.position = teleportPosition;
+            //navMeshAgent.updatePosition = true;
+            teleportExplosion.SetActive(true);
         }
-
-        Instantiate(teleportLocationIndicator, teleportPosition, Quaternion.identity);
-        yield return new WaitForSeconds(3);
-
-        //navMeshAgent.updatePosition = false;
-        transform.position = teleportPosition;
-        //navMeshAgent.updatePosition = true;
-        teleportExplosion.SetActive(true);
     }
 
     public void PerformAttack()
