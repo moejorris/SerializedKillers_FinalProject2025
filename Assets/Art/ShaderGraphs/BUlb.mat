@@ -48,6 +48,7 @@ Material:
     - _Transparency: 0.36
     m_Colors:
     - _Color: {r: 1, g: 0.82580465, b: 0.3915094, a: 0}
+    - _Emissive: {r: 0.9339623, g: 0.76432806, b: 0.20705767, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
 --- !u!114 &4535784694174890434

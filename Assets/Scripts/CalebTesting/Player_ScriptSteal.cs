@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using TMPro;
 
 public class Player_ScriptSteal : MonoBehaviour
 {
@@ -112,7 +113,6 @@ public class Player_ScriptSteal : MonoBehaviour
             scriptReturnTimer = scriptReturnTime;
         }
 
-        UpdateOnScreenControls();
 
         //UpdateEnemySelection();
     }
@@ -128,6 +128,7 @@ public class Player_ScriptSteal : MonoBehaviour
     public void ReturnScript()
     {
         heldBehavior = null;
+        selectedEnemy = null;
         enemyManager.UpdateEnemyBehaviors();
         ApplyScriptEffects();
     }
@@ -138,6 +139,7 @@ public class Player_ScriptSteal : MonoBehaviour
         while (true)
         {
             UpdateEnemySelection();
+            UpdateOnScreenControls();
             yield return new WaitForSeconds(0.1f);
         }
     }
@@ -312,6 +314,9 @@ public class Player_ScriptSteal : MonoBehaviour
         {
             activateScriptButton.gameObject.SetActive(true);
             returnScriptButton.gameObject.SetActive(true);
+
+            if (BehaviorActive()) activateScriptButton.transform.Find("Text").GetComponent<TMP_Text>().text = "Deactivate Script";
+            else activateScriptButton.transform.Find("Text").GetComponent<TMP_Text>().text = "Activate Script";
         }
         else
         {

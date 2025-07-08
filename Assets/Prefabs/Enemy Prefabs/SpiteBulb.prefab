@@ -6574,7 +6574,7 @@ MonoBehaviour:
   newLightBulbHead: {fileID: 8448016702553582307}
   headCanTurn: 0
   followGracePeriod: 0.1
-  litBulbColor: {fileID: 2100000, guid: f51a925407a489c4d9f3588986e3a074, type: 2}
+  litBulbColor: {fileID: 2100000, guid: 90b4d97123986444ba34e8e80d20e8c1, type: 2}
   unlitBulbColor: {fileID: 2100000, guid: 617021ae713a8214593229571cc2fa4a, type: 2}
   idleAlertRange: 4
   blindFollowRange: 8
