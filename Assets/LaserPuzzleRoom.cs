@@ -1,0 +1,45 @@
+using UnityEngine;
+using System.Collections;
+
+public class LaserPuzzleRoom : PuzzleRoom
+{
+    public int weightsFallen = 0;
+    public GameObject laser;
+    [SerializeField] Animator[] gates;
+
+
+    public void WeightFallen()
+    {
+        weightsFallen++;
+
+        if (weightsFallen >= 2)
+        {
+            Invoke("FireLaser", 1.5f);
+        }
+    }
+
+    public void FireLaser()
+    {
+        StopCoroutine("LaserFire");
+        StartCoroutine("LaserFire");
+    }
+
+    IEnumerator LaserFire()
+    {
+        while (laser.transform.localScale.y < 1)
+        {
+            Vector3 scale = laser.transform.localScale;
+            scale.y += 0.02f;
+            laser.transform.localScale = scale;
+            yield return new WaitForSeconds(0.01f);
+        }
+
+        RoomComplete();
+
+        foreach (Animator gate in gates)
+        {
+            yield return new WaitForSeconds(0.2f);
+            gate.SetBool("Open", true);
+        }
+    }
+}

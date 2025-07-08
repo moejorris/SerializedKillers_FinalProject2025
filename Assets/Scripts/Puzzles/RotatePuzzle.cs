@@ -4,8 +4,9 @@ public class RotatePuzzle : MonoBehaviour
 {
     [SerializeField] private float targetYRotation;
     [SerializeField] private float rotateSpeed = 5f;
-    [SerializeField] private GameObject jailCell;
-    private OpenJail jailCellScript;
+    [SerializeField] private RotatePuzzleManager rotateManager => transform.parent.GetComponent<RotatePuzzleManager>();
+    //[SerializeField] private GameObject jailCell;
+    //private OpenJail jailCellScript;
     private float currentY;
     private bool isCorrect;
 
@@ -15,7 +16,7 @@ public class RotatePuzzle : MonoBehaviour
     private void Start()
     {
         desiredYRotation = transform.eulerAngles.y;
-        jailCellScript = jailCell.GetComponent<OpenJail>();
+        //jailCellScript = jailCell.GetComponent<OpenJail>();
     }
 
     private void Update()
@@ -35,7 +36,7 @@ public class RotatePuzzle : MonoBehaviour
 
     public void RotateThisPuzzle()
     {
-        if (!isRotating)
+        if (!isRotating && rotateManager.correctRotations != 4)
         {
             float currentY = Mathf.Round(transform.eulerAngles.y / 90f) * 90f;
             float nextY = currentY + 90f;
@@ -55,11 +56,13 @@ public class RotatePuzzle : MonoBehaviour
         if (isCorrect && !wasCorrect)
         {
             Debug.Log("Puzzle solved!");
-            jailCellScript.AddToCounter();
+            //jailCellScript.AddToCounter();
+            rotateManager.AddToCounter();
         }
         else if (!isCorrect && wasCorrect)
         {
-            jailCellScript.RemoveFromCounter();
+            //jailCellScript.RemoveFromCounter();
+            rotateManager.RemoveFromCounter();
         }
     }
 }
