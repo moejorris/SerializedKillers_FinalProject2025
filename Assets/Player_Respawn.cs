@@ -22,11 +22,17 @@ public class Player_Respawn : MonoBehaviour
         transform.Find("FireStatusEffect").GetComponent<FireDamageEffect>().StopFire();
 
         //Change Position
-        GetComponent<CharacterController>().enabled = false;
-        transform.position = respawnPoint;
-        GetComponent<CharacterController>().enabled = true;
+        
+        TeleportPlayer(respawnPoint);
 
         //Remove Script / Status Effects
         PlayerController.instance.ScriptSteal.ReturnScript();
+    }
+
+    public void TeleportPlayer(Vector3 _respawnPoint)
+    {
+        GetComponent<CharacterController>().enabled = false;
+        transform.position = _respawnPoint;
+        GetComponent<CharacterController>().enabled = true;
     }
 }

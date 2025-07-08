@@ -117,9 +117,10 @@ public class Player_ScriptSteal : MonoBehaviour
         //UpdateEnemySelection();
     }
 
-    public void StealScript()
+    public void StealScript(Behavior overrideScript = null)
     {
-        heldBehavior = selectedEnemy.heldBehavior;
+        if (overrideScript != null) heldBehavior = overrideScript;
+        else heldBehavior = selectedEnemy.heldBehavior;
         enemyManager.UpdateEnemyBehaviors(heldBehavior);
         ApplyScriptEffects();
         selectedEnemy = null;

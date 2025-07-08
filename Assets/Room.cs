@@ -30,7 +30,7 @@ public class Room : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     public virtual void Start()
     {
-        InitialEnemyPass();
+        //InitialEnemyPass();
         timer = 2;
     }
 
@@ -50,36 +50,31 @@ public class Room : MonoBehaviour
     public virtual void CheckEnemies()
     {
         RemoveListNulls(respawnEnemies);
+
         for (int i = 0; i < requiredEnemyTypes.Count; i++)
         {
-            if (requiredEnemyTypes[i].transform.Find("Skull") != null)
+            if (requiredEnemyRespawnPoints[i].childCount <= 0)
             {
-                if (!EnemyTypeExists(requiredEnemyTypes[i].transform.Find("Skull").GetComponent<EnemyAI_Base>().heldBehavior))
-                {
-                    SpawnEnemy(requiredEnemyTypes[i], requiredEnemyRespawnPoints[i]);
-                }
-            }
-            else if (!EnemyTypeExists(requiredEnemyTypes[i].GetComponent<EnemyAI_Base>().heldBehavior))
-            {
-
                 SpawnEnemy(requiredEnemyTypes[i], requiredEnemyRespawnPoints[i]);
             }
-
         }
     }
 
-    public void InitialEnemyPass() // creates list from overlapsphere
-    {
-        Collider[] enems = Physics.OverlapBox(box.bounds.center, box.size / 2, Quaternion.identity, enemyLayer);
-        foreach (Collider enemy in enems)
-        {
-            respawnEnemies.Add(enemy.gameObject);
-        }
-    }
+    //public void InitialEnemyPass() // creates list from overlapsphere
+    //{
+    //    Collider[] enems = Physics.OverlapBox(box.bounds.center, box.size / 2, Quaternion.identity, enemyLayer);
+    //    foreach (Collider enemy in enems)
+    //    {
+    //        respawnEnemies.Add(enemy.gameObject);
+    //    }
+    //}
 
     public void SpawnEnemy(GameObject enemy, Transform position)
     {
         GameObject spawnedEnemy = Instantiate(enemy, position.position, Quaternion.identity);
+
+        spawnedEnemy.transform.parent = position;
+
         Instantiate(smokeSpawnPrefab, position.position, Quaternion.identity);
         RemoveListNulls(respawnEnemies);
         respawnEnemies.Add(spawnedEnemy);
@@ -96,24 +91,24 @@ public class Room : MonoBehaviour
         }
     }
 
-    public bool EnemyTypeExists(Behavior element) // checks if this enemy type exists
-    {
-        foreach (GameObject enemy in respawnEnemies)
-        {
-            if (enemy.transform.Find("Skull") != null)
-            {
-                if (enemy.transform.Find("Skull").GetComponent<EnemyAI_Base>().heldBehavior == element)
-                {
-                    return true;
-                }
-            }
-            else if (enemy.GetComponent<EnemyAI_Base>() && enemy.GetComponent<EnemyAI_Base>().heldBehavior == element)
-            {
-                return true;
-            }
-        }
-        return false;
-    }
+    //public bool EnemyTypeExists(Behavior element) // checks if this enemy type exists
+    //{
+    //    foreach (GameObject enemy in respawnEnemies)
+    //    {
+    //        if (enemy.transform.Find("Skull") != null)
+    //        {
+    //            if (enemy.transform.Find("Skull").GetComponent<EnemyAI_Base>().heldBehavior == element)
+    //            {
+    //                return true;
+    //            }
+    //        }
+    //        else if (enemy.GetComponent<EnemyAI_Base>() && enemy.GetComponent<EnemyAI_Base>().heldBehavior == element)
+    //        {
+    //            return true;
+    //        }
+    //    }
+    //    return false;
+    //}
 
     private void OnTriggerEnter(Collider other)
     {

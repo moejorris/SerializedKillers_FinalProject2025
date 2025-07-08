@@ -7,6 +7,7 @@ using Unity.VisualScripting;
 
 public class EnemyAI_Base : MonoBehaviour, ITargetable, IDamageable, IComboTarget
 {
+    public LayerMask gateLayer;
     [Header("Navigation")]
     public Transform playerTarget;
     public float attackRange;
@@ -97,7 +98,7 @@ public class EnemyAI_Base : MonoBehaviour, ITargetable, IDamageable, IComboTarge
 
     public virtual void TakeDamage(float damage)
     {
-        if (!healthBar || !whiteHealthBar) return; // in case no thing exists
+        if (!healthBar || !whiteHealthBar || Invincible()) return; // in case no thing exists
 
         if (PlayerController.instance.ScriptSteal.BehaviorActive() && PlayerController.instance.ScriptSteal.GetHeldBehavior() == heldBehavior.weakness) damage *= 2f;
 
@@ -146,7 +147,7 @@ public class EnemyAI_Base : MonoBehaviour, ITargetable, IDamageable, IComboTarge
 
     public virtual void HighlightEnemy()
     {
-        if (!behaviorActive)
+        if (!behaviorActive || Invincible())
         {
             UnHighlightEnemy();
             return;
@@ -166,5 +167,11 @@ public class EnemyAI_Base : MonoBehaviour, ITargetable, IDamageable, IComboTarge
             highlightPiece.layer = 0;
         }
         selectedIcon.SetActive(false);
+    }
+
+    public virtual bool Invincible()
+    {
+        if (Physics.CheckSphere(transform.position, 1.5f, gateLayer, QueryTriggerInteraction.Collide)) return true;
+        else return false;
     }
 }

@@ -376,7 +376,7 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
 
     IEnumerator RandomTeleport()
     {
-        if (Vector3.Distance(playerTarget.position, transform.position) < 14)
+        if (Vector3.Distance(playerTarget.position, transform.position) < 14 && !Invincible())
         {
             bool teleportSpotFound = false;
             Vector3 teleportPosition = transform.position;
@@ -412,6 +412,8 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
 
     public void PerformAttack()
     {
+        if (Invincible()) return;
+
         preparingAttack = true;
         if (Vector3.Distance(playerTarget.position, transform.position) > longRangeAttackDis && behaviorActive)
         {

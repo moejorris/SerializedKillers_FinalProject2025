@@ -165,7 +165,7 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
 
                 skull.rotation = Quaternion.Slerp(skull.rotation, Quaternion.LookRotation(TARGET - skull.position, Vector3.up), Time.deltaTime * flyingTurnSpeed); // always flies to the player
 
-                if (Vector3.Distance(playerTarget.position, skull.position) < 7f && attackTimer <= 0 && PlayerInLineOfSight() && !selfDestructing)
+                if (Vector3.Distance(playerTarget.position, skull.position) < 7f && attackTimer <= 0 && PlayerInLineOfSight() && !selfDestructing && !Invincible())
                 {
                     BeginDiveAttack();
                 }
@@ -434,7 +434,7 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
 
     public override void TakeDamage(float damage)
     {
-        if (!healthBar || !whiteHealthBar) return; // in case no thing exists
+        if (!healthBar || !whiteHealthBar || Invincible()) return; // in case no thing exists
 
 
         if (behaviorActive)
@@ -574,5 +574,11 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
     {
         base.DeactivateBehavior();
         StartFlying();
+    }
+
+    public override bool Invincible()
+    {
+        if (Physics.CheckSphere(skull.position, 1.5f, gateLayer, QueryTriggerInteraction.Collide)) return true;
+        else return false;
     }
 }

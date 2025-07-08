@@ -405,7 +405,7 @@ public class Player_CombatMachine : MonoBehaviour
         damageable.TakeDamage(currentAttack.damage);
         hitSomething = true;
 
-        if (collider.gameObject.GetComponent<EnemyAI_Base>() != null)
+        if (collider.gameObject.GetComponent<EnemyAI_Base>() != null && !collider.gameObject.GetComponent<EnemyAI_Base>().Invincible()) // Added the invincible check so enemies behind gates can't get targeted for script-stealing/dmg
         {
             selectedEnemy = collider.gameObject.GetComponent<EnemyAI_Base>();
         }
@@ -418,7 +418,10 @@ public class Player_CombatMachine : MonoBehaviour
         if (elemental == null || elemental.GetType() == typeof(Player_HealthComponent) || elementalStorage.Contains(elemental)) return;
 
         elementalStorage.Add(elemental);
-        elemental.InteractElement(PlayerController.instance.ScriptSteal.GetHeldBehavior());
+        if (PlayerController.instance.ScriptSteal.BehaviorActive()) // NEEDS TO MAKE SURE THIS IS ACTIVE. If the check is done in the actual script as to whether this is active, it will check it for enemies too (BAD).
+        {
+            elemental.InteractElement(PlayerController.instance.ScriptSteal.GetHeldBehavior());
+        }
         hitSomething = true;
     }
 

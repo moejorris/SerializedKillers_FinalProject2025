@@ -6551,6 +6551,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 68fb04ded8b19cb46b9c1531c466e507, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gateLayer:
+    serializedVersion: 2
+    m_Bits: 2048
   playerTarget: {fileID: 0}
   attackRange: 16
   navMeshAgent: {fileID: 2762355081595221215}
