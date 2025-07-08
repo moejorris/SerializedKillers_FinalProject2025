@@ -1,9 +1,8 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
-using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
 
 public class Player_ScriptSteal : MonoBehaviour
 {
@@ -32,7 +31,9 @@ public class Player_ScriptSteal : MonoBehaviour
     [SerializeField] private EnemyManager enemyManager;
 
     //[SerializeField] private GameObject onScreenControls;
-    private GameObject[] onScreenControlButtons;
+    private GameObject stealScriptButton;
+    private GameObject activateScriptButton;
+    private GameObject returnScriptButton;
 
 
     [Header("Status Effects")]
@@ -65,8 +66,9 @@ public class Player_ScriptSteal : MonoBehaviour
 
         if (GameObject.FindGameObjectWithTag("Canvas").transform.Find("OnScreenControls") != null)
         {
-            onScreenControlButtons = GetChildren(GameObject.FindGameObjectWithTag("Canvas").transform.Find("OnScreenControls").gameObject);
-            UpdateOnScreenControls();
+            stealScriptButton = GameObject.FindGameObjectWithTag("Canvas").transform.Find("OnScreenControls/StealScript").gameObject;
+            activateScriptButton = GameObject.FindGameObjectWithTag("Canvas").transform.Find("OnScreenControls/ActivateScript").gameObject;
+            returnScriptButton = GameObject.FindGameObjectWithTag("Canvas").transform.Find("OnScreenControls/ReturnScript").gameObject;
         }
 
     }
@@ -109,6 +111,8 @@ public class Player_ScriptSteal : MonoBehaviour
         {
             scriptReturnTimer = scriptReturnTime;
         }
+
+        UpdateOnScreenControls();
 
         //UpdateEnemySelection();
     }
@@ -233,8 +237,6 @@ public class Player_ScriptSteal : MonoBehaviour
             stolenScriptSlot.sprite = emptySlot;
         }
 
-
-
         //if (heldBehavior != null)
         //{
         //    if (stolenScriptSlot.sprite != heldBehavior.deactivatedBehaviorIcon)
@@ -308,18 +310,30 @@ public class Player_ScriptSteal : MonoBehaviour
         //GameObject activeScript
         if (heldBehavior != null)
         {
-            GameObject.FindGameObjectWithTag("Canvas").transform.Find("OnScreenControls/ActivateScripts").gameObject.SetActive(true);
+            activateScriptButton.gameObject.SetActive(true);
+            returnScriptButton.gameObject.SetActive(true);
         }
         else
         {
-            GameObject.FindGameObjectWithTag("Canvas").transform.Find("OnScreenControls/ActivateScripts").gameObject.SetActive(false);
+            activateScriptButton.SetActive(false);
+            returnScriptButton.gameObject.SetActive(false);
         }
 
-            foreach (GameObject button in onScreenControlButtons)
-            {
-                button.transform.Find("Keyboard").gameObject.SetActive(InputIsKeyboard());
-                button.transform.Find("Controller").gameObject.SetActive(!InputIsKeyboard());
-            }
+        if (selectedEnemy != null && selectedEnemy.behaviorActive)
+        {
+            stealScriptButton.SetActive(true);
+        }
+        else
+        {
+            stealScriptButton.SetActive(false);
+        }
+
+        activateScriptButton.transform.Find("Keyboard").gameObject.SetActive(InputIsKeyboard());
+        activateScriptButton.transform.Find("Controller").gameObject.SetActive(!InputIsKeyboard());
+        stealScriptButton.transform.Find("Keyboard").gameObject.SetActive(InputIsKeyboard());
+        stealScriptButton.transform.Find("Controller").gameObject.SetActive(!InputIsKeyboard());
+        returnScriptButton.transform.Find("Keyboard").gameObject.SetActive(InputIsKeyboard());
+        returnScriptButton.transform.Find("Controller").gameObject.SetActive(!InputIsKeyboard());
     }
 
     public GameObject[] GetChildren(GameObject parent)
