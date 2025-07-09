@@ -8,8 +8,6 @@ using UnityEditor;
 [RequireComponent(typeof(NavMeshAgent))]
 public class EnemyAI_Overclock : EnemyAI_Base
 {
-    [SerializeField] GameObject normalBody;
-    [SerializeField] GameObject coldBody;
     [Range(-1f, 1f)]
     [SerializeField] private float rotateThing;
     [Header("Overclock General")]
@@ -22,8 +20,9 @@ public class EnemyAI_Overclock : EnemyAI_Base
 
     [SerializeField] private Material redBodyColor;
     [SerializeField] private Material blueBodyColor;
-    [SerializeField] private ParticleSystem flameParticles => transform.Find("NormalFire").GetComponent<ParticleSystem>();
-    [SerializeField] private ParticleSystem smokeParticles => transform.Find("Smoke").GetComponent<ParticleSystem>();
+    [SerializeField] private ParticleSystem[] flameParticles;
+    [SerializeField] private ParticleSystem[] smokeParticles;
+    [SerializeField] private Animator bodyAnimator => transform.Find("OverclockBody").GetComponent<Animator>();
 
     [Header("Overclock Vision")]
     [SerializeField] private float idleAlertRange;
@@ -48,6 +47,7 @@ public class EnemyAI_Overclock : EnemyAI_Base
     [SerializeField] private float dashAttackCooldown = 4;
     [SerializeField] private float flamethrowerAttackCooldown = 3;
     private float attackPrepTimer = 2.3f;
+    private bool hitPlayer = false;
 
     [SerializeField] private float attackCooldownTimer = 0;
     [SerializeField] private float fireDashDist = 2;
@@ -61,6 +61,8 @@ public class EnemyAI_Overclock : EnemyAI_Base
     [Header("Overclock Dash Attack")]
     [SerializeField] private bool spawningFlames = false;
     [SerializeField] private float dashSpeed = 1f;
+    [SerializeField] private float regularWalkSpeed = 1f;
+
     [SerializeField] private float dashAttackLength = 2;
     private float dashAttackTimer = 0;
 
@@ -90,23 +92,28 @@ public class EnemyAI_Overclock : EnemyAI_Base
         healthBar = transform.Find("Canvas/Bar/Health").GetComponent<RectTransform>();
         whiteHealthBar = transform.Find("Canvas/Bar/White").GetComponent<RectTransform>();
 
+        ToggleParticles(flameParticles, true);
+
         if (PlayerController.instance.ScriptSteal.heldBehavior != null && PlayerController.instance.ScriptSteal.heldBehavior == heldBehavior) DeactivateBehavior();
     }
 
     private void OnDrawGizmos()
     {
-        //Vector3 direction = transform.forward;
-        //Vector3 axis = Vector3.up;
-        //Quaternion rotationAxis = Quaternion.AngleAxis(-flamethrowerArc * 0.5f, axis);
-        //Vector3 rotatedDirectionalAxis = rotationAxis * direction;
-
-        //Handles.color = Color.red;
-        //Handles.DrawSolidArc(transform.position, Vector3.up, rotatedDirectionalAxis, flamethrowerArc, flamethrowerDistance);
+        //Gizmos.DrawSphere(transform.position + (transform.forward.normalized * 3f), 1.8f);
     }
 
     // Update is called once per frame
     public override void Update()
     {
+        if (navMeshAgent.velocity.magnitude > 0.1f)
+        {
+            bodyAnimator.SetBool("Walking", true);
+        }
+        else
+        {
+            bodyAnimator.SetBool("Walking", false);
+        }
+
         if (!preparingAttack)
         {
             if (movementState == "wandering")
@@ -116,9 +123,6 @@ public class EnemyAI_Overclock : EnemyAI_Base
                     movementState = "pursue";
                     StopCoroutine("WanderTimer");
                     wandering = false;
-                    //wander_headTurning = false;
-                    //headCanTurn = true;
-                    //searchAnimationOccuring = false;
                 }
                 else
                 {
@@ -130,14 +134,7 @@ public class EnemyAI_Overclock : EnemyAI_Base
                     }
                     else
                     {
-                        //if (wander_headTurning) // wandering is occuring already, so head turns to the look direction from wander coroutine
-                        //{
-                        //    SetHeadTarget(wanderLookDirection - bulbHead.transform.position, 7);
-                        //}
-                        //else // in between looking around, looks towards it's destination (the new spot it will walk)
-                        //{
-                        //    SetHeadTarget(navMeshAgent.destination - bulbHead.transform.position, 15);
-                        //}
+                        
                     }
                 }
             }
@@ -186,8 +183,18 @@ public class EnemyAI_Overclock : EnemyAI_Base
         }
         else
         {
-            if (attackState == "dash") // basically, makes the guy run to the player for a few seconds
+            if (attackState == "dash") // called during the attack
             {
+                if (PlayerInCone())
+                {
+                    navMeshAgent.destination = playerTarget.position;
+                    TurnBodyTowards(playerTarget.position - transform.position, 4f);
+                }
+                else if (PlayerVisible())
+                {
+                    TurnBodyTowards(playerTarget.position - transform.position, 8);
+                }
+
                 if (!attackOccuring)
                 {
                     if (attackPrepTimer <= 0) // attacks if in range or after a few seconds of running if not
@@ -203,20 +210,13 @@ public class EnemyAI_Overclock : EnemyAI_Base
 
                 if (spawningFlames) // starts in the coroutine. this makes it go forward until either the dashLengthTimer runs out or it gets close to the player
                 {
-                    transform.position += (transform.forward.normalized * Time.deltaTime) * dashSpeed;
+                    //transform.position += (transform.forward.normalized * Time.deltaTime) * dashSpeed;
                     SpawnFire(transform.position);
 
                     dashAttackTimer -= Time.deltaTime;
-                    if (dashAttackTimer <= 0 || PlayerDistance() <= 1.3f)
+                    if (dashAttackTimer <= 0 || navMeshAgent.remainingDistance < 1.5f)
                     {
                         spawningFlames = false;
-                    }
-                }
-                else
-                {
-                    if (PlayerVisible())
-                    {
-                        TurnBodyTowards(playerTarget.position - transform.position, 15);
                     }
                 }
             }
@@ -248,7 +248,7 @@ public class EnemyAI_Overclock : EnemyAI_Base
                         flameTimer = -flamethrowerArc / 2;
                     }
 
-                    SpawnFire(flamethrowerPosition, 10);
+                    SpawnFire(flamethrowerPosition, 5);
                 }
 
                 if (!attackOccuring)
@@ -275,9 +275,14 @@ public class EnemyAI_Overclock : EnemyAI_Base
     }
     public void PerformAttack()
     {
-        if (Invincible()) return;
+        if (Invincible())
+        {
+            attackCooldownTimer = 3;
+            return;
+        }
 
         preparingAttack = true;
+        hitPlayer = false;
 
         if (behaviorActive)
         {
@@ -318,24 +323,28 @@ public class EnemyAI_Overclock : EnemyAI_Base
         attackState = "flamethrower";
         navMeshAgent.isStopped = false;
     }
-    public void ExitFlamethrowerAttack()
+    public void ExitFlamethrowerAttack(bool increaseMeter = true)
     {
         AttackCooldown(flamethrowerAttackCooldown);
+        bodyAnimator.Play("Idle", 0, 0);
         navMeshAgent.stoppingDistance = 3.5f;
         navMeshAgent.isStopped = false;
         spawningFlames = false;
         attackState = "neutral";
         flamethrowerParticles.Stop();
-        IncreaseHeatMeter(30);
         navMeshAgent.speed = 3;
         preparingAttack = false;
         attackOccuring = false;
+        if (increaseMeter) IncreaseHeatMeter(40);
     }
 
     IEnumerator FlamethrowerAttack()
     {
+        bodyAnimator.Play("SweepATK_Start", 0, 0);
         attackOccuring = true;
         navMeshAgent.isStopped = true;
+        yield return new WaitForSeconds(1.5f);
+        bodyAnimator.Play("SweepATK_Sweeping", 0, 0);
 
         flamethrowerParticles.Play();
         spawningFlames = true;
@@ -348,38 +357,81 @@ public class EnemyAI_Overclock : EnemyAI_Base
     public void EnterDashAttack()
     {
         attackPrepTimer = 1;
+        navMeshAgent.stoppingDistance = 1;
+
+        bodyAnimator.Play("Charge_Start", 0, 0);
         attackState = "dash";
         navMeshAgent.isStopped = true;
     }
 
-    public void ExitDashAttack()
+    public void ExitDashAttack(bool increaseMeter = true)
     {
+        navMeshAgent.speed = regularWalkSpeed;
+        navMeshAgent.stoppingDistance = 3.5f;
+
         AttackCooldown(dashAttackCooldown);
         navMeshAgent.stoppingDistance = 3.5f;
         navMeshAgent.isStopped = false;
         attackState = "neutral";
-        IncreaseHeatMeter(40);
+        bodyAnimator.Play("Idle", 0, 0);
         navMeshAgent.speed = 3;
         preparingAttack = false;
         attackOccuring = false;
         spawningFlames = false;
+        if (increaseMeter) IncreaseHeatMeter(40);
     }
 
     IEnumerator DashAttack()
     {
         attackOccuring = true;
-        navMeshAgent.isStopped = true;
 
         dashAttackTimer = dashAttackLength;
         spawningFlames = true;
+        bodyAnimator.Play("Charging", 0, 0);
+        navMeshAgent.isStopped = false;
+        navMeshAgent.speed = dashSpeed;
+
         yield return new WaitUntil(() => !spawningFlames);
 
-        Debug.Log("FLAME BOOM!");
+        navMeshAgent.velocity = transform.forward.normalized;
+        navMeshAgent.isStopped = true;
+        bodyAnimator.Play("Charge_Stop", 0, 0);
+
+        yield return new WaitForSeconds(1.2f);
+
+        DashHitCheck();
+
+        yield return new WaitForSeconds(0.5f);
 
         ExitDashAttack();
     }
 
-    public void SpawnFire(Vector3 location, float fireDur = 5.5f)
+    public void DashHitCheck()
+    {
+        Debug.Log("HIT CHECK!");
+
+        RaycastHit[] hits = Physics.SphereCastAll(transform.position, 1.8f, transform.forward, 2.5f, playerLayer);
+
+        //Debug.Log(hits.Length);
+
+        foreach (RaycastHit hit in hits)
+        {
+            Debug.Log(hit.transform.gameObject.name);
+            if (hit.collider == PlayerController.instance.Collider && !hitPlayer)
+            {
+                //Debug.Log("Player Hit!");
+                hitPlayer = true;
+                PlayerController.instance.Health.TakeDamage(4);
+                Vector3 dir = transform.forward.normalized;
+                dir.y = 0.5f;
+                PlayerController.instance.ForceHandler.AddForce(dir * 15, ForceMode.VelocityChange);
+                PlayerController.instance.ScriptSteal.ApplyStatusEffect(heldBehavior);
+                break;
+            }
+        }
+    }
+
+    public void SpawnFire(Vector3 location, float fireDur = 3f)
     {
         location.y = transform.position.y + 2;
         RaycastHit[] fireCheck = Physics.SphereCastAll(location, 0.5f, Vector3.down, 20, fireMask);
@@ -412,19 +464,23 @@ public class EnemyAI_Overclock : EnemyAI_Base
 
     IEnumerator CooldownMode()
     {
-
-        smokeParticles.Play();
-        flameParticles.Stop();
+        bodyAnimator.Play("ScriptStolen", 0, 0);
+        ToggleParticles(smokeParticles, true);
+        ToggleParticles(flameParticles, false);
         movementState = "cooldown";
         while (heatLevel > 0)
         {
-            yield return new WaitForSeconds(0.05f);
+            yield return new WaitForSeconds(0.03f);
             heatLevel -= 1;
         }
+
+        bodyAnimator.Play("ScriptStolenReverse", 0, 0);
+        yield return new WaitForSeconds(0.8f);
         heatLevel = 0;
+        bodyAnimator.Play("Idle", 0, 0);
         movementState = "wandering";
-        smokeParticles.Stop();
-        flameParticles.Play();
+        ToggleParticles(smokeParticles, false);
+        ToggleParticles(flameParticles, true);
         navMeshAgent.isStopped = false;
     }
 
@@ -504,6 +560,45 @@ public class EnemyAI_Overclock : EnemyAI_Base
         }
     }
 
+    public void ToggleParticles(ParticleSystem[] particles, bool on)
+    {
+        if (on)
+        {
+            foreach (ParticleSystem particle in particles)
+            {
+                particle.Play();
+            }
+        }
+        else
+        {
+            foreach (ParticleSystem particle in particles)
+            {
+                particle.Stop();
+            }
+        }
+    }
+
+    public bool PlayerInCone()
+    {
+        if (Vector3.Distance(playerTarget.position, transform.position) <= visionConeLength) // at least within sight range
+        {
+            if (Physics.Raycast(transform.position, playerTarget.transform.position - transform.position, out RaycastHit rayHit, (Vector3.Distance(playerTarget.position, transform.position) - 3), obstacleLayer)) // checks if player behind things?
+            {
+                return false;
+            }
+            else
+            {
+                Vector3 directionToTarget = (playerTarget.position - transform.position).normalized;
+                if (Vector3.Angle(transform.forward, directionToTarget) < visionConeWidth / 2)
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
     public bool PlayerVisible()
     {
         if (Vector3.Distance(playerTarget.position, transform.position) <= blindFollowRange) // within the "listen range"
@@ -554,9 +649,6 @@ public class EnemyAI_Overclock : EnemyAI_Base
         base.ActivateBehavior();
         navMeshAgent.speed = 3;
         transform.Find("IceSphere").gameObject.SetActive(false);
-        coldBody.SetActive(false);
-        normalBody.SetActive(true);
-        //transform.Find("TheOverclockPlaceholder").GetComponent<MeshRenderer>().material = redBodyColor;
     }
 
     public override void TakeDamage(float damage)
@@ -565,6 +657,8 @@ public class EnemyAI_Overclock : EnemyAI_Base
 
         if ((PlayerController.instance.ScriptSteal.BehaviorActive() && PlayerController.instance.ScriptSteal.GetHeldBehavior() == heldBehavior.weakness) ||
             (PlayerController.instance.ScriptSteal.GetHeldBehavior() == heldBehavior && !behaviorActive)) damage *= 2f;
+
+        if (movementState == "cooldown") damage *= 1.5f;
 
         health -= damage;
 
@@ -588,11 +682,9 @@ public class EnemyAI_Overclock : EnemyAI_Base
     {
         ExitDashAttack();
         ExitFlamethrowerAttack();
+        ToggleParticles(flameParticles, false);
         base.DeactivateBehavior();
         navMeshAgent.speed = 1;
         transform.Find("IceSphere").gameObject.SetActive(true);
-        coldBody.SetActive(true);
-        normalBody.SetActive(false);
-        //transform.Find("TheOverclockPlaceholder").GetComponent<MeshRenderer>().material = blueBodyColor;
     }
 }
