@@ -3,10 +3,17 @@ using UnityEngine.SceneManagement;
 
 public class MenuScript : MonoBehaviour
 {
-    //A very quickly made menu script, made by Tyler. Feel free to completely replace this with something more efficent.
-    
+    //A very quickly made menu script, made by Tyler
+
     [Header("Panel Input")]
-    public GameObject MainPanel, SettingsPanel, HelpPanel, CreditsPanel;
+    public GameObject MainPanel;
+    public GameObject SettingsPanel;
+    public GameObject HelpPanel;
+    public GameObject CreditsPanel;
+
+    [Header("Animators")]
+    public Animator FadeInOutAnimator;
+    public Animator CameraTransformAnimator;
 
     private void Start()
     {
@@ -37,14 +44,18 @@ public class MenuScript : MonoBehaviour
 
     public void CreditsBtn()
     {
+        FadeInOutAnimator.SetTrigger("FadeOut");
+        CameraTransformAnimator.SetBool("MoveToCredits", true);
+
         MainPanel.SetActive(false);
         SettingsPanel.SetActive(false);
         HelpPanel.SetActive(false);
-        CreditsPanel.SetActive(true);
+        //CreditsPanel.SetActive(true);
     }
 
     public void BackBtn()
     {
+        CameraTransformAnimator.SetBool("MoveToCredits", false);
         MainPanel.SetActive(true);
         SettingsPanel.SetActive(false);
         HelpPanel.SetActive(false);
