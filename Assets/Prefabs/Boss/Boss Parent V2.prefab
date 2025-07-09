@@ -10419,7 +10419,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   health: 100
-  maxShieldHealth: 30
+  maxShieldHealth: 75
   attackInterval: 10
   vulnerableDuration: 5
   maxVulnerableAttacks: 3

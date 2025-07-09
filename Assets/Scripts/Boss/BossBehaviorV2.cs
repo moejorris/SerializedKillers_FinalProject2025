@@ -12,8 +12,8 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable
     [SerializeField] private float health = 100f;
     [Tooltip("Shield Health of the boss")]
     [SerializeField] private float maxShieldHealth = 30f;
-    private const float shieldDamage = 5f;
-    private float shieldHealth = 30f;
+    private const float shieldDamage = 2.5f;
+    private float shieldHealth = 0f;
     [Tooltip("Attack Interval in seconds")]
     [SerializeField] private float attackInterval = 10f;
     private float attackTimer = 0f;
@@ -35,34 +35,6 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable
     [SerializeField] private float flashDuration = 0.2f;
     private Coroutine currentFlashCoroutine;
 
-    // Call this when the shield takes damage
-    private void FlashShieldRed()
-    {
-        if (shieldRenderer == null) return;
-        
-        // Stop any existing flash coroutine
-        if (currentFlashCoroutine != null)
-        {
-            StopCoroutine(currentFlashCoroutine);
-        }
-        
-        // Start new flash coroutine
-        currentFlashCoroutine = StartCoroutine(FlashShieldCoroutine());
-    }
-
-    private IEnumerator FlashShieldCoroutine()
-    {
-        // Change to red material
-        shieldRenderer.material = redFlashMaterial;
-        
-        // Wait for flash duration
-        yield return new WaitForSeconds(flashDuration);
-        
-        // Change back to original material
-        shieldRenderer.material = originalShieldMaterial;
-        
-        currentFlashCoroutine = null;
-    }
     [Tooltip("Prefabs for enemies the boss will spawn in periodically")]
     [SerializeField] private GameObject[] enemiesToSpawn; // Array of enemies for the boss to spawn in
     [Tooltip("Spawn Points for enemies to spawn into")]
@@ -87,7 +59,6 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable
     private Transform player; // Reference to the player's transform
     private bool lookAtPlayer = true; // Flag to control whether the boss should look at the player
     private Animator anim; // Reference to the boss's animator
-    private bool isFollowing = false; // Flag to control whether the boss is hovering above the player
     private float lastStateThreshold = 1f; // Last state threshold for the boss to change its state
     private bool isVulnerable = false; // Flag to control whether the boss is vulnerable
     private int vulnAttacks = 0; // Number of attacks the boss has taken while vulnerable
@@ -126,6 +97,7 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable
             return;
         }
         bossRenderer = GetComponent<Renderer>();
+        shieldHealth = maxShieldHealth; // Initialize the shield health to the maximum shield health
     }
 
     void Update()
@@ -195,6 +167,35 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable
             Gizmos.color = Color.red; // Set the color for the gizmo
             Gizmos.DrawLine(transform.position, player.position); // Draw a line from the boss to the player
         }
+    }
+
+        // Call this when the shield takes damage
+    private void FlashShieldRed()
+    {
+        if (shieldRenderer == null) return;
+        
+        // Stop any existing flash coroutine
+        if (currentFlashCoroutine != null)
+        {
+            StopCoroutine(currentFlashCoroutine);
+        }
+        
+        // Start new flash coroutine
+        currentFlashCoroutine = StartCoroutine(FlashShieldCoroutine());
+    }
+
+    private IEnumerator FlashShieldCoroutine()
+    {
+        // Change to red material
+        shieldRenderer.material = redFlashMaterial;
+        
+        // Wait for flash duration
+        yield return new WaitForSeconds(flashDuration);
+        
+        // Change back to original material
+        shieldRenderer.material = originalShieldMaterial;
+        
+        currentFlashCoroutine = null;
     }
 
     void UpdateUI()
@@ -540,6 +541,7 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable
     void StartVulnerable()
     {
         if (isVulnerable) return; // Exit if the boss is already vulnerable
+        shieldHealth = 0; // Reset shield health
         anim.SetTrigger("Weak"); // Trigger the weak animation
         Debug.Log("Boss is about to become vulnerable!"); // Log the start of the vulnerable state
     }
