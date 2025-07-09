@@ -78,6 +78,9 @@ public class EnemyAI_Overclock : EnemyAI_Base
 
     [Header("Overclock Script Change Behavior")]
     [SerializeField] private float stalkingFollowDistance = 15f;
+    [SerializeField] private Transform[] iceSpikes;
+
+    private bool spikesChangingSize = false;
 
 
     public bool testBool = false;
@@ -95,11 +98,12 @@ public class EnemyAI_Overclock : EnemyAI_Base
         ToggleParticles(flameParticles, true);
 
         if (PlayerController.instance.ScriptSteal.heldBehavior != null && PlayerController.instance.ScriptSteal.heldBehavior == heldBehavior) DeactivateBehavior();
+        else ActivateBehavior();
     }
 
     private void OnDrawGizmos()
     {
-        //Gizmos.DrawSphere(transform.position + (transform.forward.normalized * 3f), 1.8f);
+        Gizmos.DrawSphere(transform.position + (transform.forward.normalized * 0.1f), 2.8f);
     }
 
     // Update is called once per frame
@@ -134,12 +138,13 @@ public class EnemyAI_Overclock : EnemyAI_Base
                     }
                     else
                     {
-                        
+
                     }
                 }
             }
             else if (movementState == "pursue")
             {
+                navMeshAgent.stoppingDistance = 3.5f; // MIGHT NEED TO REMOVE?
                 if (PlayerVisible())
                 {
                     if (!behaviorActive)
@@ -305,7 +310,7 @@ public class EnemyAI_Overclock : EnemyAI_Base
         }
         else
         {
-
+            EnterIceAttack();
         }
     }
 
@@ -406,6 +411,85 @@ public class EnemyAI_Overclock : EnemyAI_Base
         ExitDashAttack();
     }
 
+    public void EnterIceAttack()
+    {
+        preparingAttack = true;
+        attackOccuring = true;
+        navMeshAgent.velocity = transform.forward.normalized;
+        navMeshAgent.isStopped = true;
+        attackState = "spike";
+        StopCoroutine("IceAttack");
+        StartCoroutine("IceAttack");
+    }
+
+    IEnumerator IceAttack()
+    {
+        yield return new WaitUntil(() => !spikesChangingSize);
+
+        bodyAnimator.Play("ScriptStolen", 0, 0);
+
+        yield return new WaitForSeconds(1);
+
+        float iceScale = 0.8f;
+
+        while (iceScale < 2.8f)
+        {
+            foreach (Transform iceSpike in iceSpikes)
+            {
+                iceSpike.localScale = (Vector3.one * iceScale);
+            }
+            iceScale += 0.1f;
+            yield return new WaitForSeconds(0.0005f);
+        }
+
+        IceHitCheck();
+
+        while (iceScale > 2f)
+        {
+            foreach (Transform iceSpike in iceSpikes)
+            {
+                iceSpike.localScale = (Vector3.one * iceScale);
+            }
+            iceScale -= 0.1f;
+            yield return new WaitForSeconds(0.005f);
+        }
+
+        bodyAnimator.Play("ScriptStolenReverse", 0, 0);
+        yield return new WaitForSeconds(0.5f);
+
+        while (iceScale > 0.8f)
+        {
+            foreach (Transform iceSpike in iceSpikes)
+            {
+                iceSpike.localScale = (Vector3.one * iceScale);
+            }
+            iceScale -= 0.1f;
+            yield return new WaitForSeconds(0.01f);
+        }
+
+        yield return new WaitForSeconds(0.3f);
+
+        AttackCooldown(2);
+        ExitIceAttack();
+    }
+
+    public void ExitIceAttack()
+    {
+        preparingAttack = false;
+        attackOccuring = false;
+        navMeshAgent.isStopped = false;
+        attackState = "neutral";
+        StopCoroutine("IceAttack");
+
+        Vector3 correctScale = Vector3.one * 0.8f;
+        foreach (Transform iceSpike in iceSpikes)
+        {
+            iceSpike.localScale = correctScale;
+        }
+
+        bodyAnimator.Play("Idle", 0, 0);
+    }
+
     public void DashHitCheck()
     {
         Debug.Log("HIT CHECK!");
@@ -426,6 +510,31 @@ public class EnemyAI_Overclock : EnemyAI_Base
                 dir.y = 0.5f;
                 PlayerController.instance.ForceHandler.AddForce(dir * 15, ForceMode.VelocityChange);
                 PlayerController.instance.ScriptSteal.ApplyStatusEffect(heldBehavior);
+                break;
+            }
+        }
+    }
+
+    public void IceHitCheck()
+    {
+        Debug.Log("ICE CHECK!");
+
+        RaycastHit[] hits = Physics.SphereCastAll(transform.position, 3.5f, transform.forward, 0.1f, playerLayer);
+
+        //Debug.Log(hits.Length);
+
+        foreach (RaycastHit hit in hits)
+        {
+            Debug.Log(hit.transform.gameObject.name);
+            if (hit.collider == PlayerController.instance.Collider && !hitPlayer)
+            {
+                //Debug.Log("Player Hit!");
+                hitPlayer = true;
+                PlayerController.instance.Health.TakeDamage(4);
+                Vector3 dir = transform.forward.normalized;
+                dir.y = 0.5f;
+                PlayerController.instance.ForceHandler.AddForce(dir * 5, ForceMode.VelocityChange);
+                PlayerController.instance.ScriptSteal.ApplyStatusEffect(heldBehavior.weakness);
                 break;
             }
         }
@@ -537,6 +646,66 @@ public class EnemyAI_Overclock : EnemyAI_Base
         movementState = "idle"; // returns to idle
     }
 
+    IEnumerator SpikesAppear()
+    {
+        if (iceSpikes.Length > 0)
+        {
+            spikesChangingSize = true;
+
+            float iceScale = iceSpikes[0].localScale.x;
+
+            if (iceScale < 0.8)
+            {
+                while (iceScale < 0.8f)
+                {
+                    foreach (Transform iceSpike in iceSpikes)
+                    {
+                        iceSpike.localScale = (Vector3.one * iceScale);
+                    }
+                    iceScale += 0.1f;
+                    yield return new WaitForSeconds(0.05f);
+                }
+            }
+            else if (iceScale > 0.8)
+            {
+                while (iceScale > 0.8f)
+                {
+                    foreach (Transform iceSpike in iceSpikes)
+                    {
+                        iceSpike.localScale = (Vector3.one * iceScale);
+                    }
+                    iceScale -= 0.1f;
+                    yield return new WaitForSeconds(0.05f);
+                }
+            }
+
+            spikesChangingSize = false;
+        }
+    }
+
+    IEnumerator SpikesDisappear()
+    {
+        if (iceSpikes.Length > 0)
+        {
+            spikesChangingSize = true;
+
+            float iceScale = iceSpikes[0].localScale.x;
+
+
+            while (iceScale > 0f)
+            {
+                foreach (Transform iceSpike in iceSpikes)
+                {
+                    iceSpike.localScale = (Vector3.one * iceScale);
+                }
+                iceScale -= 0.1f;
+                yield return new WaitForSeconds(0.05f);
+            }
+
+            spikesChangingSize = false;
+        }
+    }
+
     public void BeginSpotSearch()
     {
         searchAnimationOccuring = true;
@@ -646,9 +815,16 @@ public class EnemyAI_Overclock : EnemyAI_Base
 
     public override void ActivateBehavior()
     {
+        ExitIceAttack();
         base.ActivateBehavior();
         navMeshAgent.speed = 3;
         transform.Find("IceSphere").gameObject.SetActive(false);
+
+        StopCoroutine("SpikesAppear");
+        StopCoroutine("SpikesDisappear");
+        StartCoroutine("SpikesDisappear");
+
+        ToggleParticles(flameParticles, true);
     }
 
     public override void TakeDamage(float damage)
@@ -680,11 +856,20 @@ public class EnemyAI_Overclock : EnemyAI_Base
 
     public override void DeactivateBehavior()
     {
-        ExitDashAttack();
-        ExitFlamethrowerAttack();
+        ExitDashAttack(false);
+        ExitFlamethrowerAttack(false);
+        heatLevel = 0;
         ToggleParticles(flameParticles, false);
         base.DeactivateBehavior();
-        navMeshAgent.speed = 1;
+        AttackCooldown(1);
+        navMeshAgent.speed = 2.5f;
+        navMeshAgent.stoppingDistance = 3.5f;
         transform.Find("IceSphere").gameObject.SetActive(true);
+
+        StopCoroutine("SpikesDisappear");
+        StopCoroutine("SpikesAppear");
+        StartCoroutine("SpikesAppear");
+
+        ToggleParticles(flameParticles, false);
     }
 }
