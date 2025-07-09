@@ -13276,7 +13276,7 @@ MonoBehaviour:
   m_ScaleMode: 0
   m_Offset: {x: 0, y: 0, z: 0.25}
   m_Size: {x: 5, y: 5, z: 0.5}
-  m_FadeFactor: 0.724
+  m_FadeFactor: 1
 --- !u!4 &964344505
 Transform:
   m_ObjectHideFlags: 0
@@ -13799,7 +13799,7 @@ MonoBehaviour:
   m_ScaleMode: 0
   m_Offset: {x: 0, y: 0, z: 0.25}
   m_Size: {x: 8, y: 8, z: 0.5}
-  m_FadeFactor: 0.724
+  m_FadeFactor: 1
 --- !u!4 &994321989
 Transform:
   m_ObjectHideFlags: 0
