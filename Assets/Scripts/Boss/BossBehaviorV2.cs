@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public enum BossState { None, Fire, Electric, Water } // Enumeration for elemental states
 
-public class BossBehaviorV2 : MonoBehaviour, IElemental
+public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable
 {
     #region Unity Variables
     [Header("Boss Settings")]
@@ -446,7 +446,7 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental
         Destroy(gameObject, 2f); // Destroy the boss after 2 seconds
     }
 
-    public void InteractElement(Behavior behavior)
+    public void InteractElement(Behavior behavior = null)
     {
         if (!canTakeDamage || isTransitioning)
         {
@@ -717,6 +717,11 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental
         shieldHealth = maxShieldHealth; // Reset shield if needed
         AllowDamage(); // Allow damage now that transition is complete
         Debug.Log("Boss is no longer vulnearble!");
+    }
+
+    public void TakeDamage(float damage = 0)
+    {
+        InteractElement();
     }
     #endregion
 }
