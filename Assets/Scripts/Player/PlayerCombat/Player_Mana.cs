@@ -48,9 +48,10 @@ public class Player_Mana : MonoBehaviour
             Vector3 manaBarScale = manaBar.localScale;
             manaBarScale.x = lerpScale;
             manaBar.localScale = manaBarScale;
-            manaBarLerpSpeed += (Time.deltaTime / 25f);
+            if (manaBar.localScale.x >= whiteManaBar.localScale.x - 0.005f) manaBar.localScale = whiteManaBar.localScale;
+            manaBarLerpSpeed += (Time.deltaTime / 15f);
         }
-        else if (manaBar.localScale.x > whiteManaBar.localScale.x)
+        else if (manaBar.localScale.x >= whiteManaBar.localScale.x)
         {
             manaBar.localScale = whiteManaBar.localScale;
             manaBarLerpSpeed = 0;
