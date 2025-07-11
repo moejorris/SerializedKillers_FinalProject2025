@@ -233,10 +233,17 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
             if (!behaviorActive)
             {
                 teleportTimer -= Time.deltaTime;
-                if (teleportTimer <= 0 && !attackOccuring && !preparingAttack)
+                if (teleportTimer <= 0)
                 {
-                    teleportTimer = Random.Range(4f, 5f);
-                    StartCoroutine("ShadowClone");
+                    if (!attackOccuring && !preparingAttack && !Invincible())
+                    {
+                        teleportTimer = Random.Range(4f, 5f);
+                        StartCoroutine("ShadowClone");
+                    }
+                    else
+                    {
+                        teleportTimer = 3;
+                    }
                 }
             }
         }
@@ -342,6 +349,7 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
 
         if (invisible && healthBarImages[0].color.a > 0)
         {
+            Debug.Log("Insivible!");
             foreach (Image image_ in healthBarImages)
             {
                 Color color_ = image_.color;
@@ -349,7 +357,7 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
                 image_.color = color_;
             }
         }
-        else if (healthBarImages[0].color.a < 1)
+        else if (healthBarImages[0].color.a < 1 && !invisible)
         {
             foreach (Image image_ in healthBarImages)
             {
@@ -400,15 +408,17 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
         bool locationFound = false;
         Vector3 potentialLocation = transform.position;
 
-        while (!locationFound)
+        int attempts = 0;
+
+        while (!locationFound && attempts < 15)
         {
+            attempts++;
             float x = Random.Range(4f, 7f);
             float z = Random.Range(4f, 7f);
             int x_sub = Random.Range(0, 2);
             int z_sub = Random.Range(0, 2);
             if (x_sub == 0) x *= -1;
             if (z_sub == 0) z *= -1;
-
 
             potentialLocation = new Vector3(playerTarget.position.x + x, transform.position.y, playerTarget.position.z + z);
             NavMeshPath path = new NavMeshPath();
@@ -423,6 +433,7 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
                 //Debug.Log("New path made. It's location is: " + potentialLocation + " and it cannot path there :(");
             }
         }
+
         transform.position = potentialLocation;
 
         navMeshAgent.isStopped = false;
@@ -465,14 +476,30 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
 
 
         ExitMeleeAttack();
+        ExitShadowAttack();
     }
 
     public void ExitShadowMode()
     {
-        StopCoroutine("ShadowMeleeAttack");
+        StopCoroutine("ShadowClone");
+        //StopCoroutine("ShadowMeleeAttack");
         foreach (Renderer mesh in meshes)
         {
             mesh.enabled = true;
+        }
+    }
+
+    public void ExitShadowAttack()
+    {
+        StopCoroutine("ShadowClone");
+        //StopCoroutine("ShadowMeleeAttack");
+        foreach (Renderer mesh in meshes)
+        {
+            mesh.enabled = true;
+        }
+        foreach (SpriteRenderer slash in slashes)
+        {
+            slash.enabled = false;
         }
         invisible = false;
     }
@@ -518,6 +545,10 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
 
     public void ExitMeleeAttack()
     {
+        foreach (SpriteRenderer slash in slashes)
+        {
+            slash.enabled = false;
+        }
         AttackCooldown(meleeAttackCooldown);
         navMeshAgent.stoppingDistance = 3.5f;
         navMeshAgent.isStopped = false;
