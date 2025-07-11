@@ -11,40 +11,25 @@ public class ElectricWater : MonoBehaviour
 
     private bool playerHasElectric = false;
 
-
-    // void OnTriggerStay(Collider other)
-    // {
-    //     if (other == PlayerController.instance.Collider)
-    //     {
-    //         if (PlayerController.instance.ScriptSteal.GetHeldBehavior() == "electric")
-    //         {
-    //             playerHasElectric = true;
-    //         }
-    //         if (!playerHasElectric) return;
-    //         shockTimer += Time.deltaTime;
-    //         if (shockTimer >= shockInterval)
-    //         {
-    //             PlayerController.instance.Health.TakeDamage(damage);
-    //             shockTimer = 0f;
-    //         }
-    //     }
-    // }
-
     void OnTriggerStay(Collider other)
     {
-        var playerController = PlayerController.instance;
-        if (playerController != null && other == playerController.Collider)
+        if (other.gameObject.layer == LayerMask.NameToLayer("Player"))
         {
-            var heldBehavior = playerController.ScriptSteal.GetHeldBehavior();
-            playerHasElectric = (heldBehavior != null && heldBehavior.behaviorName == "electric");
-
-            if (playerHasElectric) return;
-
-            shockTimer += Time.deltaTime;
-            if (shockTimer >= shockInterval)
+            var playerController = PlayerController.instance;
+            if (playerController != null && other == playerController.Collider)
             {
-                playerController.Health.TakeDamage(damage);
-                shockTimer = 0f;
+                var scriptSteal = playerController.ScriptSteal;
+                bool hasElectricActive = scriptSteal.GetHeldBehavior() != null && scriptSteal.GetHeldBehavior().behaviorName == "electric" && scriptSteal.BehaviorActive();
+                playerHasElectric = hasElectricActive;
+
+                if (playerHasElectric) return;
+
+                shockTimer += Time.deltaTime;
+                if (shockTimer >= shockInterval)
+                {
+                    playerController.Health.TakeDamage(damage);
+                    shockTimer = 0f;
+                }
             }
         }
     }

@@ -51,8 +51,7 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable
     [Header("Testing Settings")]
     [Tooltip("Testing Flag")]
     [SerializeField] private bool testing = false;
-    [Tooltip("Boss Starts in Second Fight Phase")]
-    [SerializeField] private bool secondPhase = false;
+
     [Tooltip("Elemental State of the boss")]
     [SerializeField] private BossState currentState; // Current elemental state of the boss
     private bool hasNoMoreAttacks = false;
@@ -582,7 +581,6 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable
         else if (healthPercentage <= 0f)
         {
             // Boss will play fake death animation, then reemerge then fight harder.
-            secondPhase = true; // Set the second phase flag to true
             Debug.Log("Boss has reached the second phase!"); // Log the second phase
             Destroy(gameObject, 5f); // Destroy the boss after 5 seconds
             return; // Exit the method
