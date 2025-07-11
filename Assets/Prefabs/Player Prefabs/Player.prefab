@@ -21101,6 +21101,7 @@ MonoBehaviour:
   acceleration: -10
   gravityScale: 3
   _currentGravity: 0
+  affectedByMultipliers: 0
 --- !u!114 &9151791091005987443
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -21136,6 +21137,7 @@ MonoBehaviour:
   groundedDrag: 5
   airDrag: 2
   forceCurrent: {x: 0, y: 0, z: 0}
+  affectedByMultipliers: 0
 --- !u!114 &1459295906252677131
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -21181,6 +21183,7 @@ MonoBehaviour:
   currentComboCount: 0
   comboCountResetTime: 0.5
   comboResetOnWhiff: 1
+  comboManaBonusMultiplier: 0.25
 --- !u!114 &2845844426926673644
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -21243,6 +21246,7 @@ MonoBehaviour:
   - {fileID: 7439692056531697103}
   - {fileID: 855651479079340701}
   materialList: []
+  takeDamageBonusManaMultiplier: 0.5
 --- !u!96 &3610208228449994613
 TrailRenderer:
   serializedVersion: 3

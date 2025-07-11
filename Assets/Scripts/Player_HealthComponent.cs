@@ -7,6 +7,7 @@ public class Player_HealthComponent : Health
     [SerializeField] PlayerHealth playerHealthUI => GameObject.FindGameObjectWithTag("Canvas").GetComponent<PlayerHealth>();
     [SerializeField] private Renderer[] meshes;
     [SerializeField] private List<Material> materialList;
+    [SerializeField] float takeDamageBonusManaMultiplier = 0.5f;
 
     private void Start()
     {
@@ -23,6 +24,8 @@ public class Player_HealthComponent : Health
     public override void TakeDamage(float damage = 0)
     {
         base.TakeDamage(damage);
+
+        PlayerController.instance.Mana.GainMana(damage * takeDamageBonusManaMultiplier);
 
         if (currentHealth < 0) currentHealth = 0;
 
