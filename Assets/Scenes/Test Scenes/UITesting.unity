@@ -4838,15 +4838,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6913679290908290532, guid: 221ee92e73c803a42b396c5083667049, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 8.12
+      value: -1.98
       objectReference: {fileID: 0}
     - target: {fileID: 6913679290908290532, guid: 221ee92e73c803a42b396c5083667049, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 2.4
+      value: 1.3
       objectReference: {fileID: 0}
     - target: {fileID: 6913679290908290532, guid: 221ee92e73c803a42b396c5083667049, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -30.73
+      value: -2.95
       objectReference: {fileID: 0}
     - target: {fileID: 6913679290908290532, guid: 221ee92e73c803a42b396c5083667049, type: 3}
       propertyPath: m_LocalRotation.w
@@ -6899,6 +6899,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: SobbySkull
       objectReference: {fileID: 0}
+    - target: {fileID: 4806814001057205552, guid: efc5dc08c1f683f4c96096041a27d5c0, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5039905764734303887, guid: efc5dc08c1f683f4c96096041a27d5c0, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.014137136
@@ -7027,7 +7031,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8823160757367770844, guid: b438f22a2483c8e498fa00f3b586992e, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

@@ -152,11 +152,9 @@ public class Player_MovementMachine : MonoBehaviour
             case GroundCheckMethod.SphereCast:
 
                 _grounded = Physics.SphereCast(transform.position, PlayerController.instance.CharacterController.radius, Vector3.down, out _groundInfo, PlayerController.instance.CharacterController.height / 2f, ~0, QueryTriggerInteraction.Ignore);
-                if (_groundInfo.collider?.GetComponent<EnemyAI_Base>() != null || _groundInfo.collider?.transform.parent.GetComponent<EnemyAI_Base>() != null)
-                {
-                    _grounded = false;
-                    PlayerController.instance.ForceHandler.AddForce(Vector3.ProjectOnPlane((transform.position - _groundInfo.collider.transform.position).normalized, Vector3.up) * 100f, ForceMode.Acceleration);
-                }
+
+                EnemyCheck();
+
                 break;
         }
 
@@ -169,10 +167,22 @@ public class Player_MovementMachine : MonoBehaviour
                 PlayerController.instance.ChildMover.RemoveParent();
             }
         }
-        
+
         if (_grounded && _groundInfo.collider.transform != PlayerController.instance.ChildMover.Parent)
         {
             PlayerController.instance.ChildMover.UpdateParent(_groundInfo.collider.transform);
+        }
+    }
+
+    //Fall if standing on an Enemy
+    void EnemyCheck()
+    {
+        if (_groundInfo.collider == null) return;
+
+        if (_groundInfo.collider.GetComponent<EnemyAI_Base>() != null || _groundInfo.collider.transform.parent?.GetComponent<EnemyAI_Base>() != null)
+        {
+            _grounded = false;
+            PlayerController.instance.ForceHandler.AddForce(Vector3.ProjectOnPlane((transform.position - _groundInfo.collider.transform.position).normalized, Vector3.up) * 100f, ForceMode.Acceleration);
         }
     }
 
@@ -204,3 +214,4 @@ public class Player_MovementMachine : MonoBehaviour
         }
     }
 }
+
