@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using System.Net;
 
 
 //Joe Morris
@@ -47,6 +46,7 @@ public class Player_CombatMachine : MonoBehaviour
     [SerializeField] int currentComboCount = 0;
     [SerializeField] float comboCountResetTime = 0.5f;
     [SerializeField] bool comboResetOnWhiff = true;
+    [SerializeField] float comboManaBonusMultiplier = 0.25f;
 
     void Update()
     {
@@ -523,6 +523,8 @@ public class Player_CombatMachine : MonoBehaviour
 
     void ResetComboCount()
     {
+        if (currentComboCount > 0) PlayerController.instance.Mana.GainMana(currentComboCount * comboManaBonusMultiplier);
+
         currentComboCount = 0;
         Ui_ComboCounter.instance?.UpdateComboDisplay(0);
     }
