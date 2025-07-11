@@ -17,7 +17,7 @@ public class Player_Animation : MonoBehaviour
         if (foursTimer >= 0.1f) // 0.1f in between updates to emulate choppy feeling 
         {
             playerMeshTransform.forward = PlayerController.instance.MovementMachine.ForwardDirection;
-            playerMeshAnimator.SetFloat("NormalizedWalkSpeed", PlayerController.instance.Walk.GetNormalizedSpeed());
+            playerMeshAnimator.SetFloat("NormalizedWalkSpeed", PlayerController.instance.Walk.GetNormalizedSpeed() * PlayerController.instance.MovementMachine.MovementMultiplier);
             foursTimer = 0;
         }
 

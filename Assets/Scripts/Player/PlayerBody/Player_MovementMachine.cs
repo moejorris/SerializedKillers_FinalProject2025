@@ -15,6 +15,9 @@ public class Player_MovementMachine : MonoBehaviour
     Vector3 _forwardDirection;
     RaycastHit _groundInfo;
     bool _grounded;
+    float _movementMultiplier = 1f;
+
+
     enum TimeStep { Update, FixedUpdate }
 
     //Public Getters
@@ -23,6 +26,7 @@ public class Player_MovementMachine : MonoBehaviour
     public RaycastHit GroundInformation { get => _groundInfo; }
     public float DeltaTime { get => currentDeltaTime(); }
     public bool isGrounded { get => _grounded; }
+    public float MovementMultiplier { get => _movementMultiplier; }
 
     public Vector3 CurrentMotion;
 
@@ -51,7 +55,7 @@ public class Player_MovementMachine : MonoBehaviour
 
                     if (forceToAdd.magnitude > 0.05f)
                     {
-                        movementToMake += forceToAdd;
+                        movementToMake += forceToAdd * (mover.affectedByMultipliers ? _movementMultiplier : 1f);
 
                     }
                 }
@@ -148,7 +152,11 @@ public class Player_MovementMachine : MonoBehaviour
             case GroundCheckMethod.SphereCast:
 
                 _grounded = Physics.SphereCast(transform.position, PlayerController.instance.CharacterController.radius, Vector3.down, out _groundInfo, PlayerController.instance.CharacterController.height / 2f, ~0, QueryTriggerInteraction.Ignore);
-
+                if (_groundInfo.collider?.GetComponent<EnemyAI_Base>() != null || _groundInfo.collider?.transform.parent.GetComponent<EnemyAI_Base>() != null)
+                {
+                    _grounded = false;
+                    PlayerController.instance.ForceHandler.AddForce(Vector3.ProjectOnPlane((transform.position - _groundInfo.collider.transform.position).normalized, Vector3.up) * 100f, ForceMode.Acceleration);
+                }
                 break;
         }
 
@@ -166,6 +174,17 @@ public class Player_MovementMachine : MonoBehaviour
         {
             PlayerController.instance.ChildMover.UpdateParent(_groundInfo.collider.transform);
         }
+    }
+
+    //Movement Multiplier When in Ice (or Water?)
+    public void SetMovementMultiplier(float multiplier)
+    {
+        _movementMultiplier = multiplier;
+    }
+
+    public void RemoveMovementMultiplier()
+    {
+        _movementMultiplier = 1f;
     }
 
     void OnDrawGizmos()

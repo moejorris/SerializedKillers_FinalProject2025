@@ -261,6 +261,11 @@ MonoBehaviour:
   - {fileID: 6108447017665976633}
   - {fileID: 4079891493437518004}
   - {fileID: 4925711576124761044}
+  iceFieldTransform: {fileID: 1890078528642238426}
+  playerIsSlowedInIceField: 1
+  playerIsSlowedByIceAttack: 1
+  playerIceAttackSlowDuration: 5
+  iceFieldPlayerSpeedMultiplier: 0.25
   testBool: 0
 --- !u!136 &7361482598505038802
 CapsuleCollider:

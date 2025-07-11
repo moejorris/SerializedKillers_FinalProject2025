@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Player_ForceHandler : MonoBehaviour, IPlayerMover
 {
-
+    bool gravityControlsY = true; //for testing
     [SerializeField] float mass = 2;
     [SerializeField] float groundedDrag = 5f;
     [SerializeField] float airDrag = 3f;
@@ -12,6 +12,8 @@ public class Player_ForceHandler : MonoBehaviour, IPlayerMover
     [SerializeField] Vector3 forceCurrent;
 
     public enum OverrideMode {None, OnlyChanged, All}
+
+    public bool affectedByMultipliers = false;
 
     void OnEnable() => PlayerController.instance.MovementMachine.AddMover(this); //Add itself to the movement machine!
     void OnDisable() => PlayerController.instance.MovementMachine.RemoveMover(this); //remove itself from the movement machine when no longer active!
@@ -47,7 +49,7 @@ public class Player_ForceHandler : MonoBehaviour, IPlayerMover
             case OverrideMode.OnlyChanged: //only changes the axes that force is being applied. Ex: Vector3 (0, 10, 0) the Y axis will be set to 10, but x and z will be left alone.
                 if (forceToAdd.y != 0)
                 {
-                    if (PlayerController.instance.Gravity)
+                    if (PlayerController.instance.Gravity && gravityControlsY)
                     {
                         PlayerController.instance.Gravity.OverrideVerticalForce(forceToAdd.y);
                     }
@@ -61,7 +63,7 @@ public class Player_ForceHandler : MonoBehaviour, IPlayerMover
             break;
 
             case OverrideMode.None: //adds force normally.
-                if (PlayerController.instance.Gravity)
+                if (PlayerController.instance.Gravity && gravityControlsY)
                 {
                     PlayerController.instance.Gravity.AddVerticalForce(forceToAdd.y);
                 }

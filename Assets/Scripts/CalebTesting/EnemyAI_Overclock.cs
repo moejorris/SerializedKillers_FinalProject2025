@@ -79,6 +79,11 @@ public class EnemyAI_Overclock : EnemyAI_Base
     [Header("Overclock Script Change Behavior")]
     [SerializeField] private float stalkingFollowDistance = 15f;
     [SerializeField] private Transform[] iceSpikes;
+    [SerializeField] Transform iceFieldTransform;
+    [SerializeField] bool playerIsSlowedInIceField = true;
+    [SerializeField] bool playerIsSlowedByIceAttack = true;
+    [SerializeField] float playerIceAttackSlowDuration = 5f;
+    [SerializeField] float iceFieldPlayerSpeedMultiplier = 0.25f;
 
     private bool spikesChangingSize = false;
 
@@ -118,163 +123,175 @@ public class EnemyAI_Overclock : EnemyAI_Base
             bodyAnimator.SetBool("Walking", false);
         }
 
+        if (!behaviorActive)
+        {
+            if (Vector3.Distance(PlayerController.instance.transform.position, transform.position) < (iceFieldTransform.localScale.x * 0.5f) && PlayerController.instance.MovementMachine.MovementMultiplier == 1 && playerIsSlowedInIceField)
+            {
+                PlayerController.instance.MovementMachine.SetMovementMultiplier(iceFieldPlayerSpeedMultiplier);
+            }
+            else if (PlayerController.instance.MovementMachine.MovementMultiplier != 1)
+            {
+                PlayerController.instance.MovementMachine.RemoveMovementMultiplier();
+            }
+        }
+
         if (!preparingAttack)
-        {
-            if (movementState == "wandering")
             {
-                if (PlayerVisible()) // either the player gets into range
+                if (movementState == "wandering")
                 {
-                    movementState = "pursue";
-                    StopCoroutine("WanderTimer");
-                    wandering = false;
-                }
-                else
-                {
-                    if (!wandering) // hasn't started the wander timer coroutine
+                    if (PlayerVisible()) // either the player gets into range
                     {
-                        wandering = true;
+                        movementState = "pursue";
                         StopCoroutine("WanderTimer");
-                        StartCoroutine("WanderTimer");
+                        wandering = false;
                     }
                     else
                     {
-
-                    }
-                }
-            }
-            else if (movementState == "pursue")
-            {
-                navMeshAgent.stoppingDistance = 3.5f; // MIGHT NEED TO REMOVE?
-                if (PlayerVisible())
-                {
-                    if (!behaviorActive)
-                    {
-                        navMeshAgent.destination = playerTarget.position; // straight toward them in ice mode
-
-                        if (PlayerDistance() < 3 && attackCooldownTimer <= 0)
+                        if (!wandering) // hasn't started the wander timer coroutine
                         {
-                            PerformAttack();
+                            wandering = true;
+                            StopCoroutine("WanderTimer");
+                            StartCoroutine("WanderTimer");
+                        }
+                        else
+                        {
+
                         }
                     }
-                    else // tries to get behind the player(?)
+                }
+                else if (movementState == "pursue")
+                {
+                    navMeshAgent.stoppingDistance = 3.5f; // MIGHT NEED TO REMOVE?
+                    if (PlayerVisible())
                     {
-                        Vector3 _newDirection = Camera.main.transform.position - playerTarget.transform.position; // maybe opposite?
-                        Vector3 _newPosition = playerTarget.transform.position + (_newDirection.normalized * 12);
-                        _newPosition.y = playerTarget.transform.position.y;
-                        navMeshAgent.destination = _newPosition;
-
-                        if (attackCooldownTimer <= 0)
+                        if (!behaviorActive)
                         {
-                            PerformAttack();
+                            navMeshAgent.destination = playerTarget.position; // straight toward them in ice mode
+
+                            if (PlayerDistance() < 3 && attackCooldownTimer <= 0)
+                            {
+                                PerformAttack();
+                            }
+                        }
+                        else // tries to get behind the player(?)
+                        {
+                            Vector3 _newDirection = Camera.main.transform.position - playerTarget.transform.position; // maybe opposite?
+                            Vector3 _newPosition = playerTarget.transform.position + (_newDirection.normalized * 12);
+                            _newPosition.y = playerTarget.transform.position.y;
+                            navMeshAgent.destination = _newPosition;
+
+                            if (attackCooldownTimer <= 0)
+                            {
+                                PerformAttack();
+                            }
+                        }
+
+                        followTimer = 0;
+                    }
+                    else if (followTimer < followGracePeriod)
+                    {
+                        navMeshAgent.destination = playerTarget.position;
+                        followTimer += Time.deltaTime;
+                    }
+                    else
+                    {
+                        movementState = "wandering";
+                    }
+                }
+                else if (movementState == "cooldown")
+                {
+
+                }
+            }
+            else
+            {
+                if (attackState == "dash") // called during the attack
+                {
+                    if (PlayerInCone())
+                    {
+                        navMeshAgent.destination = playerTarget.position;
+                        TurnBodyTowards(playerTarget.position - transform.position, 4f);
+                    }
+                    else if (PlayerVisible())
+                    {
+                        TurnBodyTowards(playerTarget.position - transform.position, 8);
+                    }
+
+                    if (!attackOccuring)
+                    {
+                        if (attackPrepTimer <= 0) // attacks if in range or after a few seconds of running if not
+                        {
+                            StopCoroutine("DashAttack");
+                            StartCoroutine("DashAttack");
+                        }
+                        else
+                        {
+                            attackPrepTimer -= Time.deltaTime;
                         }
                     }
 
-                    followTimer = 0;
+                    if (spawningFlames) // starts in the coroutine. this makes it go forward until either the dashLengthTimer runs out or it gets close to the player
+                    {
+                        //transform.position += (transform.forward.normalized * Time.deltaTime) * dashSpeed;
+                        SpawnFire(transform.position);
+
+                        dashAttackTimer -= Time.deltaTime;
+                        if (dashAttackTimer <= 0 || navMeshAgent.remainingDistance < 1.5f)
+                        {
+                            spawningFlames = false;
+                        }
+                    }
                 }
-                else if (followTimer < followGracePeriod)
+                else if (attackState == "flamethrower")
                 {
-                    navMeshAgent.destination = playerTarget.position;
-                    followTimer += Time.deltaTime;
+                    if (PlayerVisible())
+                    {
+                        navMeshAgent.destination = playerTarget.position;
+                    }
+
+                    if (spawningFlames)
+                    {
+                        flameTimer += Time.deltaTime * 100;
+                        //Debug.Log(flameTimer);
+
+                        Vector3 direction = transform.forward;
+                        Vector3 axis = Vector3.up;
+                        Quaternion rotationAxis = Quaternion.AngleAxis(flameTimer, axis);
+                        Vector3 rotatedDirectionalAxis = (rotationAxis * direction).normalized;
+                        rotatedDirectionalAxis.y = transform.position.y;
+                        rotatedDirectionalAxis *= flamethrowerDistance;
+
+                        flamethrowerPosition = transform.position + rotatedDirectionalAxis;
+
+                        Debug.DrawRay(transform.position, rotatedDirectionalAxis, Color.red);
+
+                        if (flameTimer > flamethrowerArc / 2)
+                        {
+                            flameTimer = -flamethrowerArc / 2;
+                        }
+
+                        SpawnFire(flamethrowerPosition, 5);
+                    }
+
+                    if (!attackOccuring)
+                    {
+                        if (attackPrepTimer <= 0 || navMeshAgent.remainingDistance < 0.5f) // attacks if in range or after a few seconds of running if not
+                        {
+                            StopCoroutine("FlamethrowerAttack");
+                            StartCoroutine("FlamethrowerAttack");
+                        }
+                        else
+                        {
+                            attackPrepTimer -= Time.deltaTime;
+                        }
+                    }
                 }
-                else
+
+                if (!PlayerVisible()) // in case the player runs away while an attack was occuring
                 {
-                    movementState = "wandering";
+
                 }
             }
-            else if (movementState == "cooldown")
-            {
-
-            }
-        }
-        else
-        {
-            if (attackState == "dash") // called during the attack
-            {
-                if (PlayerInCone())
-                {
-                    navMeshAgent.destination = playerTarget.position;
-                    TurnBodyTowards(playerTarget.position - transform.position, 4f);
-                }
-                else if (PlayerVisible())
-                {
-                    TurnBodyTowards(playerTarget.position - transform.position, 8);
-                }
-
-                if (!attackOccuring)
-                {
-                    if (attackPrepTimer <= 0) // attacks if in range or after a few seconds of running if not
-                    {
-                        StopCoroutine("DashAttack");
-                        StartCoroutine("DashAttack");
-                    }
-                    else
-                    {
-                        attackPrepTimer -= Time.deltaTime;
-                    }
-                }
-
-                if (spawningFlames) // starts in the coroutine. this makes it go forward until either the dashLengthTimer runs out or it gets close to the player
-                {
-                    //transform.position += (transform.forward.normalized * Time.deltaTime) * dashSpeed;
-                    SpawnFire(transform.position);
-
-                    dashAttackTimer -= Time.deltaTime;
-                    if (dashAttackTimer <= 0 || navMeshAgent.remainingDistance < 1.5f)
-                    {
-                        spawningFlames = false;
-                    }
-                }
-            }
-            else if (attackState == "flamethrower")
-            {
-                if (PlayerVisible())
-                {
-                    navMeshAgent.destination = playerTarget.position;
-                }
-
-                if (spawningFlames)
-                {
-                    flameTimer += Time.deltaTime * 100;
-                    //Debug.Log(flameTimer);
-
-                    Vector3 direction = transform.forward;
-                    Vector3 axis = Vector3.up;
-                    Quaternion rotationAxis = Quaternion.AngleAxis(flameTimer, axis);
-                    Vector3 rotatedDirectionalAxis = (rotationAxis * direction).normalized;
-                    rotatedDirectionalAxis.y = transform.position.y;
-                    rotatedDirectionalAxis *= flamethrowerDistance;
-
-                    flamethrowerPosition = transform.position + rotatedDirectionalAxis;
-
-                    Debug.DrawRay(transform.position, rotatedDirectionalAxis, Color.red);
-
-                    if (flameTimer > flamethrowerArc / 2)
-                    {
-                        flameTimer = -flamethrowerArc / 2;
-                    }
-
-                    SpawnFire(flamethrowerPosition, 5);
-                }
-
-                if (!attackOccuring)
-                {
-                    if (attackPrepTimer <= 0 || navMeshAgent.remainingDistance < 0.5f) // attacks if in range or after a few seconds of running if not
-                    {
-                        StopCoroutine("FlamethrowerAttack");
-                        StartCoroutine("FlamethrowerAttack");
-                    }
-                    else
-                    {
-                        attackPrepTimer -= Time.deltaTime;
-                    }
-                }
-            }
-
-            if (!PlayerVisible()) // in case the player runs away while an attack was occuring
-            {
-
-            }
-        }
 
         base.Update();
     }
@@ -530,6 +547,13 @@ public class EnemyAI_Overclock : EnemyAI_Base
             {
                 //Debug.Log("Player Hit!");
                 hitPlayer = true;
+
+                if (playerIsSlowedByIceAttack)
+                {
+                    PlayerController.instance.MovementMachine.SetMovementMultiplier(playerIceAttackSlowDuration);
+                    PlayerController.instance.MovementMachine.Invoke("RemoveMovementMultiplier", 3f);
+                }
+
                 PlayerController.instance.Health.TakeDamage(4);
                 Vector3 dir = transform.forward.normalized;
                 dir.y = 0.5f;

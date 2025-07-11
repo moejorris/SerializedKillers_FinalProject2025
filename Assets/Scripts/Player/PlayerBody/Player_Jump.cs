@@ -51,7 +51,7 @@ public class Player_Jump : MonoBehaviour
             if (PlayerController.instance.MovementMachine.isGrounded)
             {
                 Vector3 direction = useFloorNormal ? PlayerController.instance.MovementMachine.GroundInformation.normal : Vector3.up;
-                ApplyJump(_value, _jumpMode, overrideCurrentVelocity, direction);
+                ApplyJump(_value * PlayerController.instance.MovementMachine.MovementMultiplier, _jumpMode, overrideCurrentVelocity, direction);
 
                 PlayerController.instance.Animation.PlayJumpAnimation();
             }

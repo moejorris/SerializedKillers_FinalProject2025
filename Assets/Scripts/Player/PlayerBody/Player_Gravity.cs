@@ -7,6 +7,7 @@ public class Player_Gravity : MonoBehaviour, IPlayerMover
     [SerializeField] float acceleration = -10f;
     [SerializeField] float gravityScale = 1f;
     [SerializeField] float _currentGravity;
+    public bool affectedByMultipliers = false;
 
     bool _groundedPreviousFrame; //if the character controller was grounded in the previous frame relative to this script;
 
@@ -27,7 +28,7 @@ public class Player_Gravity : MonoBehaviour, IPlayerMover
         {
             PlayerJustLanded();
         }
-        else if (!PlayerController.instance.MovementMachine.isGrounded)
+        else if (PlayerController.instance.MovementMachine.GroundInformation.collider == null) //enemies will be set as the ground, but Grounded is still false so we don't want to apply gravity if the player isn't falling
         {
             _currentGravity += acceleration * gravityScale * PlayerController.instance.MovementMachine.DeltaTime;
         }
