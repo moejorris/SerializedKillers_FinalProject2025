@@ -32,6 +32,9 @@
         },
         {
             "m_Id": "d1b3613a058e4702a9a39b606846d6b6"
+        },
+        {
+            "m_Id": "f3d7be89046e4f4c908480780cadc164"
         }
     ],
     "m_Keywords": [],
@@ -155,6 +158,9 @@
         },
         {
             "m_Id": "f6b79df1875d4426b9f8a697bb6465df"
+        },
+        {
+            "m_Id": "09149e57c44846ea92cc8819953fd09b"
         }
     ],
     "m_GroupDatas": [
@@ -176,6 +182,20 @@
                     "m_Id": "9c07e03532a3405db492552f7fb8207b"
                 },
                 "m_SlotId": 2
+            }
+        },
+        {
+            "m_OutputSlot": {
+                "m_Node": {
+                    "m_Id": "09149e57c44846ea92cc8819953fd09b"
+                },
+                "m_SlotId": 0
+            },
+            "m_InputSlot": {
+                "m_Node": {
+                    "m_Id": "193ec9be1a1e4acb98c45f42f0755747"
+                },
+                "m_SlotId": 0
             }
         },
         {
@@ -888,6 +908,42 @@
 
 {
     "m_SGVersion": 0,
+    "m_Type": "UnityEditor.ShaderGraph.PropertyNode",
+    "m_ObjectId": "09149e57c44846ea92cc8819953fd09b",
+    "m_Group": {
+        "m_Id": ""
+    },
+    "m_Name": "Property",
+    "m_DrawState": {
+        "m_Expanded": true,
+        "m_Position": {
+            "serializedVersion": "2",
+            "x": 1670.6666259765625,
+            "y": -61.99998092651367,
+            "width": 116.666748046875,
+            "height": 36.000003814697269
+        }
+    },
+    "m_Slots": [
+        {
+            "m_Id": "54b2631b25de4b98986e9b18948d4415"
+        }
+    ],
+    "synonyms": [],
+    "m_Precision": 0,
+    "m_PreviewExpanded": true,
+    "m_DismissedVersion": 0,
+    "m_PreviewMode": 0,
+    "m_CustomColors": {
+        "m_SerializableColors": []
+    },
+    "m_Property": {
+        "m_Id": "f3d7be89046e4f4c908480780cadc164"
+    }
+}
+
+{
+    "m_SGVersion": 0,
     "m_Type": "UnityEditor.ShaderGraph.Vector2MaterialSlot",
     "m_ObjectId": "0c49dd5306c3417c84e734a657bd7d80",
     "m_Id": 2,
@@ -1386,8 +1442,8 @@
     "m_ShaderOutputName": "Tiling",
     "m_StageCapability": 3,
     "m_Value": {
-        "x": 1.0,
-        "y": 1.0
+        "x": 3.0,
+        "y": 3.0
     },
     "m_DefaultValue": {
         "x": 1.0,
@@ -1552,8 +1608,8 @@
     "m_ShaderOutputName": "Tiling",
     "m_StageCapability": 3,
     "m_Value": {
-        "x": 1.0,
-        "y": 1.0
+        "x": 8.0,
+        "y": 8.0
     },
     "m_DefaultValue": {
         "x": 1.0,
@@ -1841,8 +1897,8 @@
     "m_ObjectId": "42bca06f8f884321b27cd14c3ac8597b",
     "m_Title": "Visuals",
     "m_Position": {
-        "x": -661.9998779296875,
-        "y": -500.66656494140627
+        "x": -662.0,
+        "y": -500.666748046875
     }
 }
 
@@ -2048,6 +2104,21 @@
         "z": 0.0,
         "w": 0.0
     }
+}
+
+{
+    "m_SGVersion": 0,
+    "m_Type": "UnityEditor.ShaderGraph.Vector1MaterialSlot",
+    "m_ObjectId": "54b2631b25de4b98986e9b18948d4415",
+    "m_Id": 0,
+    "m_DisplayName": "Opacity",
+    "m_SlotType": 1,
+    "m_Hidden": false,
+    "m_ShaderOutputName": "Out",
+    "m_StageCapability": 3,
+    "m_Value": 0.0,
+    "m_DefaultValue": 0.0,
+    "m_Labels": []
 }
 
 {
@@ -4375,6 +4446,9 @@
         },
         {
             "m_Id": "d1b3613a058e4702a9a39b606846d6b6"
+        },
+        {
+            "m_Id": "f3d7be89046e4f4c908480780cadc164"
         }
     ]
 }
@@ -4626,6 +4700,34 @@
         "y": 0.0,
         "z": 0.0,
         "w": 0.0
+    }
+}
+
+{
+    "m_SGVersion": 1,
+    "m_Type": "UnityEditor.ShaderGraph.Internal.Vector1ShaderProperty",
+    "m_ObjectId": "f3d7be89046e4f4c908480780cadc164",
+    "m_Guid": {
+        "m_GuidSerialized": "29c0ede4-8c23-433f-b20e-adacbacbf9d4"
+    },
+    "m_Name": "Opacity",
+    "m_DefaultRefNameVersion": 1,
+    "m_RefNameGeneratedByDisplayName": "Opacity",
+    "m_DefaultReferenceName": "_Opacity",
+    "m_OverrideReferenceName": "",
+    "m_GeneratePropertyBlock": true,
+    "m_UseCustomSlotLabel": false,
+    "m_CustomSlotLabel": "",
+    "m_DismissedVersion": 0,
+    "m_Precision": 0,
+    "overrideHLSLDeclaration": false,
+    "hlslDeclarationOverride": 0,
+    "m_Hidden": false,
+    "m_Value": 0.5,
+    "m_FloatType": 0,
+    "m_RangeValues": {
+        "x": 0.0,
+        "y": 1.0
     }
 }
 
