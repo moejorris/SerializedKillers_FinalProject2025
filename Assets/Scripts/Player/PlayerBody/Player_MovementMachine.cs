@@ -151,7 +151,7 @@ public class Player_MovementMachine : MonoBehaviour
 
             case GroundCheckMethod.SphereCast:
 
-                _grounded = Physics.SphereCast(transform.position, PlayerController.instance.CharacterController.radius, Vector3.down, out _groundInfo, PlayerController.instance.CharacterController.height / 2f, ~0, QueryTriggerInteraction.Ignore);
+                _grounded = Physics.SphereCast(transform.position, PlayerController.instance.CharacterController.radius, Vector3.down, out _groundInfo, (PlayerController.instance.CharacterController.height / 2f) - PlayerController.instance.CharacterController.radius + 0.1f, ~0, QueryTriggerInteraction.Ignore);
 
                 EnemyCheck();
 

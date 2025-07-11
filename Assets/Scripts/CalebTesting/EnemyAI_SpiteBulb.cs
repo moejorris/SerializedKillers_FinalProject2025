@@ -77,10 +77,9 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
     [SerializeField] private float scaredFollowRange = 15f;
     [SerializeField] private float scaredAttackTimer = 2f;
     [SerializeField] private float teleportTimer = 8f;
-    [SerializeField] private float teleportRange = 10f;
-    [SerializeField] private float teleportExplosionDamage = 3f;
-    [SerializeField] private GameObject teleportExplosion;
-    [SerializeField] private GameObject teleportLocationIndicator;
+    [SerializeField] private GameObject shadowClone;
+    [SerializeField] private bool invisible = false;
+    private Image[] healthBarImages = new Image[] { };
 
 
     [Header("Bulb Shockwave Attack")]
@@ -109,6 +108,8 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
         selectedIcon = transform.Find("Canvas/SelectedIcon").gameObject;
 
         if (PlayerController.instance.ScriptSteal.heldBehavior != null && PlayerController.instance.ScriptSteal.heldBehavior == heldBehavior) DeactivateBehavior();
+
+        healthBarImages = new Image[] {healthBar.GetComponent<Image>(), whiteHealthBar.GetComponent<Image>(), transform.Find("Canvas/SubBar").GetComponent<Image>()};
     }
     // Update is called once per frame
     public override void Update()
@@ -180,7 +181,7 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
             {
                 if (PlayerVisible())
                 {
-                    if (behaviorActive)
+                    if (behaviorActive || invisible)
                     {
                         navMeshAgent.destination = playerTarget.position;
                     }
@@ -197,7 +198,7 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
                         }
                     }
 
-                    if ((attackCooldownTimer <= 0 && behaviorActive) || (attackCooldownTimer <= 0 && scaredAttackTimer <= 0))
+                    if ((attackCooldownTimer <= 0 && behaviorActive) || (attackCooldownTimer <= 0 && (scaredAttackTimer <= 0 || invisible)))
                     {
                         PerformAttack();
                     }
@@ -232,10 +233,10 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
             if (!behaviorActive)
             {
                 teleportTimer -= Time.deltaTime;
-                if (teleportTimer <= 0)
+                if (teleportTimer <= 0 && !attackOccuring && !preparingAttack)
                 {
-                    teleportTimer = Random.Range(8f, 16f);
-                    StartCoroutine("RandomTeleport");
+                    teleportTimer = Random.Range(4f, 5f);
+                    StartCoroutine("ShadowClone");
                 }
             }
         }
@@ -253,8 +254,16 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
                 {
                     if (gapCloseTimer <= 0 || navMeshAgent.remainingDistance < 1.5f) // attacks if in range or after a few seconds of running if not
                     {
-                        StopCoroutine("MeleeAttack");
-                        StartCoroutine("MeleeAttack");
+                        if (invisible)
+                        {
+                            StopCoroutine("ShadowMeleeAttack");
+                            StartCoroutine("ShadowMeleeAttack");
+                        }
+                        else
+                        {
+                            StopCoroutine("MeleeAttack");
+                            StartCoroutine("MeleeAttack");
+                        }
                     }
                     else
                     {
@@ -272,7 +281,7 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
 
                 if (!attackOccuring)
                 {
-                    if (gapCloseTimer <= 0 || navMeshAgent.remainingDistance < 1.5f) // attacks if in range or after a few seconds of running if not
+                    if (gapCloseTimer <= 0 || navMeshAgent.remainingDistance < 2f) // attacks if in range or after a few seconds of running if not
                     {
                         StopCoroutine("ShockwaveAttack");
                         StartCoroutine("ShockwaveAttack");
@@ -328,27 +337,26 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
 
         if (testBool)
         {
-            //if (Vector3.Distance(transform.position, playerTarget.position) < circlingRange)
-            //{
-            //    if (!circlingPlayer)
-            //    {
-            //        circlingPlayer = true;
-            //        currentAngle = Random.Range(0f, 360f);
-            //        navMeshAgent.speed = 1;
-            //        navMeshAgent.stoppingDistance = 0;
-            //    }
-            //    else
-            //    {
-            //        CirclePlayer();
-            //    }
-            //}
-            //else
-            //{
-            //    circlingPlayer = false;
-            //    navMeshAgent.speed = 3.5f;
-            //    navMeshAgent.stoppingDistance = 3.5f;
-            //    navMeshAgent.destination = playerTarget.position;
-            //}
+            
+        }
+
+        if (invisible && healthBarImages[0].color.a > 0)
+        {
+            foreach (Image image_ in healthBarImages)
+            {
+                Color color_ = image_.color;
+                color_.a -= Time.deltaTime * 3;
+                image_.color = color_;
+            }
+        }
+        else if (healthBarImages[0].color.a < 1)
+        {
+            foreach (Image image_ in healthBarImages)
+            {
+                Color color_ = image_.color;
+                color_.a += Time.deltaTime * 3;
+                image_.color = color_;
+            }
         }
 
         base.Update();
@@ -363,7 +371,7 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
         healing = false;
         navMeshAgent.isStopped = false;
         StopCoroutine("HealTimer");
-        Debug.Log("Standing Complete Called");
+        //Debug.Log("Standing Complete Called");
     }
 
     private void FixedUpdate()
@@ -374,40 +382,99 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
         }
     }
 
-    IEnumerator RandomTeleport()
+    IEnumerator ShadowClone()
     {
-        if (Vector3.Distance(playerTarget.position, transform.position) < 14 && !Invincible())
+        navMeshAgent.isStopped = true;
+        bulbBodyAnimator.Play("Crouch");
+        yield return new WaitForSeconds(0.5f);
+        Instantiate(shadowClone, bulbBodyAnimator.transform.position, bulbBodyAnimator.transform.rotation);
+
+        invisible = true;
+        foreach (Renderer mesh in meshes)
         {
-            bool teleportSpotFound = false;
-            Vector3 teleportPosition = transform.position;
-            int failureAttempts = 0;
-            while (!teleportSpotFound)
-            {
-                failureAttempts++;
-                //Debug.Log("Attempt Number " + failureAttempts + "!");
-                teleportPosition = new Vector3(Random.Range(-teleportRange, teleportRange), Random.Range(-teleportRange, teleportRange), Random.Range(-teleportRange, teleportRange));
-                NavMeshHit hit;
-                if (NavMesh.FindClosestEdge(teleportPosition, out hit, NavMesh.AllAreas))
-                {
-                    //Debug.Log("HIT FOUND!");
-                    teleportPosition = hit.position;
-                    teleportSpotFound = true;
-                }
-                if (failureAttempts == 10)
-                {
-                    //Debug.Log("FAILURE!");
-                    teleportSpotFound = true;
-                }
-            }
-
-            Instantiate(teleportLocationIndicator, teleportPosition, Quaternion.identity);
-            yield return new WaitForSeconds(3);
-
-            //navMeshAgent.updatePosition = false;
-            transform.position = teleportPosition;
-            //navMeshAgent.updatePosition = true;
-            teleportExplosion.SetActive(true);
+            mesh.enabled = false;
         }
+
+        yield return new WaitForSeconds(0.5f);
+
+        bool locationFound = false;
+        Vector3 potentialLocation = transform.position;
+
+        while (!locationFound)
+        {
+            float x = Random.Range(4f, 7f);
+            float z = Random.Range(4f, 7f);
+            int x_sub = Random.Range(0, 2);
+            int z_sub = Random.Range(0, 2);
+            if (x_sub == 0) x *= -1;
+            if (z_sub == 0) z *= -1;
+
+
+            potentialLocation = new Vector3(playerTarget.position.x + x, transform.position.y, playerTarget.position.z + z);
+            NavMeshPath path = new NavMeshPath();
+            navMeshAgent.CalculatePath(potentialLocation, path);
+            if (path.status == NavMeshPathStatus.PathComplete) // cycles through this to check if the location is actually viable
+            {
+                //Debug.Log("New path made. It's location is: " + potentialLocation + " and it can path there :)");
+                locationFound = true;
+            }
+            else
+            {
+                //Debug.Log("New path made. It's location is: " + potentialLocation + " and it cannot path there :(");
+            }
+        }
+        transform.position = potentialLocation;
+
+        navMeshAgent.isStopped = false;
+        bulbBodyAnimator.Play("Walk_A", 0, 0);
+        navMeshAgent.stoppingDistance = 2;
+    }
+
+    IEnumerator ShadowMeleeAttack()
+    {
+        attackOccuring = true;
+        navMeshAgent.isStopped = true;
+
+        bulbBodyAnimator.Play("Melee_Attack", 0, 0.5f);
+
+        yield return new WaitForSeconds(0.5f);
+
+        invisible = false;
+        Animation clone2 = Instantiate(shadowClone, bulbBodyAnimator.transform.position, bulbBodyAnimator.transform.rotation).GetComponent<Animation>();
+        clone2.Play("ShadowCloneIn");
+
+        yield return new WaitForSeconds(0.5f);
+
+        ExitShadowMode();
+        foreach (SpriteRenderer slash in slashes)
+        {
+            slash.enabled = true;
+        }
+
+        Vector3 rotation = transform.eulerAngles;
+        rotation.y += 30;
+        transform.eulerAngles = rotation;
+
+        MeleeHitCheck();
+        yield return new WaitForSeconds(0.1f);
+        foreach (SpriteRenderer slash in slashes)
+        {
+            slash.enabled = false;
+        }
+        yield return new WaitForSeconds(1.9f);
+
+
+        ExitMeleeAttack();
+    }
+
+    public void ExitShadowMode()
+    {
+        StopCoroutine("ShadowMeleeAttack");
+        foreach (Renderer mesh in meshes)
+        {
+            mesh.enabled = true;
+        }
+        invisible = false;
     }
 
     public void PerformAttack()
@@ -445,7 +512,7 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
     {
         gapCloseTimer = 1.5f;
         attackState = "melee";
-        navMeshAgent.stoppingDistance = 2f;
+        navMeshAgent.stoppingDistance = 2.3f;
         navMeshAgent.speed = 6f;
     }
 
@@ -592,7 +659,7 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
 
         laser_lineRenderer.gameObject.SetActive(false);
         laser_endSphere.SetActive(false);
-        bulbHead.transform.Find("Capsule").gameObject.SetActive(false);
+        bulbHead.transform.Find("LaserFirePosition/Capsule").gameObject.SetActive(false);
         StopCoroutine("LaserAttack");
     }
 
@@ -608,7 +675,7 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
         laser_endSphere.SetActive(true);
         laser_inProgress = true;
         headCanTurn = true;
-        yield return new WaitForSeconds(4);
+        yield return new WaitForSeconds(3);
 
         laser_inProgress = false;
         headCanTurn = false;
@@ -617,10 +684,10 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
         yield return new WaitForSeconds(0.3f);
 
 
-        bulbHead.transform.Find("Capsule").gameObject.SetActive(true);
+        bulbHead.transform.Find("LaserFirePosition/Capsule").gameObject.SetActive(true);
         LaserHitCheck();
         yield return new WaitForSeconds(0.5f);
-        bulbHead.transform.Find("Capsule").gameObject.SetActive(false);
+        bulbHead.transform.Find("LaserFirePosition/Capsule").gameObject.SetActive(false);
         bulbBodyAnimator.SetTrigger("Arise");
         yield return new WaitForSeconds(1f);
 
@@ -629,7 +696,7 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
 
     public void LaserHitCheck()
     {
-        RaycastHit[] hits = Physics.SphereCastAll(transform.position + bulbHead.transform.forward, 1, bulbHead.transform.forward, 25, playerLayer);
+        RaycastHit[] hits = Physics.SphereCastAll(transform.position + bulbHead.transform.forward, 0.4f, laser_firePosition.forward, 25, playerLayer);
 
         //Debug.Log(hits.Length);
 
@@ -650,7 +717,7 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
 
         Vector3 endPosition = laser_firePosition.position + (laser_firePosition.forward * 100);
 
-        Quaternion lookRotation = Quaternion.Lerp(laser_firePosition.transform.rotation, Quaternion.LookRotation(playerTarget.position - laser_firePosition.position), Time.deltaTime * 10);
+        Quaternion lookRotation = Quaternion.Lerp(laser_firePosition.transform.rotation, Quaternion.LookRotation((playerTarget.position + Vector3.up) - laser_firePosition.position), Time.deltaTime * 10);
 
         //Quaternion.LookRotation(playerTarget.position - laser_firePosition.position);
         laser_firePosition.rotation = Quaternion.Euler(lookRotation.eulerAngles.x, bulbHead.transform.eulerAngles.y, lookRotation.eulerAngles.z);
@@ -807,6 +874,30 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
         }
     }
 
+    public override void TakeDamage(float damage)
+    {
+        if (!healthBar || !whiteHealthBar || Invincible() || invisible) return; // in case no thing exists
+
+        if (PlayerController.instance.ScriptSteal.BehaviorActive() && PlayerController.instance.ScriptSteal.GetHeldBehavior() == heldBehavior.weakness) damage *= 2f;
+
+        if (!PlayerController.instance.ScriptSteal.BehaviorActive())
+        {
+            PlayerController.instance.Mana.GainMana(manaPerHit);
+        }
+
+        health -= damage;
+
+        StopCoroutine("MaterialFade");
+        StartCoroutine("MaterialFade");
+
+        UpdateHealth();
+
+        if (health <= 0)
+        {
+            Die();
+        }
+    }
+
     public bool PlayerInAwakeRange()
     {
         if (Vector3.Distance(playerTarget.position, transform.position) < idleAlertRange)
@@ -875,9 +966,13 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
     public override void ActivateBehavior() // Arise needs to in some way be called so the enemy doesn't get stuck crouched when stealing!!!
     {
         base.ActivateBehavior();
+        ExitShadowMode();
+        blindFollowRange = 8;
         Material[] newMats = newLightBulbHead.materials;
         newMats[0] = litBulbColor;
         newLightBulbHead.materials = newMats;
+
+        GetComponent<Light>().enabled = true;
     }
 
     public override void DeactivateBehavior() // Arise needs to in some way be called so the enemy doesn't get stuck crouched when stealing!!!
@@ -885,9 +980,12 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
         bool arise = false;
         if (attackState == "laser" || attackState == "shockwave") arise = true;
 
+        blindFollowRange = 14;
         ExitLaserAttack();
         ExitShockwaveAttack();
         base.DeactivateBehavior();
+
+        GetComponent<Light>().enabled = false;
 
         if (arise)
         {
