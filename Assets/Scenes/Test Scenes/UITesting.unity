@@ -3294,7 +3294,7 @@ Transform:
   m_GameObject: {fileID: 1012510781}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 7.58, y: 1.48, z: -0.49}
+  m_LocalPosition: {x: 7.58, y: 1.07, z: -0.49}
   m_LocalScale: {x: 3.3113353, y: 4.2779, z: 6.902}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4319,7 +4319,7 @@ Transform:
   m_GameObject: {fileID: 1209297022}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -7.7, y: 1.48, z: -6.45}
+  m_LocalPosition: {x: -7.7, y: 1.1, z: -6.45}
   m_LocalScale: {x: 3.3113353, y: 4.2779, z: 6.902}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -6337,7 +6337,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: -2.9}
   m_SizeDelta: {x: 694.0466, y: 208.214}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2050767072
@@ -6857,7 +6857,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1334552692186007357, guid: efc5dc08c1f683f4c96096041a27d5c0, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -3.795
+      value: -0.12
       objectReference: {fileID: 0}
     - target: {fileID: 1334552692186007357, guid: efc5dc08c1f683f4c96096041a27d5c0, type: 3}
       propertyPath: m_LocalPosition.y
@@ -6865,7 +6865,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1334552692186007357, guid: efc5dc08c1f683f4c96096041a27d5c0, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -3.682
+      value: -31.38
       objectReference: {fileID: 0}
     - target: {fileID: 1334552692186007357, guid: efc5dc08c1f683f4c96096041a27d5c0, type: 3}
       propertyPath: m_LocalRotation.w
@@ -6899,17 +6899,17 @@ PrefabInstance:
       propertyPath: m_Name
       value: SobbySkull
       objectReference: {fileID: 0}
-    - target: {fileID: 6312084026052878854, guid: efc5dc08c1f683f4c96096041a27d5c0, type: 3}
-      propertyPath: m_Enabled
-      value: 1
+    - target: {fileID: 5039905764734303887, guid: efc5dc08c1f683f4c96096041a27d5c0, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.014137136
       objectReference: {fileID: 0}
-    - target: {fileID: 6312084026052878854, guid: efc5dc08c1f683f4c96096041a27d5c0, type: 3}
-      propertyPath: m_IsTrigger
-      value: 0
+    - target: {fileID: 5039905764734303887, guid: efc5dc08c1f683f4c96096041a27d5c0, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.014137136
       objectReference: {fileID: 0}
-    - target: {fileID: 8821329358334817291, guid: efc5dc08c1f683f4c96096041a27d5c0, type: 3}
-      propertyPath: m_Enabled
-      value: 1
+    - target: {fileID: 5039905764734303887, guid: efc5dc08c1f683f4c96096041a27d5c0, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.014137136
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

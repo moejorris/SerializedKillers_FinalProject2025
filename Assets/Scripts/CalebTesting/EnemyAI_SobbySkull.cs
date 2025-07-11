@@ -203,7 +203,7 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
             }
             else
             {
-                Debug.Log("Rolling Now!");
+                //Debug.Log("Rolling Now!");
                 if (Vector3.Distance(navMeshAgent.transform.position, skull.position) > 7 && (Vector3.Distance(navMeshAgent.transform.position, playerTarget.position) < Vector3.Distance(skull.position, playerTarget.position)))
                 {
                     navMeshAgent.isStopped = true;
@@ -212,6 +212,11 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
                 {
                     navMeshAgent.destination = playerTarget.position;
                     navMeshAgent.isStopped = false;
+                }
+
+                if (Vector3.Distance(playerTarget.position, waterOrb.transform.position) < 1.7f)
+                {
+                    // knockback due to coll.
                 }
 
                 if (IsGrounded())
@@ -311,7 +316,10 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
         while (true)
         {
             yield return new WaitForSeconds(0.1f);
-            CheckForOverhang();
+            if (PlayerInLineOfSight() || PlayerNearby() || duckPositions.Count != 0)
+            {
+                CheckForOverhang();
+            }
             SpacialAwareness();
         }
     }
@@ -439,7 +447,7 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
 
                 if (hit2.transform.gameObject.name == "PlayerController")
                 {
-                    if (Vector3.Angle(skull.forward, playerTarget.position - skull.position) > 70) // they're basically behind the player, no need to go through a door when the player has come back through
+                    if (Vector3.Angle(skull.forward, playerTarget.position - skull.position) > 90) // they're basically behind the player, no need to go through a door when the player has come back through
                     {
                         duckPositions.Clear();
                     }
@@ -457,7 +465,11 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
         {
             damage /= 3;
             int random = Random.Range(0, 2);
-            if (random == 0) KnockPlayerBack(Random.Range(25, 40));
+            if (random == 0)
+            {
+                skull.Find("WaterKnockback").GetComponent<Animation>().Play();
+                KnockPlayerBack(Random.Range(35, 45));
+            }
         }
         else if (!PlayerController.instance.MovementMachine.isGrounded)
         {
@@ -494,7 +506,7 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
     public void KnockPlayerBack(float force)
     {
         Vector3 dir = (playerTarget.transform.position - transform.position).normalized;
-        dir.y = 0.3f;
+        dir.y = 0.2f;
         dir *= force;
         PlayerController.instance.ForceHandler.AddForce(dir, ForceMode.VelocityChange);
     }
