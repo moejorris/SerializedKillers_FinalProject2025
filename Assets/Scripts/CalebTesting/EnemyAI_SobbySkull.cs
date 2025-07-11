@@ -8,6 +8,7 @@ using System.Collections;
 public class EnemyAI_SobbySkull : EnemyAI_Base
 {
     private GameObject waterOrb => skull.Find("WaterOrb").gameObject;
+    private Animator skullAnimator => skull.transform.Find("RealSkull/AnimatedSkull").GetComponent<Animator>();
     private Transform skull => transform;
     private NavMeshAgent rollingNavMeshAgent;
 
@@ -39,7 +40,7 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
     public bool selfDestructing = false;
     private float attackTimer = 0;
     private bool hitPlayer = false;
-    private bool attacking = false;
+    [SerializeField] private bool attacking = false;
     private bool preparingAttack = false;
     private Vector3 attackDir = Vector3.zero;
     [SerializeField] private GameObject explosionParticle;
@@ -133,6 +134,7 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
 
             if (movementState == "flying")
             {
+
                 Vector3 TARGET = skull.position;
 
                 if (!ducking) // if the player is flying normally, it goes directly to the player
@@ -201,21 +203,30 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
             }
             else
             {
-                rigidBody.AddForce(Physics.gravity * gravityLevel, ForceMode.Acceleration);
-
-                if (IsGrounded())
+                Debug.Log("Rolling Now!");
+                if (Vector3.Distance(navMeshAgent.transform.position, skull.position) > 7 && (Vector3.Distance(navMeshAgent.transform.position, playerTarget.position) < Vector3.Distance(skull.position, playerTarget.position)))
                 {
-                    newMaxVelocity = 3;
-                    rigidBody.maxLinearVelocity = 3;
-                    if (PlayerNearby())
-                    {
-                        rigidBody.AddForce((playerTarget.position - skull.position).normalized * rollSpeed, ForceMode.VelocityChange);
-                    }
+                    navMeshAgent.isStopped = true;
                 }
                 else
                 {
+                    navMeshAgent.destination = playerTarget.position;
+                    navMeshAgent.isStopped = false;
+                }
+
+                if (IsGrounded())
+                {
+                    Debug.Log("Grounded!");
+                    newMaxVelocity = 3;
+                    rigidBody.maxLinearVelocity = 3;
+                    rigidBody.AddForce((navMeshAgent.transform.position - skull.position).normalized * rollSpeed, ForceMode.VelocityChange);
+                }
+                else
+                {
+                    Debug.Log("Not Grounded!");
                     newMaxVelocity = 15;
                     rigidBody.maxLinearVelocity = 15;
+                    rigidBody.AddForce(Physics.gravity * gravityLevel, ForceMode.Acceleration);
                 }
             }
         }
@@ -311,6 +322,8 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
         waterOrb.SetActive(true);
         rigidBody.useGravity = true;
         movementState = "rolling";
+        skullAnimator.Play("Fly-Idle", 0, 0);
+        navMeshAgent.transform.position = skull.position;
     }
 
     public void StartFlying()
@@ -319,6 +332,7 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
         waterOrb.SetActive(false);
         rigidBody.useGravity = false;
         movementState = "flying";
+        skullAnimator.Play("Idle-Fly", 0, 0);
     }
 
     public void BeginDiveAttack()
@@ -334,6 +348,7 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
 
     IEnumerator DiveAttack()
     {
+        skullAnimator.Play("Attack", 0, 0);
         // Debug.Log("Performing attack!");
         yield return new WaitForSeconds(1);
         preparingAttack = false;
@@ -343,6 +358,7 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
         yield return new WaitForSeconds(1);
         attacking = false;
     }
+
 
     public void LerpMaxVelocity()
     {
@@ -440,16 +456,10 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
         if (behaviorActive)
         {
             damage /= 3;
-            Player_ForceHandler forceHandler = PlayerController.instance.ForceHandler;
-
-            if (forceHandler != null)
-            {
-                Vector3 dir = (playerTarget.transform.position - transform.position).normalized + Vector3.up * 0.25f;
-                forceHandler.AddForce(dir * 20f, ForceMode.VelocityChange);
-                Instantiate(resistantPrefab, new Vector3(skull.position.x + Random.Range(-1, 1), skull.position.y + 1, skull.position.z + Random.Range(-1, 1)), Quaternion.identity);
-            }
+            int random = Random.Range(0, 2);
+            if (random == 0) KnockPlayerBack(Random.Range(25, 40));
         }
-        else if(!PlayerController.instance.MovementMachine.isGrounded)
+        else if (!PlayerController.instance.MovementMachine.isGrounded)
         {
             //Stunned()
         }
@@ -463,8 +473,8 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
 
         health -= damage;
 
-        //StopCoroutine("MaterialFade");
-        //StartCoroutine("MaterialFade");
+        StopCoroutine("MaterialFade");
+        StartCoroutine("MaterialFade");
 
         UpdateHealth();
 
@@ -479,6 +489,14 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
     void Stunned()
     {
         //stun enemy for x seconds while the player attacks it mid-air
+    }
+
+    public void KnockPlayerBack(float force)
+    {
+        Vector3 dir = (playerTarget.transform.position - transform.position).normalized;
+        dir.y = 0.3f;
+        dir *= force;
+        PlayerController.instance.ForceHandler.AddForce(dir, ForceMode.VelocityChange);
     }
 
     public override void Die()
@@ -560,7 +578,7 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
 
     public bool IsGrounded()
     {
-        if (Physics.CheckSphere(new Vector3(skull.position.x, skull.position.y - 0.8f, skull.position.z), 0.2f, obstacleLayer))
+        if (Physics.CheckSphere(new Vector3(waterOrb.transform.position.x, waterOrb.transform.position.y - 0.9f, waterOrb.transform.position.z), 0.3f, obstacleLayer))
         {
             return true;
         }

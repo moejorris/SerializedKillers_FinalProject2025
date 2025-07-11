@@ -2650,6 +2650,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: TheOverclock
       objectReference: {fileID: 0}
+    - target: {fileID: 752360659633603987, guid: ad31d2a2994a7b54d971b868c3d5eaae, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8972746231023853210, guid: ad31d2a2994a7b54d971b868c3d5eaae, type: 3}
       propertyPath: m_LocalPosition.x
       value: -2.57
@@ -4828,6 +4832,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 5191940513537925042, guid: 221ee92e73c803a42b396c5083667049, type: 3}
+      propertyPath: airDrag
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 6913679290908290532, guid: 221ee92e73c803a42b396c5083667049, type: 3}
       propertyPath: m_LocalPosition.x
       value: 8.12
@@ -6891,9 +6899,17 @@ PrefabInstance:
       propertyPath: m_Name
       value: SobbySkull
       objectReference: {fileID: 0}
-    - target: {fileID: 4806814001057205552, guid: efc5dc08c1f683f4c96096041a27d5c0, type: 3}
-      propertyPath: m_IsActive
+    - target: {fileID: 6312084026052878854, guid: efc5dc08c1f683f4c96096041a27d5c0, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6312084026052878854, guid: efc5dc08c1f683f4c96096041a27d5c0, type: 3}
+      propertyPath: m_IsTrigger
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8821329358334817291, guid: efc5dc08c1f683f4c96096041a27d5c0, type: 3}
+      propertyPath: m_Enabled
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
