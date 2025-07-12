@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public enum BossState { None, Fire, Electric, Water } // Enumeration for elemental states
 
-public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable
+public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetable
 {
     #region Unity Variables
     [Header("Boss Settings")]
@@ -53,7 +53,7 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable
     [SerializeField] private bool testing = false;
 
     [Tooltip("Elemental State of the boss")]
-    [SerializeField] private BossState currentState; // Current elemental state of the boss
+    [SerializeField] private BossState currentState; // C rrent elemental state of the boss
     private bool hasNoMoreAttacks = false;
     private Transform player; // Reference to the player's transform
     private bool lookAtPlayer = true; // Flag to control whether the boss should look at the player
@@ -67,7 +67,13 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable
     private Renderer bossRenderer; // Reference to the boss's renderer for color changes
     private List<BossState> availableStates = new List<BossState>(); // List of available states for the boss
     private List<BossState> unusedStates = new List<BossState>(); // List of unused states for the boss
+
     #endregion
+
+    [Header("Targeting")]
+    public float TargetScore { get; set;}
+    public float TargetScoreWeight { get => 2f;} //boss is twice as likely to be targeted
+
     #region Unity Methods
     void Awake()
     {

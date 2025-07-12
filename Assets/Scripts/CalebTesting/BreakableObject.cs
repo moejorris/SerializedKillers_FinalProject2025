@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class BreakableObject : MonoBehaviour, ITargetable, IDamageable
+public class BreakableObject : MonoBehaviour, IDamageable
 {
     [Range(0, 100)]
     [SerializeField] private int itemDropChance = 25;
@@ -11,10 +11,7 @@ public class BreakableObject : MonoBehaviour, ITargetable, IDamageable
     [SerializeField] private GameObject smokeParticle;
 
     [SerializeField] private GameObject requiredToBreakFirst;
-
-    public float TargetScore { get; set; }
-    public float TargetScoreWeight { get => 0.2f; }
-
+    
     public virtual void TakeDamage(float damage)
     {
         if (requiredToBreakFirst == null)
