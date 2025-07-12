@@ -16,6 +16,7 @@ public class RotatePuzzleManager : MonoBehaviour
     public void RemoveFromCounter()
     {
         correctRotations--;
+        Check();
     }
     
     public void Check()

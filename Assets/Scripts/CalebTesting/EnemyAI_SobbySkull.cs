@@ -221,7 +221,7 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
 
                 if (IsGrounded())
                 {
-                    Debug.Log("Grounded!");
+                    // Debug.Log("Grounded!");
                     newMaxVelocity = 3;
                     rigidBody.maxLinearVelocity = 3;
                     rigidBody.AddForce((navMeshAgent.transform.position - skull.position).normalized * rollSpeed, ForceMode.VelocityChange);
