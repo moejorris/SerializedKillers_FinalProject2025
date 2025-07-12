@@ -6,6 +6,7 @@ public class IceChunk : MonoBehaviour, IElemental
     public float hits;
     public float healthForAction = 0;
     [SerializeField] private Room room;
+    public ParticleSystem snow;
     public Vector3 newScale = Vector3.one;
     public Vector3 startScale = Vector3.one;
     private void Start()
@@ -50,5 +51,6 @@ public class IceChunk : MonoBehaviour, IElemental
     public virtual void PerformAction()
     {
         if (room != null) room.RoomComplete();
+        if (snow != null) snow.Stop();
     }
 }

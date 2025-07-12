@@ -8,6 +8,7 @@ public class WeightHoldingIceChunk : IceChunk
 
     public override void PerformAction()
     {
+        if (snow != null) snow.Stop();
         WeightFall();
     }
     public void WeightFall()
