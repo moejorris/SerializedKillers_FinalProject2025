@@ -6,6 +6,7 @@ public class Room : MonoBehaviour
     [Header("Room Objective")]
     public List<Animator> exitDoors;
     public List<Animator> entranceDoors;
+    [SerializeField] Transform roomSuccessCamera;
     [SerializeField] private bool challengeStarted = false;
     //[SerializeField] private Transform postCheckpoint;
     //[SerializeField] private Transform preCheckpoint;
@@ -20,6 +21,8 @@ public class Room : MonoBehaviour
 
     private bool playerInRoom = false;
     private float timer;
+
+    bool roomCompleted = false;
 
     private void OnDrawGizmos()
     {
@@ -129,8 +132,15 @@ public class Room : MonoBehaviour
 
     public virtual void RoomComplete()
     {
+        if (roomCompleted) return; //stops from running more than once. If this runs more than once, the cutscene plays multiple times :(
+        roomCompleted = true;
+
         //if (postCheckpoint == null) return;
         //PlayerController.instance.Respawn.respawnPoint = postCheckpoint.position;
+        if (roomSuccessCamera != null)
+        {
+            PlayerCamRotate.instance.StartCutscene(roomSuccessCamera.position, roomSuccessCamera.rotation);
+        }
     }
 
     public virtual void BeginChallenge()
