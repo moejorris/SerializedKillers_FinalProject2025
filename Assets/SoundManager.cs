@@ -13,8 +13,8 @@ public class SoundManager : MonoBehaviour
     [SerializeField] AudioClip mainMenuMusic;
     [SerializeField] AudioClip levelsMusic;
 
-    AudioSource sfxSource;
-    AudioSource musicSource;
+    [SerializeField] AudioSource sfxSource;
+    [SerializeField] AudioSource musicSource;
 
     void Awake()
     {
@@ -26,9 +26,6 @@ public class SoundManager : MonoBehaviour
 
         instance = this;
         DontDestroyOnLoad(gameObject);
-
-        sfxSource = GetComponent<AudioSource>();
-        musicSource = GetComponentInChildren<AudioSource>();
 
         SetDefaults();
 
@@ -57,8 +54,26 @@ public class SoundManager : MonoBehaviour
         }
     }
 
+    private void Update()
+    {
+        UpdateVolumes();    
+    }
+
+    void UpdateVolumes()
+    {
+        if(musicSource.volume != musicVolume * masterVolume)
+        {
+            musicSource.volume = musicVolume * masterVolume;
+        }
+        if(sfxSource.volume != sfxVolume * masterVolume)
+        {
+            sfxSource.volume = sfxVolume * masterVolume;
+        }
+    }
+
     void OnEnable()
     {
+        ChangeSong(SceneManager.GetSceneByName("MainMenu"));
         SceneManager.sceneLoaded += ChangeSong;
     }
 
@@ -67,17 +82,17 @@ public class SoundManager : MonoBehaviour
         SceneManager.sceneLoaded -= ChangeSong;
     }
 
-    private void ChangeSong(Scene scene, LoadSceneMode mode)
+    private void ChangeSong(Scene scene, LoadSceneMode mode = LoadSceneMode.Single)
     {
-        if (mainMenuMusic == null || levelsMusic == null) return;
+        if (mainMenuMusic == null && levelsMusic == null) return;
 
-        musicSource.volume = musicVolume * masterVolume;
-
+        musicSource.loop = true;
         musicSource.Stop();
         switch (scene.name)
         {
             case "Levels":
                 musicSource.clip = levelsMusic;
+                Debug.Log(musicSource.clip);
                 musicSource.Play();
                 break;
             case "MainMenu":
@@ -88,7 +103,7 @@ public class SoundManager : MonoBehaviour
 
         if (!musicSource.isPlaying)
         {
-            Debug.LogWarning("No Music is assigned to this scene. Playing Main Menu Music");
+            Debug.LogWarning("No Music is assigned to this scene. Playing Main Menu Music instead");
             musicSource.clip = mainMenuMusic;
             musicSource.Play();
         }
@@ -96,6 +111,7 @@ public class SoundManager : MonoBehaviour
 
     public void PlaySoundEffect(SoundEffectSO sfx)
     {
+        sfxSource.loop = false;
         sfxSource.volume = sfxVolume * masterVolume;
         sfxSource.pitch = sfx.usesRandomPitch ? sfx.RandomPitch * Time.timeScale : 1 * Time.timeScale;
         sfxSource.PlayOneShot(sfx.SoundEffect());
@@ -122,12 +138,14 @@ public class SoundManager : MonoBehaviour
     {
         PlayerPrefs.SetFloat("SFXVolume", volume);
         sfxVolume = volume;
+        sfxSource.volume = sfxVolume * masterVolume;
     }
 
     public void UpdateMusicVolume(float volume)
     {
         PlayerPrefs.SetFloat("MusicVolume", volume);
         musicVolume = volume;
+        musicSource.volume = musicVolume * masterVolume;
     }
 
     public float GetMasterVolume()
