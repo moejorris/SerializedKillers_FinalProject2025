@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c4c30e521a962a448d563e5bc3a21a1, type: 3}
+  m_Name: FootstepStoneSound
+  m_EditorClassIdentifier: 
+  soundVariations:
+  - {fileID: 8300000, guid: bd6d4f652fd125644b3eedfe1edf80c1, type: 3}
+  - {fileID: 8300000, guid: f6dbb5ee44b070d4e8039a16db9ac3fc, type: 3}
+  - {fileID: 8300000, guid: 23611f1b908b8e4429fa721a15e94a11, type: 3}
+  - {fileID: 8300000, guid: c308c4d131606ba45992632f83a0ef95, type: 3}
+  usesRandomPitch: 0
+  minPitch: 0.9
+  maxPitch: 1.1

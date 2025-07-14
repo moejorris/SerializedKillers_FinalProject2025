@@ -10,11 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5c4c30e521a962a448d563e5bc3a21a1, type: 3}
-  m_Name: SwordStabSound
+  m_Name: DashSound
   m_EditorClassIdentifier: 
   soundVariations:
-  - {fileID: 8300000, guid: 356286395805fbe47b8b7d3b23cbacce, type: 3}
-  - {fileID: 8300000, guid: d7d070aa0d4fa074a80e4c40cb062215, type: 3}
-  usesRandomPitch: 1
-  minPitch: 0.8
-  maxPitch: 1.5
+  - {fileID: 8300000, guid: c3baabbf693cb794fa13f46beba0ea1f, type: 3}
+  usesRandomPitch: 0
+  minPitch: 0.9
+  maxPitch: 1.1

@@ -10,11 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5c4c30e521a962a448d563e5bc3a21a1, type: 3}
-  m_Name: SwordSwingSound
+  m_Name: PlayerHealSound
   m_EditorClassIdentifier: 
   soundVariations:
-  - {fileID: 8300000, guid: 03285899daf221c4880614e9f43dfbfa, type: 3}
-  - {fileID: 8300000, guid: a878130915a6cb0468bc43834fcf4557, type: 3}
-  usesRandomPitch: 1
-  minPitch: 0.8
-  maxPitch: 1.5
+  - {fileID: 8300000, guid: 0daa7567300c82542b41ef2de9967be3, type: 3}
+  usesRandomPitch: 0
+  minPitch: 0.9
+  maxPitch: 1.1

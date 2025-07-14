@@ -3628,8 +3628,8 @@ MonoBehaviour:
   - {fileID: 8175689614317766979}
   - {fileID: 9071320938110675436}
   - {fileID: 7571445481622085329}
-  healSound: {fileID: 8300000, guid: 0daa7567300c82542b41ef2de9967be3, type: 3}
-  damageSound: {fileID: 8300000, guid: bd2e8009641b77147a3191a1838adcd0, type: 3}
+  healSound: {fileID: 11400000, guid: efda618c480f83e4ab50686f9a0926b0, type: 2}
+  damageSound: {fileID: 11400000, guid: 1c1f805ecb3d03d4ca1d91b32f9dcfce, type: 2}
   speed: 7
 --- !u!1 &1995997236586940109
 GameObject:
