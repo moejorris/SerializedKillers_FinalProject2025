@@ -46,8 +46,10 @@ public class MenuScript : MonoBehaviour
 
     public void CreditsBtn()
     {
+        /*
         FadeInOutAnimator.SetTrigger("FadeOut");
         CameraTransformAnimator.SetBool("MoveToCredits", true);
+        */
 
         MainPanel.SetActive(false);
         SettingsPanel.SetActive(false);
