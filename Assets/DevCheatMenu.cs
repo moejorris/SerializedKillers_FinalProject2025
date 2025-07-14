@@ -21,10 +21,12 @@ public class DevCheatMenu : MonoBehaviour
             if (menu.activeInHierarchy)
             {
                 Cursor.lockState = CursorLockMode.None;
+                Cursor.visible = true;
             }
             else
             {
                 Cursor.lockState = CursorLockMode.Locked;
+                Cursor.visible = false;
             }
         }
     }
