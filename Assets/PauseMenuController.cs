@@ -1,5 +1,3 @@
-using TMPro;
-using UnityEditor.SearchService;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
@@ -46,7 +44,7 @@ public class PauseMenuController : MonoBehaviour
             transform.GetChild(i)?.gameObject?.SetActive(isPaused);
         }
         optionsMenu.SetActive(false);
-        
+
         if (isPaused)
         {
             UpdateSoundSliders();
