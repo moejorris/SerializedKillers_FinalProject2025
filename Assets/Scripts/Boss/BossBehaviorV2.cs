@@ -101,6 +101,10 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
             Debug.LogError("No Attack Prefabs assigned! Please assign attack prefabs in the inspector.");
             return;
         }
+
+        healthBar = GameObject.FindGameObjectWithTag("Canvas").transform.Find("BossHealth/Health").GetComponent<RectTransform>();
+        healthBar.parent.gameObject.SetActive(true);
+
         bossRenderer = GetComponent<Renderer>();
         shieldHealth = maxShieldHealth; // Initialize the shield health to the maximum shield health
     }

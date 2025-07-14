@@ -10,6 +10,7 @@ TagManager:
   - PlayerMesh
   - Ground
   - FireHazard
+  - BossHealth
   layers:
   - Default
   - TransparentFX

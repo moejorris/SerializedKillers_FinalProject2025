@@ -14897,7 +14897,6 @@ MonoBehaviour:
   - {fileID: 7232625583588388177}
   - {fileID: 6287857501113286632}
   testing: 0
-  secondPhase: 0
   currentState: 0
 --- !u!65 &6247957156169715919
 BoxCollider:
@@ -27829,7 +27828,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &7881579624651839202
 RectTransform:
   m_ObjectHideFlags: 0

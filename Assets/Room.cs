@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using TMPro;
 
 public class Room : MonoBehaviour
 {
@@ -23,6 +24,11 @@ public class Room : MonoBehaviour
     private float timer;
 
     bool roomCompleted = false;
+
+    [SerializeField] private GameObject roomTextPrefab;
+    [SerializeField] private string roomTitle = "Room Title Here";
+    [SerializeField] private RoomType roomType;
+    public enum RoomType { CombatRoom, PuzzleRoom };
 
     private void OnDrawGizmos()
     {
@@ -147,6 +153,14 @@ public class Room : MonoBehaviour
     {
         if (challengeStarted) return;
         challengeStarted = true;
+
+        if (roomTextPrefab != null)
+        {
+            GameObject roomText = Instantiate(roomTextPrefab, GameObject.FindGameObjectWithTag("Canvas").transform).gameObject;
+            roomText.transform.Find("Title").GetComponent<TMP_Text>().text = roomTitle;
+            if (roomType == RoomType.PuzzleRoom) roomText.transform.Find("RoomType").GetComponent<TMP_Text>().text = "[Puzzle Room]";
+            else roomText.transform.Find("RoomType").GetComponent<TMP_Text>().text = "[Combat Room]";
+        }
         //PlayerController.instance.Respawn.respawnPoint = postCheckpoint.position;
     }
 
