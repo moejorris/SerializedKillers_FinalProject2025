@@ -290,10 +290,9 @@ public class Player_CombatMachine : MonoBehaviour
         {
             if (currentAttack.hitboxDelay > 0)
             {
-                StopCoroutine("PlaySoundDelayed_TEMP");
-                StartCoroutine(PlaySoundDelayed_TEMP(currentAttack.swingSound, currentAttack.hitboxDelay));
+                SoundManager.instance.PlaySoundEffectDelayed(currentAttack.swingSound, currentAttack.hitboxDelay);
             }
-            else PlaySound_TEMP(currentAttack.swingSound);
+            else SoundManager.instance.PlaySoundEffect(currentAttack.swingSound);
         }
     }
 
@@ -301,34 +300,8 @@ public class Player_CombatMachine : MonoBehaviour
     {
         if (currentAttack.impactSound != null)
         {
-            PlaySound_TEMP(currentAttack.impactSound);
+            SoundManager.instance.PlaySoundEffect(currentAttack.impactSound);
         }
-    }
-
-    IEnumerator PlaySoundDelayed_TEMP(SoundEffectSO sound, float delay = 0) ///TEMP Until a proper sound manager/player is developed.
-    {
-        yield return new WaitForSeconds(delay);
-        PlaySound_TEMP(sound);
-    }
-
-    void PlaySound_TEMP(SoundEffectSO sound)
-    {
-        GameObject soundObject = new GameObject();
-
-        soundObject.name = sound.name;
-        soundObject.transform.parent = transform;
-
-        AudioSource audioSource = soundObject.AddComponent<AudioSource>();
-        AudioClip clip = sound.SoundEffect();
-
-        if (sound.usesRandomPitch)
-        {
-            audioSource.pitch = sound.RandomPitch;
-        }
-
-        audioSource.PlayOneShot(clip);
-        Destroy(soundObject, clip.length);
-        // Debug.Log("Clip length = " + clip.length);
     }
 
     void HandleAnimation()

@@ -7,8 +7,8 @@ public class PlayerHealth : MonoBehaviour
     [SerializeField] private GameObject HeartHolder;
     [SerializeField] private Image[] redHearts;
     [SerializeField] private Image[] whiteHearts;
-    [SerializeField] private AudioClip healSound;
-    [SerializeField] private AudioClip damageSound;
+    [SerializeField] private SoundEffectSO healSound;
+    [SerializeField] private SoundEffectSO damageSound;
     public float speed = 1;
     //private float maxHealth = 20;
     //public float health;
@@ -23,19 +23,9 @@ public class PlayerHealth : MonoBehaviour
         //UpdateHealth();
     }
 
-    void PlaySound(AudioClip clip)
-    {
-        GameObject soundObject = new GameObject();
-        AudioSource audioSource = soundObject.AddComponent<AudioSource>();
-        audioSource.clip = clip;
-
-        audioSource.PlayOneShot(clip);
-        Destroy(soundObject, clip.length);
-    }
-
     public void TakeDamage(float newHealth)
     {
-        PlaySound(damageSound);
+        SoundManager.instance.PlaySoundEffect(damageSound);
         //health -= newHealth;
         //if (health < 0) health = 0;
 
@@ -46,7 +36,7 @@ public class PlayerHealth : MonoBehaviour
 
     public void HealDamage(float newHealth)
     {
-        PlaySound(healSound);
+        SoundManager.instance.PlaySoundEffect(healSound);
         //health += newHealth;
         //if (health > maxHealth) health = maxHealth;
 
