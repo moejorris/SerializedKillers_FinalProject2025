@@ -21,6 +21,8 @@ public class MenuScript : MonoBehaviour
         SettingsPanel.SetActive(false);
         HelpPanel.SetActive(false);
         CreditsPanel.SetActive(false);
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
     }
 
     public void StartBtn()
