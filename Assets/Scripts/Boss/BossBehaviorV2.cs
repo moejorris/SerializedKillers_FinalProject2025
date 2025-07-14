@@ -395,6 +395,7 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
             Debug.Log("Boss teleported to: " + currentTeleportPosition.position); // Log the teleport
 
             attackTimer = 0f; // Reset the attack timer after teleporting
+            SpawnEnemies();
         }
     }
 
@@ -456,7 +457,6 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
 
         health -= damageAmount;
         vulnAttacks++;
-        vulnerableTimer = vulnerableDuration; // Reset vulnerable timer
 
         Debug.Log("Boss took damage: " + damageAmount + ". Current health: " + health); // Log the damage taken
 
@@ -464,11 +464,11 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
         anim.SetTrigger("Hit"); // Trigger the hit animation
 
         // Check if max vulnerable attack reached
-        if (vulnAttacks >= maxVulnerableAttacks)
-        {
-            Debug.Log("Boss has taken maximum vulnerable attacks! Ending vulnerable state.");
-            EndVulnerable();
-        }
+        //if (vulnAttacks >= maxVulnerableAttacks)
+        //{
+        //    Debug.Log("Boss has taken maximum vulnerable attacks! Ending vulnerable state.");
+        //    EndVulnerable();
+        //}
 
         UpdateUI();
 
@@ -600,10 +600,13 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
     {
         foreach (Transform spawn in enemySpawnPoints)
         {
+            //for (int i = 0, i < 3, i++)
+            //{
+            //    Instantiate(enemiesToSpawn[i], spawn.position, spawn.rotation);
+            //}
             int randomIndex = Random.Range(0, enemiesToSpawn.Length);
             Instantiate(enemiesToSpawn[randomIndex], spawn.position, spawn.rotation);
         }
-        // spawnTimer = 0f;
     }
     #endregion
     #region Animation Events
