@@ -108,6 +108,7 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
 
         bossRenderer = GetComponent<Renderer>();
         shieldHealth = maxShieldHealth; // Initialize the shield health to the maximum shield health
+        attackTimer = 5.0f;
 
         Invoke("SpawnEnemies", 7.0f);
 
@@ -403,9 +404,9 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
 
     void Die()
     {
+        SceneSwitcher.instance.Invoke("ReturnToMenu", 2.0f);
         Debug.Log("Boss died!");
         anim.SetTrigger("Die");
-        Destroy(gameObject, 2f); // Destroy the boss after 2 seconds
     }
 
     public void InteractElement(Behavior behavior = null)
