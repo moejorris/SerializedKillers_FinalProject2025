@@ -107,6 +107,9 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
 
         bossRenderer = GetComponent<Renderer>();
         shieldHealth = maxShieldHealth; // Initialize the shield health to the maximum shield health
+
+        Invoke("SpawnEnemies", 7.0f);
+
     }
 
     void Update()
@@ -139,7 +142,6 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
             Debug.Log("Vulnerable Timer: " + vulnerableTimer);
             if (vulnerableTimer <= 0f) // If the vulnerable timer has reached zero
             {
-                anim.SetInteger("Damage", 3); // Set the damage integer to 3 to trigger the end vulnerable animation
                 EndVulnerable(); // End the vulnerable State
             }
         }
@@ -460,7 +462,6 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
 
         // Trigger Animations
         anim.SetTrigger("Hit"); // Trigger the hit animation
-        anim.SetInteger("Damage", vulnAttacks); // Increment the attack timer to match the number of vulnerableAttacks
 
         // Check if max vulnerable attack reached
         if (vulnAttacks >= maxVulnerableAttacks)
@@ -511,7 +512,6 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
         vulnerableTimer = vulnerableDuration; // Reset the vulnerable duration
         anim.SetTrigger("EndWeak"); // Trigger the end weak animation
         Debug.Log("Boss is no longer vulnerable!"); // Log the end of the vulnerable state
-        anim.SetInteger("Damage", 0); // Reset the damage integer to 0
         anim.SetTrigger("Move"); // Trigger the move animation to teleport the boss after vulnerability ends
         shieldHealth = maxShieldHealth; // Reset shield health
         attacksUsed = 0;
