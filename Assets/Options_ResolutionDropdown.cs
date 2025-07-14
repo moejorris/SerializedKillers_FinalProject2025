@@ -189,7 +189,10 @@ public class Options_ResolutionDropdown : MonoBehaviour
 
         int curIndex = listAvailableStrings.IndexOf(Screen.width + "x" + Screen.height);
 
-        resolutionDropdown.value = curIndex;
+        if (resolutionDropdown.value != curIndex)
+        {
+            resolutionDropdown.value = curIndex;
+        }
 
         listAvailableStrings.Clear();
 
@@ -209,17 +212,27 @@ public class Options_ResolutionDropdown : MonoBehaviour
 
         if (vSyncCheckmark.isOn)
         {
-            fpsLimitDropdown.value = listAvailableStrings.IndexOf("VSync (Monitor Refresh Rate)");
+            curIndex = listAvailableStrings.IndexOf("VSync (Monitor Refresh Rate)");
         }
         else
         {
-            fpsLimitDropdown.value = listAvailableStrings.IndexOf(currentLimit);
+            curIndex = listAvailableStrings.IndexOf(currentLimit);
         }
+
+        if (fpsLimitDropdown.value != curIndex)
+        {
+            fpsLimitDropdown.value = curIndex;
+        }
+
 
         //get current windowed mode
         listAvailableStrings = fullscreenDropdown.options.Select(option => option.text).ToList();
-        fullscreenDropdown.value = Array.IndexOf(fullScreenModes, Screen.fullScreenMode);
+        curIndex = Array.IndexOf(fullScreenModes, Screen.fullScreenMode);
 
+        if (resolutionDropdown.value != curIndex)
+        {
+            resolutionDropdown.value = curIndex;
+        }
     }
 
     public void UpdateVsyncUI(bool on)
