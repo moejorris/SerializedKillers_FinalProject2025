@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class ProjectileScript : MonoBehaviour
 {
+    [SerializeField] private int damage = 10; // Damage dealt by the projectile
     private float lifeTime = 5f; // Lifetime of the projectile
 
     void Awake()
@@ -12,9 +13,11 @@ public class ProjectileScript : MonoBehaviour
     {
         if (collision.gameObject.layer == LayerMask.NameToLayer("Player"))
         {
-            Debug.Log("Projectile hit the player!"); // Log message for debugging
-            // If the projectile hits the player, destroy the projectile
-            Destroy(gameObject);
+            Player_HealthComponent playerHealth = collision.gameObject.GetComponent<Player_HealthComponent>();
+            if (playerHealth != null)
+            {
+                playerHealth.TakeDamage(damage);
+            }
         }
         else
         {

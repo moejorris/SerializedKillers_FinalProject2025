@@ -136,8 +136,10 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
         {
             vulnerableTimer -= Time.deltaTime; // Decrease the vulnerable timer
             attackTimer = 0f; // Reset the attack timer while vulnerable
+            Debug.Log("Vulnerable Timer: " + vulnerableTimer);
             if (vulnerableTimer <= 0f) // If the vulnerable timer has reached zero
             {
+                anim.SetInteger("Damage", 3); // Set the damage integer to 3 to trigger the end vulnerable animation
                 EndVulnerable(); // End the vulnerable State
             }
         }
@@ -394,61 +396,6 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
         }
     }
 
-    // public void TakeDamage(float damage = 5, Player_ScriptSteal scriptSteal = null)
-    // {
-    //     bool isWeakness = false;
-    //     if (scriptSteal != null && scriptSteal.GetHeldBehavior() != null)
-    //     {
-    //         string playerBehavior = scriptSteal.GetHeldBehavior().behaviorName;
-    //         switch (currentState)
-    //         {
-    //             case BossState.Fire:
-    //                 if (playerBehavior == "water") isWeakness = true;
-    //                 break;
-    //             case BossState.Water:
-    //                 if (playerBehavior == "electric") isWeakness = true;
-    //                 break;
-    //             case BossState.Electric:
-    //                 if (playerBehavior == "fire") isWeakness = true;
-    //                 break;
-    //         }
-    //     }
-
-    //     if (shieldHealth > 0)
-    //     {
-    //         damage = 5f;
-    //         if (isWeakness)
-    //         {
-    //             Debug.Log("Counter element used! Shield breaks immediatly.");
-    //             shieldHealth = 0;
-    //             StartVulnerable();
-    //             return;
-    //         }
-    //         shieldHealth -= damage;
-    //         Debug.Log("Shield took " + damage + " damage! Shield has " + shieldHealth + " health left!");
-    //         if (shieldHealth <= 0)
-    //         {
-    //             StartVulnerable();
-    //         }
-    //     }
-
-    //     if (!isVulnerable) return; // Exit if the boss is not vulnerable
-
-    //     damage = 2.5f;
-    //     if (isWeakness) damage *= 2f;
-    //     health -= damage; // Reduce the boss's health by the damage amount
-    //     vulnAttacks++;
-    //     vulnerableTimer = vulnerableDuration; // Reset the vulnerable timer
-    //     Debug.Log("Boss took damage: " + damage + ". Current health: " + health); // Log the damage taken
-    //     anim.SetTrigger("Hit"); // Trigger the hit animation
-    //     anim.SetInteger("Damage", vulnAttacks); // Increment the attack timer to match the number of vulnerableAttacks
-    //     if (vulnAttacks >= maxVulnerableAttacks)
-    //     {
-    //         EndVulnerable();
-    //     }
-    //     UpdateUI();
-    // }
-
     void Die()
     {
         Debug.Log("Boss died!");
@@ -564,6 +511,7 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
         vulnerableTimer = vulnerableDuration; // Reset the vulnerable duration
         anim.SetTrigger("EndWeak"); // Trigger the end weak animation
         Debug.Log("Boss is no longer vulnerable!"); // Log the end of the vulnerable state
+        anim.SetInteger("Damage", 0); // Reset the damage integer to 0
         anim.SetTrigger("Move"); // Trigger the move animation to teleport the boss after vulnerability ends
         shieldHealth = maxShieldHealth; // Reset shield health
         attacksUsed = 0;

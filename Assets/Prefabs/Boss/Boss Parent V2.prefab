@@ -14743,7 +14743,6 @@ GameObject:
   - component: {fileID: 1132903339147245590}
   - component: {fileID: 6247957156169715919}
   - component: {fileID: 8307154367038906562}
-  - component: {fileID: 996369811166401935}
   m_Layer: 0
   m_Name: KeyboardBase
   m_TagString: Untagged
@@ -14920,19 +14919,6 @@ BoxCollider:
   m_Size: {x: 1.0526472, y: 54.810173, z: 1.2032149}
   m_Center: {x: -0.004889342, y: 3.8850136, z: -0.0066521647}
 --- !u!114 &8307154367038906562
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6621602730755595738}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0b27f49da3b98e24fb99d1b4b57509e4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  hController: {fileID: 5781754925148430033}
---- !u!114 &996369811166401935
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

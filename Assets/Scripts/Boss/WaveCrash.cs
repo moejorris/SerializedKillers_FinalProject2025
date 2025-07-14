@@ -38,12 +38,11 @@ public class WaveCrash : MonoBehaviour
     {
         if (other.gameObject.layer == LayerMask.NameToLayer("Player"))
         {
-            Debug.Log("Player hit!");
-            PlayerHealth playerHealth = GameObject.FindGameObjectWithTag("Canvas").GetComponent<PlayerHealth>();
+            Player_HealthComponent playerHealth = other.GetComponent<Player_HealthComponent>();
             if (playerHealth != null)
             {
-                Debug.Log("Player hit!");
                 playerHealth.TakeDamage(damage);
+                Debug.Log("Wave hit the player!"); // Log message for debugging
             }
         }
     }
