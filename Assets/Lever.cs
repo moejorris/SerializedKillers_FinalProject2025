@@ -22,7 +22,7 @@ public class Lever : MonoBehaviour, IDamageable
 
             foreach (Collider col in invincibleAreas)
             {
-                col.enabled = !leverAnimator.GetBool("On");
+                col.gameObject.SetActive(!leverAnimator.GetBool("On"));
             }
 
             Invoke("ResetInteract", 1);
