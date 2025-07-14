@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class Joe_MovingPlatform : MonoBehaviour
 {
+    [SerializeField] bool wontMoveUnlessPlayerIsStandingOnIt = true;
     [SerializeField] bool isOneWay = false;
     [SerializeField] Transform startPosition;
     [SerializeField] Transform endPosition;
@@ -21,6 +22,15 @@ public class Joe_MovingPlatform : MonoBehaviour
     void Start()
     {
         platform.position = startPosition.position;
+    }
+
+    void Update()
+    {
+        if (PlayerController.instance.transform.position.y < platform.position.y && platform.position != startPosition.position) //failsafe in case the player somehow ends up below the elevator after activation
+        {
+            StopCoroutine("MoveElevator");
+            platform.position = startPosition.position;
+        }
     }
 
     void OnDrawGizmos()
@@ -68,6 +78,11 @@ public class Joe_MovingPlatform : MonoBehaviour
     public void StartMoving()
     {
         if ((transform.position == endPosition.position && isOneWay) || isMoving)
+        {
+            return;
+        }
+
+        if (PlayerController.instance.ChildMover.GetParent() != platform && wontMoveUnlessPlayerIsStandingOnIt)
         {
             return;
         }

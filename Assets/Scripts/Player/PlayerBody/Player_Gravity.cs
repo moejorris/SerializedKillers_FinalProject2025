@@ -27,6 +27,7 @@ public class Player_Gravity : MonoBehaviour, IPlayerMover
         if (JustLanded()) //if the player just landed
         {
             PlayerJustLanded();
+            _currentGravity = 0;
         }
         else if (PlayerController.instance.MovementMachine.GroundInformation.collider == null) //enemies will be set as the ground, but Grounded is still false so we don't want to apply gravity if the player isn't falling
         {
