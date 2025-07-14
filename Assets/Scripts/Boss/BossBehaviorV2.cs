@@ -67,6 +67,7 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
     private Renderer bossRenderer; // Reference to the boss's renderer for color changes
     private List<BossState> availableStates = new List<BossState>(); // List of available states for the boss
     private List<BossState> unusedStates = new List<BossState>(); // List of unused states for the boss
+    private List<GameObject> spawnedEnemies;
 
     #endregion
 
@@ -229,7 +230,6 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
     #region Elemental  Methods
     void ChangeElementalState(BossState newState)
     {
-        SpawnEnemies();
         currentState = newState; // Set the current state to the new state
         switch (currentState)
         {
@@ -249,6 +249,8 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
                 Debug.LogWarning("No elemental state set!"); // Log a warning if no state is set
                 break;
         }
+        SpawnEnemies();
+
     }
 
     void SpawnFallingRocks()
@@ -448,7 +450,7 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
             return;
         }
 
-        damageAmount = 2.5f;
+        damageAmount = 1f;
         if (isWeakness)
         {
             damageAmount *= 2f;
@@ -598,14 +600,37 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
 
     void SpawnEnemies()
     {
-        foreach (Transform spawn in enemySpawnPoints)
+        //foreach (Transform spawn in enemySpawnPoints)
+        //{
+        //    //for (int i = 0, i < 3, i++)
+        //    //{
+        //    //    Instantiate(enemiesToSpawn[i], spawn.position, spawn.rotation);
+        //    //}
+        //    int randomIndex = Random.Range(0, enemiesToSpawn.Length);
+        //    Instantiate(enemiesToSpawn[randomIndex], spawn.position, spawn.rotation);
+        //}
+
+        int randomIndex = Random.Range(0, enemySpawnPoints.Length);
+        Debug.Log("Boss is preparing to spawn an enemy!");
+        switch (currentState)
         {
-            //for (int i = 0, i < 3, i++)
-            //{
-            //    Instantiate(enemiesToSpawn[i], spawn.position, spawn.rotation);
-            //}
-            int randomIndex = Random.Range(0, enemiesToSpawn.Length);
-            Instantiate(enemiesToSpawn[randomIndex], spawn.position, spawn.rotation);
+            case BossState.Fire:
+                Debug.Log("Boss is in the fire state, spawning a water enemy!");
+                Instantiate(enemiesToSpawn[2], enemySpawnPoints[0].position, enemySpawnPoints[0].rotation);
+                break;
+            case BossState.Electric:
+                Debug.Log("Boss is in the Electric state, spawning a fire enemy!");
+                Instantiate(enemiesToSpawn[0], enemySpawnPoints[1].position, enemySpawnPoints[1].rotation);
+                break;
+            case BossState.Water:
+                Debug.Log("Boss is in the Water State, spawning an electric enemy!");
+                Instantiate(enemiesToSpawn[1], enemySpawnPoints[1].position, enemySpawnPoints[2].rotation);
+                break;
+            case BossState.None:
+                Instantiate(enemiesToSpawn[randomIndex], enemySpawnPoints[randomIndex].position, enemySpawnPoints[randomIndex].rotation);
+                break;
+            default:
+                break;
         }
     }
     #endregion

@@ -2166,67 +2166,6 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: -1552633963922468278, guid: f56f702f9e79c6f4a8a17f80748de2a9, type: 3}
---- !u!1001 &954133067
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 1001452410109340638, guid: 10545f0b86261d74a864c7f5c7e54261, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5025052686389344318, guid: 10545f0b86261d74a864c7f5c7e54261, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 6.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 5025052686389344318, guid: 10545f0b86261d74a864c7f5c7e54261, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5025052686389344318, guid: 10545f0b86261d74a864c7f5c7e54261, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 13.75
-      objectReference: {fileID: 0}
-    - target: {fileID: 5025052686389344318, guid: 10545f0b86261d74a864c7f5c7e54261, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 5025052686389344318, guid: 10545f0b86261d74a864c7f5c7e54261, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5025052686389344318, guid: 10545f0b86261d74a864c7f5c7e54261, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5025052686389344318, guid: 10545f0b86261d74a864c7f5c7e54261, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5025052686389344318, guid: 10545f0b86261d74a864c7f5c7e54261, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5025052686389344318, guid: 10545f0b86261d74a864c7f5c7e54261, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5025052686389344318, guid: 10545f0b86261d74a864c7f5c7e54261, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5148123958022569072, guid: 10545f0b86261d74a864c7f5c7e54261, type: 3}
-      propertyPath: m_Name
-      value: Thunderbolt
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 10545f0b86261d74a864c7f5c7e54261, type: 3}
 --- !u!1 &987176257
 GameObject:
   m_ObjectHideFlags: 0
@@ -4813,12 +4752,36 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1132903339147245590, guid: 23464843f6af0a2418f29f645574e5bf, type: 3}
+      propertyPath: health
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 1132903339147245590, guid: 23464843f6af0a2418f29f645574e5bf, type: 3}
       propertyPath: maxShieldHealth
       value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 1132903339147245590, guid: 23464843f6af0a2418f29f645574e5bf, type: 3}
+      propertyPath: enemiesToSpawn.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1132903339147245590, guid: 23464843f6af0a2418f29f645574e5bf, type: 3}
+      propertyPath: 'enemiesToSpawn.Array.data[2]'
+      value: 
+      objectReference: {fileID: 4806814001057205552, guid: efc5dc08c1f683f4c96096041a27d5c0, type: 3}
+    - target: {fileID: 2656391169433079513, guid: 23464843f6af0a2418f29f645574e5bf, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -15
+      objectReference: {fileID: 0}
+    - target: {fileID: 2837121557429292169, guid: 23464843f6af0a2418f29f645574e5bf, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 13
       objectReference: {fileID: 0}
     - target: {fileID: 4568253867351399053, guid: 23464843f6af0a2418f29f645574e5bf, type: 3}
       propertyPath: m_Name
       value: Boss Parent V2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6959351681969473925, guid: 23464843f6af0a2418f29f645574e5bf, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -4837,7 +4800,6 @@ SceneRoots:
   - {fileID: 1725360631}
   - {fileID: 734755758}
   - {fileID: 2146215526}
-  - {fileID: 954133067}
   - {fileID: 87522493}
   - {fileID: 736195309}
   - {fileID: 468946163}

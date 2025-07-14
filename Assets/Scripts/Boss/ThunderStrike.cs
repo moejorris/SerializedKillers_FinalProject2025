@@ -42,7 +42,6 @@ public class ThunderStrike : MonoBehaviour
         if (isChasing && target != null)
         {
             Vector3 direction = target.position - transform.position; // Calculate direction to the target
-            direction.y = 0; // Ignore vertical difference to keep the strike horizontal
             transform.position += direction.normalized * speed * Time.deltaTime; // Move towards the target
         }
     }
