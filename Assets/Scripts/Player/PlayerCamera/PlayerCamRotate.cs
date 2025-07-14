@@ -14,7 +14,7 @@ public class PlayerCamRotate : MonoBehaviour
     public static PlayerCamRotate instance;
 
     [SerializeField] Vector2 upDownLimit = new Vector2(30, 90);
-    [SerializeField] float joystickSensitivity = 100f, mouseSensitivity = 30f;
+    [SerializeField] float joystickSensitivity = 100f, mouseSensitivity = 300f;
     [SerializeField] InputActionReference cameraInput;
     [SerializeField] bool enableCollision;
     [SerializeField] Transform cameraTargetPosition;
@@ -38,7 +38,6 @@ public class PlayerCamRotate : MonoBehaviour
     enum CamMode { Manual, Traversal, Combat, Cutscene }
     CamMode currentMode = CamMode.Manual;
     Vector2 input;
-    bool unscaledTime = false;
 
     void Awake()
     {
@@ -54,17 +53,13 @@ public class PlayerCamRotate : MonoBehaviour
 
     void Start()
     {
-        if (FindAnyObjectByType<Dev_TimeScaleController>() != null)
-        {
-            unscaledTime = true;
-        }
 
         xRot = transform.eulerAngles.x;
         yRot = transform.eulerAngles.y;
         camLocalPos = cameraTargetPosition.localPosition;
 
         // Hi joe I added this because mouse go way off screen otherwise teehee sorry! - caleb
-        Cursor.lockState = CursorLockMode.Locked;
+        // Cursor.lockState = CursorLockMode.Locked;
     }
 
     // Update is called once per frame
@@ -106,7 +101,7 @@ public class PlayerCamRotate : MonoBehaviour
     {
         if (currentMode == CamMode.Cutscene) return;
 
-        input = cameraInput.action.ReadValue<Vector2>();
+        input = cameraInput.action.ReadValue<Vector2>() * Time.deltaTime;
 
         if (input.magnitude < 0.01f) //if didn't input, with a very slight deadzone
         {
@@ -131,16 +126,8 @@ public class PlayerCamRotate : MonoBehaviour
 
     void ManualCam()
     {
-        if (unscaledTime)
-        {
-            xRot -= input.y * Time.unscaledDeltaTime;
-            yRot += input.x * Time.unscaledDeltaTime;
-            return;
-        }
-
-
-        xRot -= input.y * Time.deltaTime;
-        yRot += input.x * Time.deltaTime;
+        xRot -= input.y;
+        yRot += input.x;
 
         UpdateTransform();
     }
@@ -231,6 +218,11 @@ public class PlayerCamRotate : MonoBehaviour
 
         while (t < travelToTime)
         {
+            if (PauseMenuController.isPaused)
+            {
+                continue;
+            }
+
             cameraTargetPosition.position = Vector3.Lerp(startPoint, destinationPosition, t / travelToTime);
             cameraTargetPosition.rotation = Quaternion.Slerp(startRotation, destinationRotation, t / travelToTime);
 
@@ -247,6 +239,11 @@ public class PlayerCamRotate : MonoBehaviour
 
         while (t < travelReturnTime)
         {
+            if (PauseMenuController.isPaused)
+            {
+                continue;
+            }
+
             cameraTargetPosition.position = Vector3.Lerp(destinationPosition, startPoint, t / travelReturnTime);
             cameraTargetPosition.rotation = Quaternion.Slerp(destinationRotation, startRotation, t / travelReturnTime);
 
