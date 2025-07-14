@@ -101,7 +101,7 @@ public class PlayerCamRotate : MonoBehaviour
     {
         if (currentMode == CamMode.Cutscene) return;
 
-        input = cameraInput.action.ReadValue<Vector2>() * Time.deltaTime;
+        input = cameraInput.action.ReadValue<Vector2>();
 
         if (input.magnitude < 0.01f) //if didn't input, with a very slight deadzone
         {
@@ -111,6 +111,8 @@ public class PlayerCamRotate : MonoBehaviour
         {
             CancelAutoRotate();
         }
+
+        input *= Time.deltaTime;
 
         if (GetComponent<PlayerInput>()?.currentControlScheme != "Keyboard&Mouse") //magnitude should only exceed 1 if using the mouse
         {

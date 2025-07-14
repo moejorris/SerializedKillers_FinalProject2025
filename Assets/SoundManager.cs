@@ -30,9 +30,31 @@ public class SoundManager : MonoBehaviour
         sfxSource = GetComponent<AudioSource>();
         musicSource = GetComponentInChildren<AudioSource>();
 
+        SetDefaults();
+
         masterVolume = PlayerPrefs.GetFloat("MasterVolume");
         sfxVolume = PlayerPrefs.GetFloat("SFXVolume");
         musicVolume = PlayerPrefs.GetFloat("MusicVolume");
+    }
+
+    void SetDefaults()
+    {
+        masterVolume = PlayerPrefs.GetFloat("MasterVolume");
+        sfxVolume = PlayerPrefs.GetFloat("SFXVolume");
+        musicVolume = PlayerPrefs.GetFloat("MusicVolume");
+
+        if (masterVolume == 0)
+        {
+            PlayerPrefs.SetFloat("MasterVolume", 1f);
+        }
+        if (sfxVolume == 0)
+        {
+            PlayerPrefs.SetFloat("SFXVolume", 1f);
+        }
+        if (musicVolume == 0)
+        {
+            PlayerPrefs.SetFloat("MusicVolume", 1f);
+        }
     }
 
     void OnEnable()

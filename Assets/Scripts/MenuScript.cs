@@ -24,7 +24,9 @@ public class MenuScript : MonoBehaviour
     }
 
     public void StartBtn()
-    { SceneManager.LoadScene("Levels"); }
+    {
+        SceneSwitcher.instance.LoadLevels();
+    }
 
     public void HelpBtn()
     {
@@ -50,12 +52,19 @@ public class MenuScript : MonoBehaviour
         MainPanel.SetActive(false);
         SettingsPanel.SetActive(false);
         HelpPanel.SetActive(false);
-        //CreditsPanel.SetActive(true);
+        CreditsPanel.SetActive(true);
     }
+
+    public void BackBtnFade()
+    {
+        FadeInOutAnimator.SetTrigger("FadeOut");
+        CameraTransformAnimator.SetBool("MoveToCredits", false);
+        BackBtn();
+    }
+
 
     public void BackBtn()
     {
-        CameraTransformAnimator.SetBool("MoveToCredits", false);
         MainPanel.SetActive(true);
         SettingsPanel.SetActive(false);
         HelpPanel.SetActive(false);

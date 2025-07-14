@@ -14,7 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   soundVariations:
   - {fileID: 8300000, guid: ecaf993ee5afdfa46839d0bf04dd6b17, type: 3}
-  - {fileID: 8300000, guid: 1b7c4dd000afa894f95e6f64add821e6, type: 3}
   - {fileID: 8300000, guid: bc8dad5c9ff0042489a0269832dd54c4, type: 3}
   usesRandomPitch: 0
   minPitch: 0.8
