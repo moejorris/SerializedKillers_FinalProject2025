@@ -12,6 +12,7 @@ public class SceneSwitcher : MonoBehaviour
             return;
         }
         instance = this;
+        DontDestroyOnLoad(gameObject);
     }
     public void ReturnToMenu()
     {

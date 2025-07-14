@@ -1,6 +1,4 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -27,6 +25,7 @@ public class SoundManager : MonoBehaviour
         }
 
         instance = this;
+        DontDestroyOnLoad(gameObject);
 
         sfxSource = GetComponent<AudioSource>();
         musicSource = GetComponentInChildren<AudioSource>();
