@@ -785,6 +785,9 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
     {
         yield return new WaitUntil(() => navMeshAgent.remainingDistance < navMeshAgent.stoppingDistance + 0.1f); // wait for them to get into position
 
+        int iterationLimit = 15;
+        int currentIterations = 0;
+
         wanderHome = navMeshAgent.destination;
 
         randomWanderLocations = Random.Range(2, 4);
@@ -796,7 +799,7 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
                 Vector3 potentialLocation = Vector3.zero;
                 bool walkable = false;
 
-                while (!walkable)
+                while (!walkable && currentIterations < iterationLimit)
                 {
                     potentialLocation = new Vector3(wanderHome.x + Random.Range(-wanderDistance, wanderDistance), wanderHome.y, wanderHome.z + Random.Range(-wanderDistance, wanderDistance));
                     NavMeshPath path = new NavMeshPath();
@@ -810,6 +813,9 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
                     {
                         //Debug.Log("New path made. It's location is: " + potentialLocation + " and it cannot path there :(");
                     }
+                    currentIterations++;
+                    yield return new WaitForSecondsRealtime(0.1f);
+
                 }
 
                 navMeshAgent.isStopped = false;
@@ -839,8 +845,8 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
             {
                 Vector3 potentialLocation = Vector3.zero;
                 bool walkable = false;
-
-                while (!walkable)
+                currentIterations = 0;
+                while (!walkable && currentIterations < iterationLimit)
                 {
                     potentialLocation = new Vector3(transform.position.x + Random.Range(-wanderDistance*2, wanderDistance*2), transform.position.y, transform.position.z + Random.Range(-wanderDistance*2, wanderDistance*2));
                     NavMeshPath path = new NavMeshPath();
@@ -854,6 +860,8 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
                     {
                         //Debug.Log("New path made. It's location is: " + potentialLocation + " and it cannot path there :(");
                     }
+                    currentIterations++;
+                    yield return new WaitForSecondsRealtime(0.1f);
                 }
 
                 navMeshAgent.isStopped = false;
