@@ -9,6 +9,8 @@ public class PlayerHealth : MonoBehaviour
     [SerializeField] private Image[] whiteHearts;
     [SerializeField] private SoundEffectSO healSound;
     [SerializeField] private SoundEffectSO damageSound;
+    [SerializeField] private bool useDamageVignette = true;
+    private Image damageVignette => transform.Find("DamageVignette").GetComponent<Image>();
     public float speed = 1;
     //private float maxHealth = 20;
     //public float health;
@@ -26,6 +28,7 @@ public class PlayerHealth : MonoBehaviour
     public void TakeDamage(float newHealth)
     {
         SoundManager.instance.PlaySoundEffect(damageSound);
+        damageVignette.color = Color.white;
         //health -= newHealth;
         //if (health < 0) health = 0;
 
@@ -71,15 +74,12 @@ public class PlayerHealth : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //if (Input.GetKeyDown(KeyCode.T))
-        //{
-        //    TakeDamage(8.0f);
-        //}
-
-        //if (Input.GetKeyDown(KeyCode.Q))
-        //{
-        //    HealDamage(1.0f);
-        //}
+        if (damageVignette.color.a > 0)
+        {
+            Color color = damageVignette.color;
+            color.a -= Time.deltaTime * 5;
+            damageVignette.color = color;
+        }
 
         if (whiteHeartTimer > 0)
         {
