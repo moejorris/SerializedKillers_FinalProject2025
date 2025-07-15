@@ -19,6 +19,7 @@ public class FirePot : MonoBehaviour, IElemental
 
         lit = true;
         transform.Find("Fire").gameObject.SetActive(true);
+        //transform.Find("Smoke").GetComponent<ParticleSystem>().Stop();
         room.StartFire();
     }
 }
