@@ -48,7 +48,11 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
     [SerializeField] private Transform[] waveSpawnPositions; // Array of spawn positions for the water state attack
     [Tooltip("Boss Particle Effects")]
     [SerializeField] private GameObject[] particleEffects; // Array of particle effects for the boss
+    [Tooltip("Prefab for the heart object to spawn when the boss is hurt")]
     [SerializeField] private GameObject heartPrefab; // Prefab for the heart object to spawn when the boss is hurt
+    [Tooltip("Keys that will fly off the keyboard when the boss slams his hands down")]
+    [SerializeField] private GameObject[] keysToSmash; // Array of keys to smash
+    [SerializeField] private Animator handAnim; // Animator for the boss's hands
     [Header("Testing Settings")]
     [Tooltip("Testing Flag")]
     [SerializeField] private bool testing = false;
@@ -135,6 +139,11 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
             if (Input.GetKeyDown(KeyCode.U))
             {
                 anim.SetTrigger("Summon");
+            }
+            if (Input.GetKeyDown(KeyCode.K))
+            {
+                handAnim.SetTrigger("Hand Smash");
+                Invoke("KeyboardSmash", 1.95f);
             }
         }
 
@@ -375,6 +384,43 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
     }
     #endregion
     #region Boss Methods
+    void KeyboardSmash()
+    {
+        // First check if the keysToSmash array is not empty
+        if (keysToSmash.Length == 0)
+        {
+            Debug.LogError("keysToSmash array is empty. Please assign keys to smash.");
+            return;
+        }
+        // Choose 5 radom keys from the keysToSmash array
+        List<GameObject> keysToSmashList = new List<GameObject>(keysToSmash);
+        List<GameObject> keysToSmashRandom = new List<GameObject>();
+        for (int i = 0; i < 5 && keysToSmashList.Count > 0; i++)
+        {
+            int randomIndex = Random.Range(0, keysToSmashList.Count); // Get a random index from the keysToSmashList
+            GameObject keyToSmash = keysToSmashList[randomIndex]; // Get the key to smash
+            keysToSmashList.RemoveAt(randomIndex); // Remove the key from the list
+            keysToSmashRandom.Add(keyToSmash); // Add the key to the list of keys to smash
+            Debug.Log("Key to smash: " + keyToSmash.name); // Log the key to smash
+
+            // Smash the keys
+            foreach (GameObject key in keysToSmashRandom)
+            {
+                // Remove the key from the parent object
+                key.transform.SetParent(null);
+                Rigidbody rb = key.GetComponent<Rigidbody>();
+                if (rb != null)
+                {
+                    rb.isKinematic = false;
+                    // Add a force to the keys to make them fly up
+                    rb.AddForce(Vector3.up * 2f, ForceMode.Impulse);
+                    Debug.Log("Key smashed: " + key.name); // Log the key that was smashed
+                }
+                Destroy(key, 2f); // Destroy the key after 2 seconds
+            }
+        }
+    }
+
     void StartTeleport()
     {
         StartCoroutine(TeleportAfterDelay(0.5f)); // Start the teleport coroutine
