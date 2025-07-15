@@ -4855,15 +4855,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: cdb8128c75d24134c93225d6bc800833, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -19
+      value: -86.80491
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: cdb8128c75d24134c93225d6bc800833, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1
+      value: 150.89326
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: cdb8128c75d24134c93225d6bc800833, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 2.1055276
+      value: 532.14825
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: cdb8128c75d24134c93225d6bc800833, type: 3}
       propertyPath: m_LocalRotation.w
@@ -4964,6 +4964,8 @@ MonoBehaviour:
   speed: 7.5
   lifeTime: 3
   damage: 2.5
+  pathOfFire: {fileID: 5237861518898813480, guid: a35a70eed11f3724c8b84574cf235ad6, type: 3}
+  pathSpawnInterval: 0.5
 --- !u!65 &8815310045910150574
 BoxCollider:
   m_ObjectHideFlags: 0

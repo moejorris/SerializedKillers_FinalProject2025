@@ -18,6 +18,7 @@ public class ProjectileScript : MonoBehaviour
             {
                 playerHealth.TakeDamage(damage);
             }
+            Destroy(gameObject); // Destroy the projectile on hit
         }
         else
         {

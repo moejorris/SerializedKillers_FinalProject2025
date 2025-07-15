@@ -48,6 +48,7 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
     [SerializeField] private Transform[] waveSpawnPositions; // Array of spawn positions for the water state attack
     [Tooltip("Boss Particle Effects")]
     [SerializeField] private GameObject[] particleEffects; // Array of particle effects for the boss
+    [SerializeField] private GameObject heartPrefab; // Prefab for the heart object to spawn when the boss is hurt
     [Header("Testing Settings")]
     [Tooltip("Testing Flag")]
     [SerializeField] private bool testing = false;
@@ -110,7 +111,7 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
         shieldHealth = maxShieldHealth; // Initialize the shield health to the maximum shield health
         attackTimer = 5.0f;
 
-        Invoke("SpawnEnemies", 7.0f);
+        Invoke("SpawnWeakAndRandomEnemy", 7.0f);
 
     }
 
@@ -250,7 +251,7 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
                 Debug.LogWarning("No elemental state set!"); // Log a warning if no state is set
                 break;
         }
-        SpawnEnemies();
+        SpawnWeakAndRandomEnemy();
 
     }
 
@@ -398,7 +399,6 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
             Debug.Log("Boss teleported to: " + currentTeleportPosition.position); // Log the teleport
 
             attackTimer = 0f; // Reset the attack timer after teleporting
-            SpawnEnemies();
         }
     }
 
@@ -466,13 +466,6 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
         // Trigger Animations
         anim.SetTrigger("Hit"); // Trigger the hit animation
 
-        // Check if max vulnerable attack reached
-        //if (vulnAttacks >= maxVulnerableAttacks)
-        //{
-        //    Debug.Log("Boss has taken maximum vulnerable attacks! Ending vulnerable state.");
-        //    EndVulnerable();
-        //}
-
         UpdateUI();
 
         if (health <= 0)
@@ -502,6 +495,7 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
     {
         if (isVulnerable) return; // Exit if the boss is already vulnerable
         shieldHealth = 0; // Reset shield health
+        StopAllCoroutines(); // Stop any ongoing coroutines
         anim.SetTrigger("Weak"); // Trigger the weak animation
         Debug.Log("Boss is about to become vulnerable!"); // Log the start of the vulnerable state
     }
@@ -526,16 +520,19 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
         float healthPercentage = health / 100f; // Calculate the health percentage
         if (healthPercentage <= 0.75f && lastStateThreshold > 0.75f)
         {
+            SpawnHearts(3); 
             lastStateThreshold = 0.75f;
             anim.SetTrigger("Change"); // Trigger the change animation
         }
         else if (healthPercentage <= 0.5f && lastStateThreshold > 0.5f)
         {
+            SpawnHearts(3);
             lastStateThreshold = 0.5f;
             anim.SetTrigger("Change"); // Trigger the change animation
         }
         else if (healthPercentage <= 0.25f && lastStateThreshold > 0.25f)
         {
+            SpawnHearts(3);
             lastStateThreshold = 0.25f;
             anim.SetTrigger("Change"); // Trigger the change animation
         }
@@ -545,6 +542,15 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
             Debug.Log("Boss has reached the second phase!"); // Log the second phase
             Destroy(gameObject, 5f); // Destroy the boss after 5 seconds
             return; // Exit the method
+        }
+    }
+
+    void SpawnHearts(int count)
+    {
+        for (int i = 0; i < count; i++)
+        {
+            Rigidbody rb = Instantiate(heartPrefab, transform.position, Quaternion.identity).GetComponent<Rigidbody>();
+            rb.AddForce(new Vector3(Random.Range(-100f, 100), 100, Random.Range(-100f, 100f)));
         }
     }
 
@@ -594,45 +600,51 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
         }
         if (hasNoMoreAttacks)
         {
-            StartVulnerable();
             hasNoMoreAttacks = false;
+            Debug.Log("Boss has no more attacks! Starting vulnerable state.");
+            StartVulnerable(); // Start the vulnerable state
         }
+        StopAllCoroutines(); // Stop all coroutines after the attack is summoned
     }
 
-    void SpawnEnemies()
+    void SpawnWeakAndRandomEnemy()
     {
-        //foreach (Transform spawn in enemySpawnPoints)
-        //{
-        //    //for (int i = 0, i < 3, i++)
-        //    //{
-        //    //    Instantiate(enemiesToSpawn[i], spawn.position, spawn.rotation);
-        //    //}
-        //    int randomIndex = Random.Range(0, enemiesToSpawn.Length);
-        //    Instantiate(enemiesToSpawn[randomIndex], spawn.position, spawn.rotation);
-        //}
+        if (enemySpawnPoints.Length < 2 || enemiesToSpawn.Length < 3)
+        {
+            Debug.LogError("Not enough enemy spawn points or enemy prefabs assigned!"); // Log error if not enough spawn points or prefabs are assigned
+            return; // Exit the method if not enough spawn points or prefabs are assigned
+        }
 
-        int randomIndex = Random.Range(0, enemySpawnPoints.Length);
-        Debug.Log("Boss is preparing to spawn an enemy!");
+        int weaknessEnemyIndex = -1;
         switch (currentState)
         {
             case BossState.Fire:
-                Debug.Log("Boss is in the fire state, spawning a water enemy!");
-                Instantiate(enemiesToSpawn[2], enemySpawnPoints[0].position, enemySpawnPoints[0].rotation);
+                weaknessEnemyIndex = 2;
                 break;
             case BossState.Electric:
-                Debug.Log("Boss is in the Electric state, spawning a fire enemy!");
-                Instantiate(enemiesToSpawn[0], enemySpawnPoints[1].position, enemySpawnPoints[1].rotation);
+                weaknessEnemyIndex = 0;
                 break;
             case BossState.Water:
-                Debug.Log("Boss is in the Water State, spawning an electric enemy!");
-                Instantiate(enemiesToSpawn[1], enemySpawnPoints[1].position, enemySpawnPoints[2].rotation);
-                break;
-            case BossState.None:
-                Instantiate(enemiesToSpawn[randomIndex], enemySpawnPoints[randomIndex].position, enemySpawnPoints[randomIndex].rotation);
+                weaknessEnemyIndex = 1;
                 break;
             default:
+                weaknessEnemyIndex = Random.Range(0, enemiesToSpawn.Length); // Randomly select an enemy if no state is set
                 break;
         }
+
+        int firstSpawnIndex = Random.Range(0, enemySpawnPoints.Length); // Randomly select the first spawn point
+        int secondSpawnIndex = firstSpawnIndex;
+        while (secondSpawnIndex == firstSpawnIndex)
+        {
+            secondSpawnIndex = Random.Range(0, enemySpawnPoints.Length); // Ensure the second spawn point is different from the first
+        }
+
+        Instantiate(enemiesToSpawn[weaknessEnemyIndex], enemySpawnPoints[firstSpawnIndex].position, enemySpawnPoints[firstSpawnIndex].rotation);
+
+        int randomEnemyIndex = weaknessEnemyIndex;
+        while (randomEnemyIndex == weaknessEnemyIndex) randomEnemyIndex = Random.Range(0, enemiesToSpawn.Length); // Ensure the random enemy is different from the weakness enemy
+
+        Instantiate(enemiesToSpawn[randomEnemyIndex], enemySpawnPoints[secondSpawnIndex].position, enemySpawnPoints[secondSpawnIndex].rotation);
     }
     #endregion
     #region Animation Events

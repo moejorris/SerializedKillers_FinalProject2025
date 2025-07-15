@@ -9,6 +9,9 @@ public class FirePillar : MonoBehaviour
     [SerializeField] private float speed = 5f; // Speed of the fire pillar
     [SerializeField] private float lifeTime = 3f; // Lifetime of the fire pillar
     [SerializeField] private float damage = 2.5f; // Damage of the fire pillar
+    [SerializeField] private GameObject pathOfFire;
+    [SerializeField] private float pathSpawnInterval = 0.5f; // Interval for spawning fire paths
+    private float pathTimer; // Timer for the fire path
 
     private float damageTimer = 0f;
     #endregion
@@ -30,6 +33,22 @@ public class FirePillar : MonoBehaviour
         {
             Vector3 direction = target.position - transform.position; // Calculate direction to the target
             transform.position += direction.normalized * speed * Time.deltaTime; // Move towards the target
+        }
+
+        // Spawn fire paths
+        pathTimer += Time.deltaTime;
+        if (pathTimer >= pathSpawnInterval)
+        {
+            SpawnFirePath();
+            pathTimer = 0f;
+        }
+    }
+
+    void SpawnFirePath()
+    {
+        if (pathOfFire != null)
+        {
+            Instantiate(pathOfFire, transform.position, Quaternion.identity); // Spawn the fire path at the current position
         }
     }
 
