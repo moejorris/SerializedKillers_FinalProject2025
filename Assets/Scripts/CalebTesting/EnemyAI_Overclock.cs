@@ -299,7 +299,7 @@ public class EnemyAI_Overclock : EnemyAI_Base
     {
         if (Invincible())
         {
-            attackCooldownTimer = 3;
+            AttackCooldown(1);
             return;
         }
 
