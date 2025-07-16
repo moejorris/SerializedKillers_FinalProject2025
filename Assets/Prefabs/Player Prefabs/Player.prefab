@@ -21219,7 +21219,7 @@ MonoBehaviour:
   waterParticles: {fileID: 5608910413428001789}
   selectedEnemy: {fileID: 0}
   heldBehavior: {fileID: 0}
-  emptySlot: {fileID: 21300000, guid: b574f3cfa060084479405e3cd26d0c94, type: 3}
+  emptySlot: {fileID: 960495944, guid: 05aa7f1155a3bb94c89ba5cf30ef0e06, type: 3}
   enemyManager: {fileID: 0}
   fireStatusEffect: {fileID: 8131181348710889001}
   fireHazardColliders: []
@@ -21396,6 +21396,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 248708413fa91b347a65ce4a5101190d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  force: {x: 0, y: 0, z: 0}
 --- !u!114 &9132798164434119282
 MonoBehaviour:
   m_ObjectHideFlags: 0
