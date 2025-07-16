@@ -14,7 +14,7 @@ public class FireSpewer : MonoBehaviour, IElemental
     public float fireDuration = 5;
     private float enemyExtinguishTimer = 1;
 
-    private float health = 2;
+    private float health = 1;
     private float knockbackCooldown = 0;
     public float knockbackStrength = 10;
 
