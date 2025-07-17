@@ -591,6 +591,7 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
         anim.SetTrigger("Move"); // Trigger the move animation to teleport the boss after vulnerability ends
         shieldHealth = maxShieldHealth; // Reset shield health
         attacksUsed = 0;
+        shieldRenderer.material = originalShieldMaterial; // Reset the shield material to the original
         ChangeState(); // Call State Method
     }
 
@@ -803,7 +804,15 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
 
     public void TakeDamage(float damage = 0)
     {
-        InteractElement();
+
+        if (PlayerController.instance?.CombatMachine?.isAttacking == true)
+        {
+            InteractElement();
+        }
+        else
+        {
+            Debug.Log("Boss can only take damage from player attacks.");
+        }
     }
     #endregion
 }

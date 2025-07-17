@@ -11,6 +11,7 @@ public class FirePillar : MonoBehaviour
     [SerializeField] private float damage = 2.5f; // Damage of the fire pillar
     [SerializeField] private GameObject pathOfFire;
     [SerializeField] private float pathSpawnInterval = 0.5f; // Interval for spawning fire paths
+    [SerializeField] private float damageInterval = 0.75f; // Interval for dealing damage to the player
     private float pathTimer; // Timer for the fire path
 
     private float damageTimer = 0f;
@@ -57,7 +58,7 @@ public class FirePillar : MonoBehaviour
         if (other.gameObject.layer == LayerMask.NameToLayer("Player"))
         {
             damageTimer += Time.deltaTime;
-            if (damageTimer >= 0.75f)
+            if (damageTimer >= damageInterval)
             {
                 Debug.Log("Player hit by the fire pillar!");
                 PlayerHealth playerHealth = GameObject.FindGameObjectWithTag("Canvas").GetComponent<PlayerHealth>();
