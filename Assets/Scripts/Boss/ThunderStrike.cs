@@ -14,6 +14,8 @@ public class ThunderStrike : MonoBehaviour
     [SerializeField] private Transform thunderBlast; // Position of the thunder blast
     [Tooltip("Radius of the thunder strike")]
     [SerializeField] private float radius = 2f; // Radius of the thunder strike
+    [SerializeField] private GameObject thunderFX;
+    private ParticleSystem thunderFXParticleSystem;
 
 
 
@@ -28,6 +30,9 @@ public class ThunderStrike : MonoBehaviour
             Debug.LogError("Player not found! Make sure the player has the 'Player' tag assigned.");
             return; // Exit if the player is not found
         }
+
+        // Refrence the particle system of the thunder FX
+        thunderFXParticleSystem = thunderFX.GetComponent<ParticleSystem>();
     }
 
     void OnDrawGizmosSelected()
@@ -42,6 +47,7 @@ public class ThunderStrike : MonoBehaviour
         if (isChasing && target != null)
         {
             Vector3 direction = target.position - transform.position; // Calculate direction to the target
+            direction.y = 0f; // Ignore vertical movement
             transform.position += direction.normalized * speed * Time.deltaTime; // Move towards the target
         }
     }
@@ -74,6 +80,15 @@ public class ThunderStrike : MonoBehaviour
                     playerHealth.TakeDamage(damage);
                 }
             }
+        }
+    }
+
+    void PlayThunderFX()
+    {
+        // Play the thunder FX particle system
+        if (thunderFXParticleSystem != null)
+        {
+            thunderFXParticleSystem.Play();
         }
     }
 

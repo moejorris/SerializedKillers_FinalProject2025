@@ -36,7 +36,7 @@ public class Player_CombatMachine : MonoBehaviour
     float currentAerialAttack = 0;
 
     //Local Stuff
-    bool isAttacking = false;
+    public bool isAttacking = false;
     bool attackQueued = false;
     int currentAnim = 1;
     PlayerAttackSO currentAttack;
