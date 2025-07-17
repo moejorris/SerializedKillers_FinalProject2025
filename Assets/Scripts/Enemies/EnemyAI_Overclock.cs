@@ -12,7 +12,7 @@ public class EnemyAI_Overclock : EnemyAI_Base
     [SerializeField] private float rotateThing;
     [Header("Overclock General")]
     //public float idleActivateRange;
-    [SerializeField] private string movementState = "wandering";
+    public string movementState = "wandering";
     [SerializeField] private bool bodyCanTurn = false;
     public float followGracePeriod = 1;
     private float followTimer = 0;
