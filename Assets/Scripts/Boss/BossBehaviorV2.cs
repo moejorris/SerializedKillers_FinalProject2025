@@ -804,15 +804,7 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
 
     public void TakeDamage(float damage = 0)
     {
-
-        if (PlayerController.instance?.CombatMachine?.isAttacking == true)
-        {
-            InteractElement();
-        }
-        else
-        {
-            Debug.Log("Boss can only take damage from player attacks.");
-        }
+        InteractElement(); // Call the InteractElement method to handle damage
     }
     #endregion
 }
