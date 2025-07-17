@@ -24,6 +24,8 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
     [SerializeField] private int maxVulnerableAttacks = 3; // Maximum number of attacks the boss can take while vulnerable
     [Tooltip("Max number of attacks before the boss can use before becoming vulnerable")]
     [SerializeField] private int maxAttacks = 3; // Maximum number of attacks before the boss becomes vulnerable
+    [Tooltip("Radius for the keyboard smash attack")]
+    [SerializeField] private float smashRadius = 5f; // Radius for the keyboard smash attack
     [Header("Boss Components")]
     [Tooltip("Reference to the boss health bar RectTransform.")]
     [SerializeField] private RectTransform healthBar; // Assign this in the inspector
@@ -73,12 +75,10 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
     private List<BossState> availableStates = new List<BossState>(); // List of available states for the boss
     private List<BossState> unusedStates = new List<BossState>(); // List of unused states for the boss
     private List<GameObject> spawnedEnemies;
-
-    #endregion
-
-    [Header("Targeting")]
+   [Header("Targeting")]
     public float TargetScore { get; set;}
     public float TargetScoreWeight { get => 2f;} //boss is twice as likely to be targeted
+    #endregion
 
     #region Unity Methods
     void Awake()
@@ -115,7 +115,7 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
         shieldHealth = maxShieldHealth; // Initialize the shield health to the maximum shield health
         attackTimer = 5.0f;
 
-        Invoke("SpawnWeakAndRandomEnemy", 7.0f);
+        // Invoke("SpawnWeakAndRandomEnemy", 7.0f);
 
     }
 
@@ -143,7 +143,7 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
             if (Input.GetKeyDown(KeyCode.K))
             {
                 handAnim.SetTrigger("Hand Smash");
-                Invoke("KeyboardSmash", 1.95f);
+                Invoke("KeyboardSmash", 1.02f);
             }
         }
 
@@ -164,6 +164,7 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
             attackTimer += Time.deltaTime; // Increment the attack timer
             if (attackTimer >= attackInterval)
             {
+                Debug.Log("Boss is attacking!"); // Log the attack
                 Attack(); // Call the attack method when the attack timer reaches the attack interval
             }
             else if (attackTimer == 1f)
@@ -192,6 +193,10 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
             Gizmos.color = Color.red; // Set the color for the gizmo
             Gizmos.DrawLine(transform.position, player.position); // Draw a line from the boss to the player
         }
+
+        // Draw the sphere for the keyboard smash
+        Gizmos.color = Color.blue;
+        Gizmos.DrawWireSphere(transform.position, smashRadius);
     }
 
         // Call this when the shield takes damage
@@ -384,14 +389,34 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
     }
     #endregion
     #region Boss Methods
+    public void KnockPlayerBack(float force)
+    {
+        Vector3 dir = (player.transform.position - transform.position).normalized;
+        dir.y = 0.5f;
+        dir *= force;
+        PlayerController.instance.ForceHandler.AddForce(dir, ForceMode.VelocityChange);
+    }
     void KeyboardSmash()
     {
-        // First check if the keysToSmash array is not empty
-        if (keysToSmash.Length == 0)
+        // Create a physics overlap sphere to detect the player, then send the player flying away
+        Collider[] hitColliders = Physics.OverlapSphere(transform.position, smashRadius, LayerMask.GetMask("Player")); // Get all colliders within the smash radius
+        foreach (Collider hitCollider in hitColliders)
         {
-            Debug.LogError("keysToSmash array is empty. Please assign keys to smash.");
-            return;
+            Debug.Log("Player hit by keyboard smash!"); // Log message for debugging
+            Player_HealthComponent playerHealth = hitCollider.GetComponent<Player_HealthComponent>();
+            KnockPlayerBack(Random.Range(20, 30)); // Knock the player back with a random force
+            if (playerHealth != null)
+            {
+                playerHealth.TakeDamage(2.5f); // Deal damage to the player
+            }
         }
+
+        // First check if the keysToSmash array is not empty
+            if (keysToSmash.Length == 0)
+            {
+                Debug.LogError("keysToSmash array is empty. Please assign keys to smash.");
+                return;
+            }
         // Choose 5 radom keys from the keysToSmash array
         List<GameObject> keysToSmashList = new List<GameObject>(keysToSmash);
         List<GameObject> keysToSmashRandom = new List<GameObject>();
@@ -399,9 +424,9 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
         {
             int randomIndex = Random.Range(0, keysToSmashList.Count); // Get a random index from the keysToSmashList
             GameObject keyToSmash = keysToSmashList[randomIndex]; // Get the key to smash
+            Debug.Log("Key to smash: " + keyToSmash.name); // Log the key to smash
             keysToSmashList.RemoveAt(randomIndex); // Remove the key from the list
             keysToSmashRandom.Add(keyToSmash); // Add the key to the list of keys to smash
-            Debug.Log("Key to smash: " + keyToSmash.name); // Log the key to smash
 
             // Smash the keys
             foreach (GameObject key in keysToSmashRandom)
@@ -414,6 +439,7 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
                     rb.isKinematic = false;
                     // Add a force to the keys to make them fly up
                     rb.AddForce(Vector3.up * 2f, ForceMode.Impulse);
+                    rb.AddForce(Vector3.forward * 2f, ForceMode.Impulse);
                     Debug.Log("Key smashed: " + key.name); // Log the key that was smashed
                 }
                 Destroy(key, 2f); // Destroy the key after 2 seconds
@@ -542,6 +568,7 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
         if (isVulnerable) return; // Exit if the boss is already vulnerable
         shieldHealth = 0; // Reset shield health
         StopAllCoroutines(); // Stop any ongoing coroutines
+        handAnim.SetTrigger("Hand Stunned"); // Trigger the stunned animation
         anim.SetTrigger("Weak"); // Trigger the weak animation
         Debug.Log("Boss is about to become vulnerable!"); // Log the start of the vulnerable state
     }
@@ -553,6 +580,7 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
         isVulnerable = false; // Set the boss to not vulnerable
         vulnAttacks = 0; // Reset the number of attacks taken
         vulnerableTimer = vulnerableDuration; // Reset the vulnerable duration
+        // handAnim.SetTrigger("Hand EndWeak"); // Trigger the end weak animation
         anim.SetTrigger("EndWeak"); // Trigger the end weak animation
         Debug.Log("Boss is no longer vulnerable!"); // Log the end of the vulnerable state
         anim.SetTrigger("Move"); // Trigger the move animation to teleport the boss after vulnerability ends
@@ -617,6 +645,7 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
             return; // Exit the attack method
         }
         anim.SetTrigger("Summon"); // Trigger the summon animation
+        handAnim.SetTrigger("Hand Summon"); // Trigger the hand summon animation
         attackTimer = 0f; // Reset the attack timer
     }
 

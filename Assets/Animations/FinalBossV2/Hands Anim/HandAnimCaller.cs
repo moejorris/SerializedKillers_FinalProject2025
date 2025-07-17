@@ -10,7 +10,7 @@ public class HandAnimCaller : MonoBehaviour
     {hController.SetTrigger("Hand Summon");}
 
     public void handSmash()
-    { hController.SetTrigger("Hand Smash"); }
+    { hController.SetTrigger("Hand EndWeak"); }
 
     public void handSwipe()
     { hController.SetTrigger("Hand Swipe"); }
