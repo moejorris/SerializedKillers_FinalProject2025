@@ -12,8 +12,13 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
     [SerializeField] private float health = 100f;
     [Tooltip("Shield Health of the boss")]
     [SerializeField] private float maxShieldHealth = 30f;
-    private const float shieldDamage = 2.5f;
+    [Tooltip("Amount of damage the shield takes from the player")]
+    [SerializeField] private float shieldDamage = 2.5f;
     private float shieldHealth = 0f;
+    [Tooltip("Amount of damage the boss takes from the player")]
+    [SerializeField] private float vulnerableDamage = 1f;
+    [Tooltip("Multipler for the boss's weakness to the player's attack")]
+    [SerializeField] private float weaknessMultiplier = 2f;
     [Tooltip("Attack Interval in seconds")]
     [SerializeField] private float attackInterval = 15f;
     private float attackTimer = 0f;
@@ -523,10 +528,10 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
             return;
         }
 
-        damageAmount = 1f;
+        damageAmount = vulnerableDamage;
         if (isWeakness)
         {
-            damageAmount *= 2f;
+            damageAmount *= weaknessMultiplier; // Double the damage if the attack is a weakness
             Debug.Log("Weakness detected! Damage doubled.");
         }
 
