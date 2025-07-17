@@ -26,6 +26,8 @@ public class EnemyAI_Base : MonoBehaviour, ITargetable, IDamageable, IComboTarge
     public float health = 20f;
     private float healthSpeedMult = 1;
 
+    public GameObject heartPrefab;
+
     [HideInInspector] public RectTransform healthBar;
     [HideInInspector] public RectTransform whiteHealthBar;
 
@@ -122,6 +124,7 @@ public class EnemyAI_Base : MonoBehaviour, ITargetable, IDamageable, IComboTarge
     public virtual void Die()
     {
         PlayerController.instance.Mana.GainMana(manaOnDeath);
+        Instantiate(heartPrefab, transform.position, Quaternion.identity);
         Destroy(gameObject);
     }
 

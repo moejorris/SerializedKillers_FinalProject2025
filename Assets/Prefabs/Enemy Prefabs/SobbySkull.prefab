@@ -1288,6 +1288,7 @@ MonoBehaviour:
   manaPerHit: 5
   maxHealth: 70
   health: 70
+  heartPrefab: {fileID: 7148735774821552614, guid: 6119c701b6ae20245841a51a34be0eb7, type: 3}
   healthBar: {fileID: 0}
   whiteHealthBar: {fileID: 0}
   meshes:

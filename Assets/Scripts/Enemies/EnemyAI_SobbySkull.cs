@@ -514,6 +514,7 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
     public override void Die()
     {
         PlayerController.instance.Mana.GainMana(manaOnDeath);
+        Instantiate(heartPrefab, skull.position, Quaternion.identity);
         Destroy(skull.parent.gameObject);
     }
 
