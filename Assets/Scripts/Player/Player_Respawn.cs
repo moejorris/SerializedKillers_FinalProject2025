@@ -3,6 +3,7 @@ using UnityEngine;
 public class Player_Respawn : MonoBehaviour
 {
     public Vector3 respawnPoint;
+    public Room currentRoom;
 
     void Start()
     {
@@ -19,7 +20,10 @@ public class Player_Respawn : MonoBehaviour
         PlayerController.instance.Health.UpdatePlayerHealth();
         PlayerController.instance.ScriptSteal.ReturnScript();
         PlayerController.instance.Mana.UseMana(100);
+        PlayerController.instance.Mana.ToggleMana();
         transform.Find("FireStatusEffect").GetComponent<FireDamageEffect>().StopFire();
+
+        if (currentRoom != null && !currentRoom.roomCompleted) currentRoom.ResetRoom(); // newly added, hopefully won't be jank
 
         //Change Position
         

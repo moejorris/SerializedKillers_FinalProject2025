@@ -157,7 +157,7 @@ public class EnemyAI_Base : MonoBehaviour, ITargetable, IDamageable, IComboTarge
         {
             highlightPiece.layer = 6;
         }
-        selectedIcon.SetActive(true);
+        if (selectedIcon != null) selectedIcon.SetActive(true);
     }
 
     public virtual void UnHighlightEnemy()
@@ -166,7 +166,7 @@ public class EnemyAI_Base : MonoBehaviour, ITargetable, IDamageable, IComboTarge
         {
             highlightPiece.layer = 0;
         }
-        selectedIcon.SetActive(false);
+        if (selectedIcon != null) selectedIcon.SetActive(false);
     }
 
     public virtual bool Invincible()

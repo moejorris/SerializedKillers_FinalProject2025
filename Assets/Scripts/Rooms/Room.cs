@@ -8,27 +8,24 @@ public class Room : MonoBehaviour
     public List<Animator> exitDoors;
     public List<Animator> entranceDoors;
     [SerializeField] Transform roomSuccessCamera;
-    [SerializeField] private bool challengeStarted = false;
+    public bool challengeStarted = false;
     //[SerializeField] private Transform postCheckpoint;
     //[SerializeField] private Transform preCheckpoint;
 
-    [Header("Room Respawning (If Applicable)")]
-    [SerializeField] private GameObject smokeSpawnPrefab;
-    [SerializeField] private List<GameObject> requiredEnemyTypes;
-    [SerializeField] private List<Transform> requiredEnemyRespawnPoints;
+    public GameObject smokeSpawnPrefab;
     private BoxCollider box => GetComponent<BoxCollider>();
-    [SerializeField] private LayerMask enemyLayer;
-    private List<GameObject> respawnEnemies = new List<GameObject>();
 
     private bool playerInRoom = false;
-    private float timer;
+    public float roomCheckTimer;
 
-    bool roomCompleted = false;
+    public bool roomCompleted = false;
 
     [SerializeField] private GameObject roomTextPrefab;
-    [SerializeField] private string roomTitle = "Room Title Here";
+    [SerializeField] private string roomText = "Room Title Here";
     [SerializeField] private RoomType roomType;
     public enum RoomType { CombatRoom, PuzzleRoom };
+
+    public EnemyDisplay enemyDisplay => GameObject.FindGameObjectWithTag("Canvas").transform.Find("EnemyDisplay").GetComponent<EnemyDisplay>();
 
     private void OnDrawGizmos()
     {
@@ -40,17 +37,17 @@ public class Room : MonoBehaviour
     public virtual void Start()
     {
         //InitialEnemyPass();
-        timer = 2;
+        roomCheckTimer = 2;
     }
 
     public virtual void Update()
     {
         if (playerInRoom)
         {
-            timer -= Time.deltaTime;
-            if (timer <= 0)
+            roomCheckTimer -= Time.deltaTime;
+            if (roomCheckTimer <= 0)
             {
-                timer = 2;
+                roomCheckTimer = 1;
                 CheckEnemies();
             }
         }
@@ -58,35 +55,16 @@ public class Room : MonoBehaviour
 
     public virtual void CheckEnemies()
     {
-        RemoveListNulls(respawnEnemies);
-
-        for (int i = 0; i < requiredEnemyTypes.Count; i++)
-        {
-            if (requiredEnemyRespawnPoints[i].childCount <= 0)
-            {
-                SpawnEnemy(requiredEnemyTypes[i], requiredEnemyRespawnPoints[i]);
-            }
-        }
+        
     }
 
-    //public void InitialEnemyPass() // creates list from overlapsphere
-    //{
-    //    Collider[] enems = Physics.OverlapBox(box.bounds.center, box.size / 2, Quaternion.identity, enemyLayer);
-    //    foreach (Collider enemy in enems)
-    //    {
-    //        respawnEnemies.Add(enemy.gameObject);
-    //    }
-    //}
-
-    public void SpawnEnemy(GameObject enemy, Transform position)
+    public virtual void SpawnEnemy(GameObject enemy, Transform position)
     {
         GameObject spawnedEnemy = Instantiate(enemy, position.position, Quaternion.identity);
 
         spawnedEnemy.transform.parent = position;
 
         Instantiate(smokeSpawnPrefab, position.position, Quaternion.identity);
-        RemoveListNulls(respawnEnemies);
-        respawnEnemies.Add(spawnedEnemy);
     }
 
     public void RemoveListNulls(List<GameObject> checkedEnemies) // goes through and clears any null enemies that were killed
@@ -124,6 +102,7 @@ public class Room : MonoBehaviour
         if (other == PlayerController.instance.Collider)
         {
             playerInRoom = true;
+            PlayerController.instance.Respawn.currentRoom = this;
             BeginChallenge();
         }
     }
@@ -132,6 +111,7 @@ public class Room : MonoBehaviour
     {
         if (other == PlayerController.instance.Collider)
         {
+            PlayerController.instance.Respawn.currentRoom = null;
             playerInRoom = false;
         }
     }
@@ -157,9 +137,9 @@ public class Room : MonoBehaviour
         if (roomTextPrefab != null)
         {
             GameObject roomText = Instantiate(roomTextPrefab, GameObject.FindGameObjectWithTag("Canvas").transform).gameObject;
-            roomText.transform.Find("Title").GetComponent<TMP_Text>().text = roomTitle;
-            if (roomType == RoomType.PuzzleRoom) roomText.transform.Find("RoomType").GetComponent<TMP_Text>().text = "[Puzzle Room]";
-            else roomText.transform.Find("RoomType").GetComponent<TMP_Text>().text = "[Combat Room]";
+            roomText.transform.Find("Title").GetComponent<TMP_Text>().text = this.roomText;
+            //if (roomType == RoomType.PuzzleRoom) roomText.transform.Find("RoomType").GetComponent<TMP_Text>().text = "[Puzzle Room]";
+            //else roomText.transform.Find("RoomType").GetComponent<TMP_Text>().text = "[Combat Room]";
         }
         //PlayerController.instance.Respawn.respawnPoint = postCheckpoint.position;
     }
@@ -178,6 +158,11 @@ public class Room : MonoBehaviour
         {
             door.SetBool("Open", false);
         }
+    }
+
+    public virtual void ResetRoom()
+    {
+
     }
 }
 

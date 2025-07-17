@@ -263,7 +263,7 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
             {
                 //Debug.Log("Player Hit!");
                 hitPlayer = true;
-                PlayerController.instance.Health.TakeDamage(5);
+                PlayerController.instance.Health.TakeDamage(2);
                 break;
             }
         }

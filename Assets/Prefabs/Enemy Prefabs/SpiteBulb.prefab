@@ -11640,6 +11640,72 @@ ParticleSystemRenderer:
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
   m_MaskInteraction: 0
+--- !u!1001 &126495948241428390
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 948481832720710908}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: 883b9d0923fe01d42a63559fdd502e17, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.004
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 883b9d0923fe01d42a63559fdd502e17, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.756
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 883b9d0923fe01d42a63559fdd502e17, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.02
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 883b9d0923fe01d42a63559fdd502e17, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: -0.00000029802317
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 883b9d0923fe01d42a63559fdd502e17, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0.00000026822084
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 883b9d0923fe01d42a63559fdd502e17, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.707107
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 883b9d0923fe01d42a63559fdd502e17, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0.7071066
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 883b9d0923fe01d42a63559fdd502e17, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: -90
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 883b9d0923fe01d42a63559fdd502e17, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 883b9d0923fe01d42a63559fdd502e17, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 180
+      objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 883b9d0923fe01d42a63559fdd502e17, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 89b318a07ab881a44897c62e96567e2e, type: 2}
+    - target: {fileID: 919132149155446097, guid: 883b9d0923fe01d42a63559fdd502e17, type: 3}
+      propertyPath: m_Name
+      value: Eyes
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 883b9d0923fe01d42a63559fdd502e17, type: 3}
+--- !u!4 &453700384067270733 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 883b9d0923fe01d42a63559fdd502e17, type: 3}
+  m_PrefabInstance: {fileID: 126495948241428390}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &2744878082045278240
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -11748,8 +11814,16 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: acca146880939134081c6e08c5b98f3b, type: 3}
       insertIndex: 2
       addedObject: {fileID: 5344636336954050440}
+    - targetCorrespondingSourceObject: {fileID: 3116045781718189276, guid: acca146880939134081c6e08c5b98f3b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 453700384067270733}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: acca146880939134081c6e08c5b98f3b, type: 3}
+--- !u!4 &948481832720710908 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 3116045781718189276, guid: acca146880939134081c6e08c5b98f3b, type: 3}
+  m_PrefabInstance: {fileID: 2744878082045278240}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &2422230094160142283 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: acca146880939134081c6e08c5b98f3b, type: 3}

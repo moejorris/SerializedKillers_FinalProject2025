@@ -30,6 +30,7 @@ public class Player_Mana : MonoBehaviour
     public bool scriptActive = false;
 
     private RectTransform manaBar => GameObject.FindGameObjectWithTag("Canvas").transform.Find("HUD/Mana/Bar").GetComponent<RectTransform>();
+    private Animator barAnimator => manaBar.GetComponent<Animator>();
     private RectTransform whiteManaBar => GameObject.FindGameObjectWithTag("Canvas").transform.Find("HUD/Mana/WhiteBar").GetComponent<RectTransform>();
     [SerializeField] private float manaBarLerpSpeed = 0f;
 
@@ -75,18 +76,25 @@ public class Player_Mana : MonoBehaviour
 
         if (scriptToggleButton.action.WasPressedThisFrame()) // Checks if the player has pressed Y and toggles menu
         {
-            if (PlayerController.instance.ScriptSteal.heldBehavior != null && currentMana > 0)
-            {
-                scriptActive = !scriptActive;
-                //PlayerController.instance.ScriptSteal.UpdateUI();
-                PlayerController.instance.ScriptSteal.ApplyScriptEffects();
-            }
-            else
-            {
-                scriptActive = false;
-                //PlayerController.instance.ScriptSteal.UpdateUI();
-                PlayerController.instance.ScriptSteal.ApplyScriptEffects();
-            }
+            ToggleMana();
+        }
+    }
+
+    public void ToggleMana()
+    {
+        if (PlayerController.instance.ScriptSteal.heldBehavior != null && currentMana > 0)
+        {
+            scriptActive = !scriptActive;
+            barAnimator.SetBool("Active", scriptActive);
+            //PlayerController.instance.ScriptSteal.UpdateUI();
+            PlayerController.instance.ScriptSteal.ApplyScriptEffects();
+        }
+        else
+        {
+            barAnimator.SetBool("Active", false);
+            scriptActive = false;
+            //PlayerController.instance.ScriptSteal.UpdateUI();
+            PlayerController.instance.ScriptSteal.ApplyScriptEffects();
         }
     }
 
