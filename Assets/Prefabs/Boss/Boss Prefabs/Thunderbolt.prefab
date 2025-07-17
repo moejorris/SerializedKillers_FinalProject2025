@@ -249,7 +249,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 10
-  damage: 10
+  damage: 6
   thunderBlast: {fileID: 303334430383947468}
   radius: 2
 --- !u!1 &6900121685799780893
