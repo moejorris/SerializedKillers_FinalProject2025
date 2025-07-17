@@ -15,7 +15,7 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
     private const float shieldDamage = 2.5f;
     private float shieldHealth = 0f;
     [Tooltip("Attack Interval in seconds")]
-    [SerializeField] private float attackInterval = 10f;
+    [SerializeField] private float attackInterval = 15f;
     private float attackTimer = 0f;
     [Tooltip("Vulnerable Duration in seconds")]
     [SerializeField] private float vulnerableDuration = 5f;
@@ -638,15 +638,15 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
     void Attack()
     {
         attacksUsed++;
-        if (attacksUsed >= maxAttacks) // If the maximum number of attacks has been used
-        {
-            hasNoMoreAttacks = true;
-            attacksUsed = 0; // Reset the number of attacks used
-            return; // Exit the attack method
-        }
         anim.SetTrigger("Summon"); // Trigger the summon animation
         handAnim.SetTrigger("Hand Summon"); // Trigger the hand summon animation
         attackTimer = 0f; // Reset the attack timer
+        if (attacksUsed >= maxAttacks) // If the maximum number of attacks has been used
+        {
+            hasNoMoreAttacks = true;
+            // attacksUsed = 0; // Reset the number of attacks used
+            Debug.Log("Boss has no more attacks! Starting vulnerable state.");
+        }
     }
 
     private IEnumerator SummonProjectileCoroutine(float delay)
@@ -672,14 +672,17 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
                     Debug.LogWarning("No State is set! Cannot spawn elemental based projectile"); // Log a warning if no attack is spawned
                     break;
             }
+            if (count >= 4)
+            {
+                if (hasNoMoreAttacks)
+                {
+                    StartVulnerable(); // Start the vulnerable state
+                    hasNoMoreAttacks = false;
+                    Debug.Log("Boss has no more attacks! Starting vulnerable state.");
+                }
+            }
+            attackTimer = 0f; // Reset the attack timer after each attack so the boss cannot attack while summoning projectiles
         }
-        if (hasNoMoreAttacks)
-        {
-            hasNoMoreAttacks = false;
-            Debug.Log("Boss has no more attacks! Starting vulnerable state.");
-            StartVulnerable(); // Start the vulnerable state
-        }
-        StopAllCoroutines(); // Stop all coroutines after the attack is summoned
     }
 
     void SpawnWeakAndRandomEnemy()
