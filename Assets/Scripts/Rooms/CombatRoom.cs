@@ -85,7 +85,7 @@ public class CombatRoom : Room
         {
             Debug.Log(enemiesTypesToSpawn[i].gameObject.name);
             SpawnEnemy(enemiesTypesToSpawn[i], enemySpawnPoints[i]);
-            yield return new WaitForSeconds(1);
+            yield return new WaitForSeconds(0.3f);
         }
     }
 }
