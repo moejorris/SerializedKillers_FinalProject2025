@@ -17580,16 +17580,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   health: 100
   maxShieldHealth: 50
+  shieldDamage: 2.5
+  vulnerableDamage: 1
+  weaknessMultiplier: 2
   attackInterval: 10
   vulnerableDuration: 5
   maxVulnerableAttacks: 3
   maxAttacks: 2
   smashRadius: 8
   healthBar: {fileID: 4228399980290044623}
-  originalShieldMaterial: {fileID: 2100000, guid: 650a24a553aa482478c91723cfeef5dc, type: 2}
-  redFlashMaterial: {fileID: 2100000, guid: e94629539b49a8e4ba800a3e15c3c773, type: 2}
-  shieldRenderer: {fileID: 8902761865993362216}
-  flashDuration: 0.2
   enemiesToSpawn:
   - {fileID: 752360659633603987, guid: ad31d2a2994a7b54d971b868c3d5eaae, type: 3}
   - {fileID: 8823160757367770844, guid: b438f22a2483c8e498fa00f3b586992e, type: 3}
@@ -17682,6 +17681,11 @@ MonoBehaviour:
   - {fileID: 294764509057356765}
   - {fileID: 6174572842642043167}
   handAnim: {fileID: 5781754925148430033}
+  keyboardSmashFX: {fileID: 331622526231180889, guid: c1bae86f690d6d240936a920bea3b77a, type: 3}
+  originalShieldMaterial: {fileID: 2100000, guid: 650a24a553aa482478c91723cfeef5dc, type: 2}
+  redFlashMaterial: {fileID: 2100000, guid: e94629539b49a8e4ba800a3e15c3c773, type: 2}
+  shieldRenderer: {fileID: 8902761865993362216}
+  flashDuration: 0.2
   testing: 1
   currentState: 3
 --- !u!65 &6247957156169715919
