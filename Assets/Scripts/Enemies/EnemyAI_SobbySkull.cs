@@ -34,6 +34,9 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
     [Header("Rolling Movement")]
     [SerializeField] private float gravityLevel = 1;
     [SerializeField] private float rollSpeed = 1;
+    [SerializeField] private float bounceTimer = 5;
+    private bool bouncing = false;
+    private float knockbackTimer = 3;
 
     [Header("Sobby Skull Combat")]
     [SerializeField] private float attackCooldown = 5;
@@ -80,6 +83,9 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
         StartCoroutine("DoorCheckTimer");
 
         if (PlayerController.instance.ScriptSteal.heldBehavior != null && PlayerController.instance.ScriptSteal.heldBehavior == heldBehavior) DeactivateBehavior();
+
+        bounceTimer += Random.Range(2f, 8f);
+        knockbackTimer = Random.Range(3f, 6f);
     }
 
     private void OnDrawGizmos()
@@ -174,9 +180,15 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
             }
             else if (movementState == "rolling")
             {
-
+                bounceTimer -= Time.deltaTime;
+                if (bounceTimer <= 0)
+                {
+                    BouncyBoy();
+                    bounceTimer = Random.Range(4f,25f);
+                }
             }
         }
+
 
         LerpMaxVelocity();
         base.Update();
@@ -201,7 +213,7 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
                 }
                 rigidBody.AddForce(skull.forward * flyingSpeed, ForceMode.VelocityChange);
             }
-            else
+            else // rolling
             {
                 //Debug.Log("Rolling Now!");
                 if (Vector3.Distance(navMeshAgent.transform.position, skull.position) > 7 && (Vector3.Distance(navMeshAgent.transform.position, playerTarget.position) < Vector3.Distance(skull.position, playerTarget.position)))
@@ -214,24 +226,34 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
                     navMeshAgent.isStopped = false;
                 }
 
-                if (Vector3.Distance(playerTarget.position, waterOrb.transform.position) < 1.7f)
+                if (Vector3.Distance(playerTarget.position, waterOrb.transform.position) < 2f)
                 {
-                    // knockback due to coll.
+                    knockbackTimer -= Time.fixedDeltaTime;
                 }
 
-                if (IsGrounded())
+                if (knockbackTimer <= 0)
                 {
-                    // Debug.Log("Grounded!");
-                    newMaxVelocity = 3;
-                    rigidBody.maxLinearVelocity = 3;
-                    rigidBody.AddForce((navMeshAgent.transform.position - skull.position).normalized * rollSpeed, ForceMode.VelocityChange);
+                    knockbackTimer = Random.Range(3f, 6f);
+                    skull.Find("WaterKnockback").GetComponent<Animation>().Play();
+                    KnockPlayerBack(Random.Range(25, 35));
                 }
-                else
+
+                if (!bouncing)
                 {
-                    Debug.Log("Not Grounded!");
-                    newMaxVelocity = 15;
-                    rigidBody.maxLinearVelocity = 15;
-                    rigidBody.AddForce(Physics.gravity * gravityLevel, ForceMode.Acceleration);
+                    if (IsGrounded())
+                    {
+                        // Debug.Log("Grounded!");
+                        newMaxVelocity = 3;
+                        rigidBody.maxLinearVelocity = 3;
+                        rigidBody.AddForce((navMeshAgent.transform.position - skull.position).normalized * rollSpeed, ForceMode.VelocityChange);
+                    }
+                    else
+                    {
+                        //Debug.Log("Not Grounded!");
+                        newMaxVelocity = 15;
+                        rigidBody.maxLinearVelocity = 15;
+                        rigidBody.AddForce(Physics.gravity * gravityLevel, ForceMode.Acceleration);
+                    }
                 }
             }
         }
@@ -291,6 +313,23 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
         Explode();
     }
 
+    public void BouncyBoy()
+    {
+        bouncing = true;
+        newMaxVelocity = 100;
+        Vector3 playerDir = (navMeshAgent.transform.position - skull.position).normalized;
+        playerDir /= 7;
+        playerDir.y = 1;
+        rigidBody.AddForce(playerDir * Random.Range(4f,8f), ForceMode.VelocityChange);
+        Invoke("EndBounce", 2f);
+    }
+
+    public void EndBounce()
+    {
+        bouncing = false;
+        newMaxVelocity = 15f;
+    }
+
     public void Explode()
     {
         Instantiate(explosionParticle, transform.position, Quaternion.identity);
@@ -336,7 +375,7 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
 
     public void StartFlying()
     {
-        attackTimer = 2;
+        attackTimer = 2 + Random.Range(0f,5f);
         waterOrb.SetActive(false);
         rigidBody.useGravity = false;
         movementState = "flying";
@@ -467,8 +506,7 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
             int random = Random.Range(0, 2);
             if (random == 0)
             {
-                skull.Find("WaterKnockback").GetComponent<Animation>().Play();
-                KnockPlayerBack(Random.Range(35, 45));
+                knockbackTimer -= 1.5f;
             }
         }
         else if (!PlayerController.instance.MovementMachine.isGrounded)
@@ -490,7 +528,7 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
 
         UpdateHealth();
 
-        if (health <= maxHealth / 4 && !selfDestructing) EnterSelfDestructMode();
+        if (health <= maxHealth / 4 && !selfDestructing) //EnterSelfDestructMode();
 
         if (health <= 0)
         {
@@ -604,6 +642,7 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
     public override void DeactivateBehavior() // fly mode
     {
         base.DeactivateBehavior();
+        EndBounce();
         StartFlying();
     }
 

@@ -81,7 +81,7 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
     [Header("Bulb Scared Behavior")]
     [SerializeField] private float scaredFollowRange = 15f;
     [SerializeField] private float scaredAttackTimer = 2f;
-    [SerializeField] private float teleportTimer = 8f;
+    [SerializeField] private float shadowAttackTimer = 8f;
     [SerializeField] private GameObject shadowClone;
     [SerializeField] private bool invisible = false;
     private Image[] healthBarImages = new Image[] { };
@@ -237,17 +237,17 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
 
             if (!behaviorActive)
             {
-                teleportTimer -= Time.deltaTime;
-                if (teleportTimer <= 0)
+                shadowAttackTimer -= Time.deltaTime;
+                if (shadowAttackTimer <= 0)
                 {
                     if (!attackOccuring && !preparingAttack && !Invincible())
                     {
-                        teleportTimer = Random.Range(4f, 5f);
+                        shadowAttackTimer = Random.Range(7f, 9f);
                         StartCoroutine("ShadowClone");
                     }
                     else
                     {
-                        teleportTimer = 3;
+                        shadowAttackTimer = Random.Range(3, 6);
                     }
                 }
             }
@@ -1068,6 +1068,8 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
         ExitLaserAttack();
         ExitShockwaveAttack();
         base.DeactivateBehavior();
+
+        shadowAttackTimer = Random.Range(3, 6);
 
         GetComponent<Light>().enabled = false;
 

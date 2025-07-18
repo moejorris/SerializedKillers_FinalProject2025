@@ -353,7 +353,7 @@ NavMeshAgent:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 786659527851482683}
   m_Enabled: 1
-  m_AgentTypeID: 0
+  m_AgentTypeID: 1479372276
   m_Radius: 0.37
   m_Speed: 3.5
   m_Acceleration: 8
@@ -1311,6 +1311,7 @@ MonoBehaviour:
   maxVelocityLerpSpeed: 5
   gravityLevel: 5
   rollSpeed: 0.35
+  bounceTimer: 5
   attackCooldown: 4
   selfDestructing: 0
   attacking: 0
