@@ -97,7 +97,6 @@ public class SoundManager : MonoBehaviour
         {
             case "Levels":
                 musicSource.clip = levelsMusic;
-                Debug.Log(musicSource.clip);
                 musicSource.Play();
                 break;
             case "MainMenu":

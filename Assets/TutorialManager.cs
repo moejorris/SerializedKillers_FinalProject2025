@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using System;
 
 public class TutorialManager : MonoBehaviour
 {
@@ -19,16 +20,20 @@ public class TutorialManager : MonoBehaviour
 
     private bool tutorialFinished = false;
 
-    [SerializeField] private TMP_Text textBox;
+    // [SerializeField] private TMP_Text textBox;
     [SerializeField] private Animator panelAnimator;
     [SerializeField] private string[] phaseOneMessages;
     [SerializeField] private string[] phaseTwoMessages;
     [SerializeField] private float secondsBetweenCharacters = 0.01f;
     [SerializeField] private float speedUpMult = 1;
 
+    [SerializeField] Sprite[] phaseOneSprites;
+    [SerializeField] Sprite[] phaseTwoSprites;
+
     private int phase = 0;
     private string textToWrite;
     private bool cont = false;
+    bool isRunning = false;
 
     [Header("Enemies")]
     [SerializeField] private GameObject tutorialOverclockPrefab;
@@ -38,7 +43,6 @@ public class TutorialManager : MonoBehaviour
     void Start()
     {
         StartPhaseOne();
-        StartCoroutine("ContinueTimer");
     }
 
     // Update is called once per frame
@@ -58,218 +62,215 @@ public class TutorialManager : MonoBehaviour
                 speedUpMult = 0.5f;
             }
         }
+
+        if (isRunning && Time.timeScale == 0)
+        {
+            audioSource.pitch = 0;
+        }
+        else audioSource.pitch = 1;
     }
 
     public void StartPhaseOne()
     {
-        StopCoroutine("TutorialPhaseOne");
-        StartCoroutine("TutorialPhaseOne");
+        phase = 1;
+        StartCoroutine(TutorialPhase(phase));
     }
 
     public void StartPhaseTwo()
     {
-        StopCoroutine("TutorialPhaseOne");
-
         if (phase == 2) return;
 
-        StopCoroutine("TutorialPhaseTwo");
-        StartCoroutine("TutorialPhaseTwo");
-    }
-
-    IEnumerator ContinueTimer()
-    {
-        while (true)
-        {
-            if (continueAvailable && continueText.color.a < 1)
-            {
-                Color aColor = continueText.color;
-                aColor.a += 0.1f;
-                continueText.color = aColor;
-            }
-            else if (continueText.color.a > 0)
-            {
-                Color aColor = continueText.color;
-                aColor.a -= 0.1f;
-                continueText.color = aColor;
-            }
-            yield return new WaitForSeconds(0.1f * speedUpMult);
-        }
-    }
-
-    IEnumerator TutorialPhaseOne()
-    {
-        phase = 1;
-
-        yield return new WaitForSeconds(1);
-        //-------------------------------INITIAL APPEAR-------------
-
-        middleTextbox.text = string.Empty;
-        textToWrite = phaseOneMessages[0];
-        panelAnimator.SetBool("Appear", true);
-
-        yield return new WaitForSeconds(1);
-
-        //-------------------------------FIRST TEXT-------------
-
-        audioSource.volume = SoundManager.instance.SFXVolume;
-        audioSource.Play();
-
-        foreach (char letter in textToWrite)
-        {
-            middleTextbox.text += letter;
-            yield return new WaitForSeconds(secondsBetweenCharacters * speedUpMult);
-        }
-
-        audioSource.Stop();
-
-        yield return new WaitForSeconds(1);
-
-        continuePressed = false;
-        continueAvailable = true;
-
-        yield return new WaitUntil(() => continuePressed);
-        speedUpMult = 1;
-
-        audioSource.volume = SoundManager.instance.SFXVolume;
-        audioSource.Play();
-
-        while (middleTextbox.text.Length > 0)
-        {
-            middleTextbox.text = middleTextbox.text.Substring(0, middleTextbox.text.Length - 1);
-
-            yield return new WaitForSeconds(secondsBetweenCharacters * 0.5f * speedUpMult);
-        }
-
-        audioSource.Stop();
-
-        //-------------------------------IMAGE AND SECOND TEXT-------------
-
-        while (HUDImage.color.a < 1)
-        {
-            Color aColor = HUDImage.color;
-            aColor.a += 0.1f;
-            yield return new WaitForSeconds(0.1f * speedUpMult);
-            HUDImage.color = aColor;
-        }
-
-        middleTextbox.text = string.Empty;
-        textToWrite = phaseOneMessages[1];
-
-        audioSource.volume = SoundManager.instance.SFXVolume;
-        audioSource.Play();
-
-        foreach (char letter in textToWrite)
-        {
-            bottomTextbox.text += letter;
-            yield return new WaitForSeconds(secondsBetweenCharacters * speedUpMult);
-        }
-
-        audioSource.Stop();
-
-        yield return new WaitForSeconds(1);
-
-        continuePressed = false;
-        continueAvailable = true;
-
-        yield return new WaitUntil(() => continuePressed);
-        speedUpMult = 1;
-
-        audioSource.volume = SoundManager.instance.SFXVolume;
-        audioSource.Play();
-
-        while (bottomTextbox.text.Length > 0)
-        {
-            bottomTextbox.text = bottomTextbox.text.Substring(0, bottomTextbox.text.Length - 1);
-
-            yield return new WaitForSeconds(secondsBetweenCharacters * 0.5f * speedUpMult);
-        }
-
-        //-------------------------------SECOND IMAGE AND THIRD TEXT-------------
-
-        HUDImage.sprite = scriptHudWithStuff;
-        bottomTextbox.text = string.Empty;
-        textToWrite = phaseOneMessages[2];
-
-        foreach (char letter in textToWrite)
-        {
-            bottomTextbox.text += letter;
-            yield return new WaitForSeconds(secondsBetweenCharacters * speedUpMult);
-        }
-
-        audioSource.Stop();
-
-        yield return new WaitForSeconds(1);
-
-        continuePressed = false;
-        continueAvailable = true;
-
-        yield return new WaitUntil(() => continuePressed);
-        speedUpMult = 1;
-
-        audioSource.volume = SoundManager.instance.SFXVolume;
-        audioSource.Play();
-
-        while (bottomTextbox.text.Length > 0)
-        {
-            bottomTextbox.text = bottomTextbox.text.Substring(0, bottomTextbox.text.Length - 1);
-
-            yield return new WaitForSeconds(secondsBetweenCharacters * 0.5f * speedUpMult);
-        }
-
-        audioSource.Stop();
-
-        while (HUDImage.color.a > 0)
-        {
-            Color aColor = HUDImage.color;
-            aColor.a -= 0.1f;
-            yield return new WaitForSeconds(0.1f * speedUpMult);
-            HUDImage.color = aColor;
-        }
-
-        panelAnimator.SetBool("Appear", false);
-    }
-
-    IEnumerator TutorialPhaseTwo()
-    {
+        StartCoroutine(TutorialPhase(2));
         phase = 2;
-        textBox.text = string.Empty;
-        textToWrite = phaseTwoMessages[0];
+    }
+
+    IEnumerator ContinuePromptFlash()
+    {
+        bool increasing = true;
+        Color aColor = continueText.color;
+        aColor.a = 0;
+        continueText.color = aColor;
+
+        while (!continuePressed || aColor.a > 0) // this SHOULD only run until the continue is pressed and then once it is run until it's returned back to invis. - Joe
+        {
+
+            aColor.a += increasing ? 0.1f : -0.1f;
+            continueText.color = aColor;
+
+            yield return new WaitForSeconds(0.1f * speedUpMult);
+
+            if (aColor.a > 1) increasing = false;
+            else if (aColor.a < 0) increasing = true;
+        }
+    }
+
+    string[] GetPhaseMessages(int phaseNumber = 1)
+    {
+        string[] arrayToReturn = new string[0];
+
+        switch (phaseNumber)
+        {
+            case 1:
+                arrayToReturn = phaseOneMessages;
+                break;
+
+            case 2:
+                arrayToReturn = phaseTwoMessages;
+                break;
+
+            // case 3:
+            // arrayToReturn = phaseThreeMessages;
+            // break;
+
+            default:
+                arrayToReturn[0] = "No array created for phase " + phaseNumber + ". Please create a new one and add it to the switch statement in GetPhaseMessages().";
+                arrayToReturn[1] = "Try again!";
+                break;
+        }
+
+        return arrayToReturn;
+    }
+
+    Sprite[] GetPhaseSprites(int phaseNumber = 1)
+    {
+        Sprite[] arrayToReturn = null;
+
+        switch (phaseNumber)
+        {
+            case 1:
+                arrayToReturn = phaseOneSprites;
+                break;
+
+            case 2:
+                arrayToReturn = phaseTwoSprites;
+                break;
+
+            default:
+                //No Sprite Array Created
+                break;
+        }
+
+        return arrayToReturn;
+    }
+
+    IEnumerator TutorialPhase(int phaseNumber = 1)
+    {
+        yield return new WaitForSeconds(1);
+
+        string[] phaseMessages = GetPhaseMessages(phaseNumber);
+        Sprite[] phaseSprites = GetPhaseSprites(phaseNumber);
+
+        for (int i = 0; i < phaseMessages.Length; i++)
+        {
+            StopCoroutine("TypePhaseText");
+            yield return TypePhaseText(phaseMessages[i], phaseSprites[i], i == phaseMessages.Length - 1);
+        }
+    }
+
+    IEnumerator TypePhaseText(string phaseStepText, Sprite sprite, bool isLast = false) //this is the logic used for all phases. This is run for each element in the phaseMessages array per phase. 
+    {
+        isRunning = true;
+
+        speedUpMult = 1;
+
+        Color aColor = HUDImage.color;
+
+        if (phaseStepText.Contains("/ALPHA/")) //Add /ALPHA/ if you want to re-fade in the current image when the next image doesn't match the previous.
+        {
+            aColor.a = 0;
+            HUDImage.color = aColor;
+
+            phaseStepText = phaseStepText.Replace("/ALPHA/", "");
+        }
+
+        TMP_Text textBox = middleTextbox;
+
+        if (sprite != null)
+        {
+            HUDImage.sprite = sprite;
+
+            while (HUDImage.color.a < 1)
+            {
+                aColor = HUDImage.color;
+                aColor.a += 0.1f;
+                yield return new WaitForSeconds(0.1f * speedUpMult);
+                HUDImage.color = aColor;
+            }
+            aColor.a = 1;
+            HUDImage.color = aColor;
+
+            textBox = bottomTextbox;
+        }
+        else
+        {
+            aColor.a = 0;
+            HUDImage.color = aColor;
+        }
+
+        textBox.text = "";
+        textToWrite = phaseStepText;
         panelAnimator.SetBool("Appear", true);
 
         yield return new WaitForSeconds(1);
 
+        audioSource.Stop();
+        audioSource.volume = SoundManager.instance.SFXVolume;
+        audioSource.loop = true;
+        audioSource.Play();
+
+        //type the text
         foreach (char letter in textToWrite)
         {
             textBox.text += letter;
-            yield return new WaitForSeconds(secondsBetweenCharacters);
+            yield return new WaitForSeconds(secondsBetweenCharacters * speedUpMult);
         }
+
+        audioSource.Stop();
 
         yield return new WaitForSeconds(1);
 
-        GameObject enemy = Instantiate(tutorialOverclockPrefab, spawnPos);
-        enemy.transform.position = enemy.transform.parent.position;
+        continuePressed = false;
+        continueAvailable = true;
 
-        textBox.text = string.Empty;
-        textToWrite = phaseTwoMessages[1];
+        StartCoroutine(ContinuePromptFlash());
 
-        foreach (char letter in textToWrite)
+        yield return new WaitUntil(() => continuePressed);
+        speedUpMult = 0.1f;
+
+        audioSource.volume = SoundManager.instance.SFXVolume;
+        audioSource.Play();
+
+        //remove the text
+        while (textBox.text.Length > 0)
         {
-            textBox.text += letter;
-            yield return new WaitForSeconds(secondsBetweenCharacters);
+            textBox.text = textBox.text.Substring(0, textBox.text.Length - 1);
+
+            yield return new WaitForSeconds(secondsBetweenCharacters * speedUpMult);
         }
 
-        yield return new WaitUntil(() => phase == 3);
+        audioSource.Stop();
 
-        StartPhaseThree();
+        if (isLast)
+        {
+            while (HUDImage.color.a > 0)
+            {
+                aColor = HUDImage.color;
+                aColor.a -= 0.1f;
+                yield return new WaitForSeconds(0.1f * speedUpMult);
+                HUDImage.color = aColor;
+            }
+
+            panelAnimator.SetBool("Appear", false);
+        }
+
+        isRunning = false;
     }
 
     public void StartPhaseThree()
     {
-        StopCoroutine("TutorialPhaseTwo");
-
         if (phase == 3) return;
 
-        StopCoroutine("TutorialPhaseThree");
-        StartCoroutine("TutorialPhaseThree");
+        StartCoroutine(TutorialPhase(3));
+        phase = 3;
     }
 }
