@@ -7,6 +7,7 @@ public enum BossState { None, Fire, Electric, Water } // Enumeration for element
 public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetable
 {
     #region Unity Variables
+
     [Header("Boss Settings")]
     [Tooltip("Max health of the boss")]
     [SerializeField] private float health = 100f;
@@ -31,16 +32,10 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
     [SerializeField] private int maxAttacks = 3; // Maximum number of attacks before the boss becomes vulnerable
     [Tooltip("Radius for the keyboard smash attack")]
     [SerializeField] private float smashRadius = 5f; // Radius for the keyboard smash attack
+
     [Header("Boss Components")]
     [Tooltip("Reference to the boss health bar RectTransform.")]
     [SerializeField] private RectTransform healthBar; // Assign this in the inspector
-    [Header("Shield Flash Effect")]
-    [Tooltip("Shield Materials")]
-    [SerializeField] private Material originalShieldMaterial;
-    [SerializeField] private Material redFlashMaterial;
-    [SerializeField] private Renderer shieldRenderer; // Assign the shield's renderer
-    [SerializeField] private float flashDuration = 0.2f;
-    private Coroutine currentFlashCoroutine;
 
     [Tooltip("Prefabs for enemies the boss will spawn in periodically")]
     [SerializeField] private GameObject[] enemiesToSpawn; // Array of enemies for the boss to spawn in
@@ -59,7 +54,22 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
     [SerializeField] private GameObject heartPrefab; // Prefab for the heart object to spawn when the boss is hurt
     [Tooltip("Keys that will fly off the keyboard when the boss slams his hands down")]
     [SerializeField] private GameObject[] keysToSmash; // Array of keys to smash
+    [Tooltip("Animator for the boss's hands")]
     [SerializeField] private Animator handAnim; // Animator for the boss's hands
+    [Tooltip("Particle effect for the keyboard smash attack")]
+    [SerializeField] private GameObject keyboardSmashFX; // Particle effect for the keyboard smash attack
+    private ParticleSystem keyboardSmashPS; // Particle system for the keyboard smash effect
+    
+    [Header("Shield Flash Effect")]
+    [Tooltip("Shield Materials")]
+    [SerializeField] private Material originalShieldMaterial;
+    [SerializeField] private Material redFlashMaterial;
+    [SerializeField] private Renderer shieldRenderer; // Assign the shield's renderer
+    [SerializeField] private float flashDuration = 0.2f;
+    private Coroutine currentFlashCoroutine;
+
+    
+
     [Header("Testing Settings")]
     [Tooltip("Testing Flag")]
     [SerializeField] private bool testing = false;
@@ -116,11 +126,11 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
         healthBar = GameObject.FindGameObjectWithTag("Canvas").transform.Find("BossHealth/Health").GetComponent<RectTransform>();
         healthBar.parent.gameObject.SetActive(true);
 
+        keyboardSmashPS = keyboardSmashFX.GetComponent<ParticleSystem>();
+
         bossRenderer = GetComponent<Renderer>();
         shieldHealth = maxShieldHealth; // Initialize the shield health to the maximum shield health
         attackTimer = 2.5f;
-
-        // Invoke("SpawnWeakAndRandomEnemy", 7.0f);
 
     }
 
@@ -270,7 +280,7 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
                 Debug.LogWarning("No elemental state set!"); // Log a warning if no state is set
                 break;
         }
-        SpawnWeakAndRandomEnemy();
+        SpawnWeakandStrongEnemy();
 
     }
 
@@ -434,6 +444,7 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
             keysToSmashRandom.Add(keyToSmash); // Add the key to the list of keys to smash
 
             // Smash the keys
+            keyboardSmashPS.Play(); // Play the keyboard smash particle effect
             foreach (GameObject key in keysToSmashRandom)
             {
                 // Remove the key from the parent object
@@ -505,8 +516,8 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
 
             if (isWeakness)
             {
-                Debug.Log("Counter element used! Shield breaks immediatly.");
-                shieldHealth = 0;
+                shieldHealth -= damageAmount * weaknessMultiplier; // Double the damage if the attack is a weakness
+                Debug.Log("Weakness detected! Shield damage doubled.");
                 StartVulnerable();
                 return;
             }
@@ -573,7 +584,6 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
         if (isVulnerable) return; // Exit if the boss is already vulnerable
         shieldHealth = 0; // Reset shield health
         StopAllCoroutines(); // Stop any ongoing coroutines
-        // handAnim.SetTrigger("Hand Stunned"); // Trigger the stunned animation
         anim.SetTrigger("Weak"); // Trigger the weak animation
         Debug.Log("Boss is about to become vulnerable!"); // Log the start of the vulnerable state
     }
@@ -592,7 +602,7 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
         shieldHealth = maxShieldHealth; // Reset shield health
         attacksUsed = 0;
         shieldRenderer.material = originalShieldMaterial; // Reset the shield material to the original
-        ChangeState(); // Call State Method
+        Invoke("ChangeState", 2f); // Change the state after a delay
     }
 
     void ChangeState()
@@ -630,7 +640,7 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
         for (int i = 0; i < count; i++)
         {
             Rigidbody rb = Instantiate(heartPrefab, transform.position, Quaternion.identity).GetComponent<Rigidbody>();
-            rb.AddForce(new Vector3(Random.Range(-100f, 100), 100, Random.Range(-100f, 100f)));
+            rb.AddForce(transform.forward * 5f, ForceMode.Impulse);
         }
     }
 
@@ -691,7 +701,7 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
         }
     }
 
-    void SpawnWeakAndRandomEnemy()
+    void SpawnWeakandStrongEnemy()
     {
         if (enemySpawnPoints.Length < 2 || enemiesToSpawn.Length < 3)
         {
@@ -700,35 +710,37 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
         }
 
         int weaknessEnemyIndex = -1;
+        int resistedEnemyIndex = -1;
         switch (currentState)
         {
             case BossState.Fire:
-                weaknessEnemyIndex = 2;
+                resistedEnemyIndex = 0; // Fire resists itself, so it spawns a fire enemy
+                weaknessEnemyIndex = 2; // Water is weak against fire, so it spawns a water enemy
                 break;
             case BossState.Electric:
-                weaknessEnemyIndex = 0;
+                resistedEnemyIndex = 1; // Electric resists itself, so it spawns an electric enemy
+                weaknessEnemyIndex = 0; // Fire is weak against electric, so it spawns a fire enemy
                 break;
             case BossState.Water:
-                weaknessEnemyIndex = 1;
+                resistedEnemyIndex = 2; // Water resists itself, so it spawns a water enemy
+                weaknessEnemyIndex = 1; // Electric is weak against water, so it spawns an electric enemy
                 break;
             default:
+                resistedEnemyIndex = Random.Range(0, enemiesToSpawn.Length); // Randomly select an enemy if no state is set
                 weaknessEnemyIndex = Random.Range(0, enemiesToSpawn.Length); // Randomly select an enemy if no state is set
                 break;
         }
 
-        int firstSpawnIndex = Random.Range(0, enemySpawnPoints.Length); // Randomly select the first spawn point
-        int secondSpawnIndex = firstSpawnIndex;
-        while (secondSpawnIndex == firstSpawnIndex)
+        // Spawn the enemies at different spawn points
+        int firstSpawnIndex = Random.Range(0, enemySpawnPoints.Length);
+        int secondSpawnIndex;
+        do
         {
-            secondSpawnIndex = Random.Range(0, enemySpawnPoints.Length); // Ensure the second spawn point is different from the first
-        }
+            secondSpawnIndex = Random.Range(0, enemySpawnPoints.Length);
+        } while (secondSpawnIndex == firstSpawnIndex);
 
-        Instantiate(enemiesToSpawn[weaknessEnemyIndex], enemySpawnPoints[firstSpawnIndex].position, enemySpawnPoints[firstSpawnIndex].rotation);
-
-        int randomEnemyIndex = weaknessEnemyIndex;
-        while (randomEnemyIndex == weaknessEnemyIndex) randomEnemyIndex = Random.Range(0, enemiesToSpawn.Length); // Ensure the random enemy is different from the weakness enemy
-
-        Instantiate(enemiesToSpawn[randomEnemyIndex], enemySpawnPoints[secondSpawnIndex].position, enemySpawnPoints[secondSpawnIndex].rotation);
+        Instantiate(enemiesToSpawn[resistedEnemyIndex], enemySpawnPoints[firstSpawnIndex].position, Quaternion.identity);
+        Instantiate(enemiesToSpawn[weaknessEnemyIndex], enemySpawnPoints[secondSpawnIndex].position, Quaternion.identity);
     }
     #endregion
     #region Animation Events

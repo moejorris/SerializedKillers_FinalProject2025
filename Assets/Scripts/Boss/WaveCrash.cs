@@ -39,6 +39,14 @@ public class WaveCrash : MonoBehaviour
         if (other.gameObject.layer == LayerMask.NameToLayer("Player"))
         {
             Player_HealthComponent playerHealth = other.GetComponent<Player_HealthComponent>();
+            var scriptSteal = PlayerController.instance.ScriptSteal;
+            bool hasWaterActive = scriptSteal.GetHeldBehavior() != null && scriptSteal.GetHeldBehavior().behaviorName == "water" && scriptSteal.BehaviorActive();
+            if (hasWaterActive)
+            {
+                Debug.Log("Player has water active, no damage taken");
+                return;
+            }
+            
             if (playerHealth != null)
             {
                 playerHealth.TakeDamage(damage);

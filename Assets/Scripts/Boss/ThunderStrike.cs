@@ -75,6 +75,14 @@ public class ThunderStrike : MonoBehaviour
             {
                 Debug.Log("Thunder strike hit the player!");
                 Player_HealthComponent playerHealth = collider.GetComponent<Player_HealthComponent>();
+                var scriptSteal = PlayerController.instance.ScriptSteal;
+                bool hasThunderActive = scriptSteal.GetHeldBehavior() != null && scriptSteal.GetHeldBehavior().behaviorName == "thunder" && scriptSteal.BehaviorActive();
+                if (hasThunderActive)
+                {
+                    Debug.Log("Player has electric active, no damage taken");
+                    return;
+                }
+                
                 if (playerHealth != null)
                 {
                     playerHealth.TakeDamage(damage);
