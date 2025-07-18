@@ -5,8 +5,13 @@ using UnityEngine.SceneManagement;
 public class SoundManager : MonoBehaviour
 {
     public static SoundManager instance;
+    
+    public float MasterVolume { get { return masterVolume;}}
+    public float SFXVolume { get { return masterVolume * sfxVolume;}}
+    public float MusicVolume { get { return masterVolume * musicVolume;}}
 
-    [SerializeField]float masterVolume = 1;
+
+    [SerializeField] float masterVolume = 1;
     [SerializeField]float sfxVolume = 1;
     [SerializeField]float musicVolume = 1;
 
