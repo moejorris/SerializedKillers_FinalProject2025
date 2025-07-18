@@ -11692,7 +11692,7 @@ PrefabInstance:
     - target: {fileID: -7511558181221131132, guid: 883b9d0923fe01d42a63559fdd502e17, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: 89b318a07ab881a44897c62e96567e2e, type: 2}
+      objectReference: {fileID: 2100000, guid: 5b0b00c3f5701804e98139b479922a0a, type: 2}
     - target: {fileID: 919132149155446097, guid: 883b9d0923fe01d42a63559fdd502e17, type: 3}
       propertyPath: m_Name
       value: Eyes
@@ -11939,11 +11939,11 @@ PrefabInstance:
     - target: {fileID: -3377666895175559372, guid: 06c7fc69b6f789e479d686edb2b4d3a3, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: df1f2344c4907274bb4ca6d83749f9a0, type: 2}
+      objectReference: {fileID: 2100000, guid: 5b0b00c3f5701804e98139b479922a0a, type: 2}
     - target: {fileID: -3377666895175559372, guid: 06c7fc69b6f789e479d686edb2b4d3a3, type: 3}
       propertyPath: 'm_Materials.Array.data[1]'
       value: 
-      objectReference: {fileID: 2100000, guid: df1f2344c4907274bb4ca6d83749f9a0, type: 2}
+      objectReference: {fileID: 2100000, guid: 43a4062288c157e4a99fe3c8716c9df2, type: 2}
     - target: {fileID: -2547893667493820587, guid: 06c7fc69b6f789e479d686edb2b4d3a3, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
       value: 50.03105
