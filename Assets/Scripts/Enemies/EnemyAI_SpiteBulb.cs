@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.UI;
 using UnityEngine.Splines.Interpolators;
+using System.Net;
 //using static UnityEditor.PlayerSettings;
 
 
@@ -52,7 +53,7 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
     [SerializeField] private bool canAttack = false;
     [SerializeField] private float meleeAttackCooldown = 5;
     [SerializeField] private float shockwaveAttackCooldown = 7;
-    
+
     [SerializeField] private float attackCooldownTimer = 0;
     [SerializeField] private float longRangeAttackDis = 10;
 
@@ -72,6 +73,10 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
     [SerializeField] private LineRenderer laser_lineRenderer;
     [SerializeField] private GameObject laser_endSphere;
     [SerializeField] private float laserAttackCooldown = 9;
+    private Vector3 laserEndPoint = Vector3.zero;
+    [SerializeField] private GameObject lightningBoltPrefab;
+
+    [SerializeField] private Gradient[] laserGradients;
 
     [Header("Bulb Scared Behavior")]
     [SerializeField] private float scaredFollowRange = 15f;
@@ -109,7 +114,7 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
 
         if (PlayerController.instance.ScriptSteal.heldBehavior != null && PlayerController.instance.ScriptSteal.heldBehavior == heldBehavior) DeactivateBehavior();
 
-        healthBarImages = new Image[] {healthBar.GetComponent<Image>(), whiteHealthBar.GetComponent<Image>(), transform.Find("Canvas/SubBar").GetComponent<Image>()};
+        healthBarImages = new Image[] { healthBar.GetComponent<Image>(), whiteHealthBar.GetComponent<Image>(), transform.Find("Canvas/SubBar").GetComponent<Image>() };
     }
     // Update is called once per frame
     public override void Update()
@@ -312,7 +317,7 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
                 {
                     if (PlayerVisible())
                     {
-                        if (Vector3.Distance(playerTarget.position, transform.position) < longRangeAttackDis-3) // way too close!!! gets away
+                        if (Vector3.Distance(playerTarget.position, transform.position) < longRangeAttackDis - 3) // way too close!!! gets away
                         {
                             Vector3 newPos = transform.position + ((transform.position - playerTarget.position).normalized * (longRangeAttackDis - Vector3.Distance(playerTarget.position, transform.position)));
                             navMeshAgent.destination = newPos;
@@ -344,7 +349,7 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
 
         if (testBool)
         {
-            
+
         }
 
         if (invisible && healthBarImages[0].color.a > 0)
@@ -659,7 +664,7 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
             {
                 Debug.Log("Player Hit!");
                 PlayerController.instance.Health.TakeDamage(6);
-                if(hit.collider == PlayerController.instance.Collider)
+                if (hit.collider == PlayerController.instance.Collider)
                 {
                     Vector3 dir = (hit.transform.position - transform.position).normalized + Vector3.up * 0.25f;
                     PlayerController.instance.ForceHandler.AddForce(dir * 20f, ForceMode.VelocityChange);
@@ -690,12 +695,13 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
 
         laser_lineRenderer.gameObject.SetActive(false);
         laser_endSphere.SetActive(false);
-        bulbHead.transform.Find("LaserFirePosition/Capsule").gameObject.SetActive(false);
+        //bulbHead.transform.Find("LaserFirePosition/Capsule").gameObject.SetActive(false);
         StopCoroutine("LaserAttack");
     }
 
     IEnumerator LaserAttack()
     {
+        laserEndPoint = Vector3.zero;
         attackOccuring = true;
         navMeshAgent.isStopped = true;
         bulbBodyAnimator.Play("Crouch");
@@ -715,31 +721,70 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
         yield return new WaitForSeconds(0.3f);
 
 
-        bulbHead.transform.Find("LaserFirePosition/Capsule").gameObject.SetActive(true);
-        LaserHitCheck();
+        laserEndPoint = LaserHitCheck();
+        StartCoroutine("LightningBolt");
+
         yield return new WaitForSeconds(0.5f);
-        bulbHead.transform.Find("LaserFirePosition/Capsule").gameObject.SetActive(false);
+
+
         bulbBodyAnimator.SetTrigger("Arise");
         yield return new WaitForSeconds(1f);
 
         ExitLaserAttack();
     }
 
-    public void LaserHitCheck()
+    IEnumerator LightningBolt()
     {
-        RaycastHit[] hits = Physics.SphereCastAll(transform.position + bulbHead.transform.forward, 0.4f, laser_firePosition.forward, 25, playerLayer);
+        LineRenderer lightning_lineRenderer = Instantiate(lightningBoltPrefab, Vector3.zero, Quaternion.identity).GetComponent<LineRenderer>();
 
-        //Debug.Log(hits.Length);
+        Destroy(lightning_lineRenderer.gameObject, 1);
 
-        foreach (RaycastHit hit in hits)
+        lightning_lineRenderer.SetPosition(0, laser_firePosition.position);
+        lightning_lineRenderer.SetPosition(1, laserEndPoint);
+
+
+        foreach (Gradient grad in laserGradients)
+        {
+            lightning_lineRenderer.colorGradient = grad;
+            yield return new WaitForSeconds(0.15f);
+        }
+    }
+
+
+    public Vector3 LaserHitCheck()
+    {
+        //RaycastHit[] hits = Physics.SphereCastAll(transform.position + bulbHead.transform.forward, 0.2f, laser_firePosition.forward, 25, playerLayer);
+        if (Physics.SphereCast(transform.position + bulbHead.transform.forward, 0.2f, laser_firePosition.forward, out RaycastHit hit, 100, laser_targetLayers))
         {
             if (hit.transform.parent != null && hit.transform.parent.CompareTag("Player"))
             {
                 Debug.Log("Player Hit!");
-                PlayerController.instance.Health.TakeDamage(8);
-                break;
+                PlayerController.instance.Health.TakeDamage(6);
             }
+            else
+            {
+                Debug.Log("Hit some WALL!");
+            }
+
+            return hit.point;
         }
+        else
+        {
+            return (transform.position + bulbHead.transform.forward.normalized * 100);
+        }
+
+
+        //Debug.Log(hits.Length);
+
+        //foreach (RaycastHit hit in hits)
+        //{
+        //    if (hit.transform.parent != null && hit.transform.parent.CompareTag("Player"))
+        //    {
+        //        Debug.Log("Player Hit!");
+        //        PlayerController.instance.Health.TakeDamage(6);
+        //        break;
+        //    }
+        //}
     }
 
     public void UpdateLaserPosition()
@@ -841,14 +886,14 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
         }
         else
         {
-            while(!behaviorActive)
+            while (!behaviorActive)
             {
                 Vector3 potentialLocation = Vector3.zero;
                 bool walkable = false;
                 currentIterations = 0;
                 while (!walkable && currentIterations < iterationLimit)
                 {
-                    potentialLocation = new Vector3(transform.position.x + Random.Range(-wanderDistance*2, wanderDistance*2), transform.position.y, transform.position.z + Random.Range(-wanderDistance*2, wanderDistance*2));
+                    potentialLocation = new Vector3(transform.position.x + Random.Range(-wanderDistance * 2, wanderDistance * 2), transform.position.y, transform.position.z + Random.Range(-wanderDistance * 2, wanderDistance * 2));
                     NavMeshPath path = new NavMeshPath();
                     navMeshAgent.CalculatePath(potentialLocation, path);
                     if (path.status == NavMeshPathStatus.PathComplete) // cycles through this to check if the location is actually viable
