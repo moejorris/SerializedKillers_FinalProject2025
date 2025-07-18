@@ -50,6 +50,8 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
 
     [SerializeField] private GameObject resistantPrefab;
 
+    private int navID;
+
     [Header("Sobby Skull Vision")]
     [SerializeField] private float idleAlertRange;
     [SerializeField] private float blindFollowRange;
@@ -86,6 +88,8 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
 
         bounceTimer += Random.Range(2f, 8f);
         knockbackTimer = Random.Range(3f, 6f);
+        navID = navMeshAgent.agentTypeID;
+        navMeshAgent.agentTypeID = 0;
     }
 
     private void OnDrawGizmos()
@@ -316,11 +320,14 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
     public void BouncyBoy()
     {
         bouncing = true;
+
+        navMeshAgent.agentTypeID = navID;
+
         newMaxVelocity = 100;
-        Vector3 playerDir = (navMeshAgent.transform.position - skull.position).normalized;
+        Vector3 playerDir = (playerTarget.position - skull.position).normalized;
         playerDir /= 7;
         playerDir.y = 1;
-        rigidBody.AddForce(playerDir * Random.Range(4f,8f), ForceMode.VelocityChange);
+        rigidBody.AddForce(playerDir * Random.Range(6f,10f), ForceMode.VelocityChange);
         Invoke("EndBounce", 2f);
     }
 
@@ -328,6 +335,7 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
     {
         bouncing = false;
         newMaxVelocity = 15f;
+        navMeshAgent.agentTypeID = 0;
     }
 
     public void Explode()
