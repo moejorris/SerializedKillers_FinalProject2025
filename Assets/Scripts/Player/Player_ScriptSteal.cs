@@ -311,28 +311,28 @@ public class Player_ScriptSteal : MonoBehaviour
     public void UpdateOnScreenControls()
     {
         //GameObject activeScript
-        if (heldBehavior != null)
-        {
-            activateScriptButton.gameObject.SetActive(true);
-            returnScriptButton.gameObject.SetActive(true);
+        //if (heldBehavior != null)
+        //{
+        //    activateScriptButton.gameObject.SetActive(true);
+        //    returnScriptButton.gameObject.SetActive(true);
 
-            if (BehaviorActive()) activateScriptButton.transform.Find("Text").GetComponent<TMP_Text>().text = "Deactivate Script";
-            else activateScriptButton.transform.Find("Text").GetComponent<TMP_Text>().text = "Activate Script";
-        }
-        else
-        {
-            activateScriptButton.SetActive(false);
-            returnScriptButton.gameObject.SetActive(false);
-        }
+        //    if (BehaviorActive()) activateScriptButton.transform.Find("Text").GetComponent<TMP_Text>().text = "Deactivate Script";
+        //    else activateScriptButton.transform.Find("Text").GetComponent<TMP_Text>().text = "Activate Script";
+        //}
+        //else
+        //{
+        //    activateScriptButton.SetActive(false);
+        //    returnScriptButton.gameObject.SetActive(false);
+        //}
 
-        if (selectedEnemy != null && selectedEnemy.behaviorActive)
-        {
-            stealScriptButton.SetActive(true);
-        }
-        else
-        {
-            stealScriptButton.SetActive(false);
-        }
+        //if (selectedEnemy != null && selectedEnemy.behaviorActive)
+        //{
+        //    stealScriptButton.SetActive(true);
+        //}
+        //else
+        //{
+        //    stealScriptButton.SetActive(false);
+        //}
 
         activateScriptButton.transform.Find("Keyboard").gameObject.SetActive(InputIsKeyboard());
         activateScriptButton.transform.Find("Controller").gameObject.SetActive(!InputIsKeyboard());

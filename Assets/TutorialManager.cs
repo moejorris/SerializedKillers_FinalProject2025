@@ -13,6 +13,7 @@ public class TutorialManager : MonoBehaviour
     [SerializeField] private TMP_Text continueText;
     [SerializeField] private Sprite scriptHudWithStuff;
     [SerializeField] private Image HUDImage;
+    private AudioSource audioSource => GetComponent<AudioSource>();
     private bool continueAvailable = false;
     private bool continuePressed = false;
 
@@ -37,6 +38,7 @@ public class TutorialManager : MonoBehaviour
     void Start()
     {
         StartPhaseOne();
+        StartCoroutine("ContinueTimer");
     }
 
     // Update is called once per frame
@@ -56,19 +58,6 @@ public class TutorialManager : MonoBehaviour
                 speedUpMult = 0.5f;
             }
         }
-
-        if (continueAvailable && continueText.color.a < 1)
-        {
-            Color aColor = continueText.color;
-            aColor.a += Time.deltaTime * 2;
-            continueText.color = aColor;
-        }
-        else if (continueText.color.a > 0)
-        {
-            Color aColor = continueText.color;
-            aColor.a -= Time.deltaTime * 2;
-            continueText.color = aColor;
-        }
     }
 
     public void StartPhaseOne()
@@ -87,6 +76,26 @@ public class TutorialManager : MonoBehaviour
         StartCoroutine("TutorialPhaseTwo");
     }
 
+    IEnumerator ContinueTimer()
+    {
+        while (true)
+        {
+            if (continueAvailable && continueText.color.a < 1)
+            {
+                Color aColor = continueText.color;
+                aColor.a += 0.1f;
+                continueText.color = aColor;
+            }
+            else if (continueText.color.a > 0)
+            {
+                Color aColor = continueText.color;
+                aColor.a -= 0.1f;
+                continueText.color = aColor;
+            }
+            yield return new WaitForSeconds(0.1f * speedUpMult);
+        }
+    }
+
     IEnumerator TutorialPhaseOne()
     {
         phase = 1;
@@ -102,11 +111,16 @@ public class TutorialManager : MonoBehaviour
 
         //-------------------------------FIRST TEXT-------------
 
+        audioSource.volume = SoundManager.instance.SFXVolume;
+        audioSource.Play();
+
         foreach (char letter in textToWrite)
         {
             middleTextbox.text += letter;
             yield return new WaitForSeconds(secondsBetweenCharacters * speedUpMult);
         }
+
+        audioSource.Stop();
 
         yield return new WaitForSeconds(1);
 
@@ -116,12 +130,17 @@ public class TutorialManager : MonoBehaviour
         yield return new WaitUntil(() => continuePressed);
         speedUpMult = 1;
 
-        while(middleTextbox.text.Length > 0)
+        audioSource.volume = SoundManager.instance.SFXVolume;
+        audioSource.Play();
+
+        while (middleTextbox.text.Length > 0)
         {
             middleTextbox.text = middleTextbox.text.Substring(0, middleTextbox.text.Length - 1);
 
             yield return new WaitForSeconds(secondsBetweenCharacters * 0.5f * speedUpMult);
         }
+
+        audioSource.Stop();
 
         //-------------------------------IMAGE AND SECOND TEXT-------------
 
@@ -136,11 +155,16 @@ public class TutorialManager : MonoBehaviour
         middleTextbox.text = string.Empty;
         textToWrite = phaseOneMessages[1];
 
+        audioSource.volume = SoundManager.instance.SFXVolume;
+        audioSource.Play();
+
         foreach (char letter in textToWrite)
         {
             bottomTextbox.text += letter;
             yield return new WaitForSeconds(secondsBetweenCharacters * speedUpMult);
         }
+
+        audioSource.Stop();
 
         yield return new WaitForSeconds(1);
 
@@ -149,6 +173,9 @@ public class TutorialManager : MonoBehaviour
 
         yield return new WaitUntil(() => continuePressed);
         speedUpMult = 1;
+
+        audioSource.volume = SoundManager.instance.SFXVolume;
+        audioSource.Play();
 
         while (bottomTextbox.text.Length > 0)
         {
@@ -169,6 +196,8 @@ public class TutorialManager : MonoBehaviour
             yield return new WaitForSeconds(secondsBetweenCharacters * speedUpMult);
         }
 
+        audioSource.Stop();
+
         yield return new WaitForSeconds(1);
 
         continuePressed = false;
@@ -176,6 +205,28 @@ public class TutorialManager : MonoBehaviour
 
         yield return new WaitUntil(() => continuePressed);
         speedUpMult = 1;
+
+        audioSource.volume = SoundManager.instance.SFXVolume;
+        audioSource.Play();
+
+        while (bottomTextbox.text.Length > 0)
+        {
+            bottomTextbox.text = bottomTextbox.text.Substring(0, bottomTextbox.text.Length - 1);
+
+            yield return new WaitForSeconds(secondsBetweenCharacters * 0.5f * speedUpMult);
+        }
+
+        audioSource.Stop();
+
+        while (HUDImage.color.a > 0)
+        {
+            Color aColor = HUDImage.color;
+            aColor.a -= 0.1f;
+            yield return new WaitForSeconds(0.1f * speedUpMult);
+            HUDImage.color = aColor;
+        }
+
+        panelAnimator.SetBool("Appear", false);
     }
 
     IEnumerator TutorialPhaseTwo()

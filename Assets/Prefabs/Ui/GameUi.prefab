@@ -4107,10 +4107,10 @@ RectTransform:
   - {fileID: 8488824062159550323}
   - {fileID: 8795253882878949088}
   - {fileID: 5332075979339627017}
+  - {fileID: 5758499708790949028}
   - {fileID: 474700548142053591}
   - {fileID: 5207724890049723407}
   - {fileID: 4831594636734439709}
-  - {fileID: 5758499708790949028}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -5996,11 +5996,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b7b0e5849a3b98345a8e739905132c5b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  jumpAction: {fileID: 0}
+  middleTextbox: {fileID: 0}
+  bottomTextbox: {fileID: 0}
+  continueText: {fileID: 0}
+  scriptHudWithStuff: {fileID: 0}
+  HUDImage: {fileID: 0}
   textBox: {fileID: 0}
   panelAnimator: {fileID: 0}
   phaseOneMessages: []
   phaseTwoMessages: []
   secondsBetweenCharacters: 0.01
+  speedUpMult: 1
   tutorialOverclockPrefab: {fileID: 752360659633603987, guid: e3d8e4f6665600d47b94e563fd57b0be, type: 3}
   spawnPos: {fileID: 0}
 --- !u!1 &2773529798038120582
