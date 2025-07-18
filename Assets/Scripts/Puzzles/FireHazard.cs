@@ -69,6 +69,7 @@ public class FireHazard : MonoBehaviour, IElemental
             IElemental elemental = hitObject.GetComponent<IElemental>();
             if (elemental == null) continue;
 
+            if (hitObject.GetComponent<BossBehaviorV2>() != null) continue;
             elemental.InteractElement(heldBehavior);
         }
     }
