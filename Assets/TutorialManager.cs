@@ -30,6 +30,9 @@ public class TutorialManager : MonoBehaviour
     [SerializeField] Sprite[] phaseOneSprites;
     [SerializeField] Sprite[] phaseTwoSprites;
 
+    [SerializeField] bool[] phaseOneTinyPanel;
+    [SerializeField] bool[] phaseTwoTinyPanel;
+
     private int phase = 0;
     private string textToWrite;
     private bool cont = false;
@@ -59,7 +62,7 @@ public class TutorialManager : MonoBehaviour
             }
             else
             {
-                speedUpMult = 0.5f;
+                speedUpMult = 0.25f;
             }
         }
 
@@ -153,21 +156,48 @@ public class TutorialManager : MonoBehaviour
         return arrayToReturn;
     }
 
+    bool[] GetPhaseSizes(int phaseNumber = 1)
+    {
+        bool[] arrayToReturn = new bool[0];
+
+        switch (phaseNumber)
+        {
+            case 1:
+                arrayToReturn = phaseOneTinyPanel;
+                break;
+
+            case 2:
+                arrayToReturn = phaseTwoTinyPanel;
+                break;
+
+            // case 3:
+            // arrayToReturn = phaseThreeMessages;
+            // break;
+
+            default:
+                
+                break;
+        }
+
+        return arrayToReturn;
+    }
+
     IEnumerator TutorialPhase(int phaseNumber = 1)
     {
         yield return new WaitForSeconds(1);
 
         string[] phaseMessages = GetPhaseMessages(phaseNumber);
         Sprite[] phaseSprites = GetPhaseSprites(phaseNumber);
+        bool[] phasePanelSizes = GetPhaseSizes(phaseNumber);
 
         for (int i = 0; i < phaseMessages.Length; i++)
         {
             StopCoroutine("TypePhaseText");
-            yield return TypePhaseText(phaseMessages[i], phaseSprites[i], i == phaseMessages.Length - 1);
+            yield return TypePhaseText(phaseMessages[i], phaseSprites[i], i == phaseMessages.Length - 1, phasePanelSizes[i]);
         }
     }
 
-    IEnumerator TypePhaseText(string phaseStepText, Sprite sprite, bool isLast = false) //this is the logic used for all phases. This is run for each element in the phaseMessages array per phase. 
+    IEnumerator TypePhaseText(string phaseStepText, Sprite sprite, bool isLast = false, bool tinyPanel = false) //this is the logic used for all phases. This is run for each element in the phaseMessages array per phase. 
     {
         isRunning = true;
 
@@ -207,11 +237,32 @@ public class TutorialManager : MonoBehaviour
             HUDImage.color = aColor;
         }
 
+
+        bool beginningEvent = false;
+        bool endEvent = false;
+        if (phaseStepText.StartsWith('*'))
+        {
+            phaseStepText = phaseStepText.Replace("*", "");
+            endEvent = false;
+            beginningEvent = true;
+        }
+        else if (phaseStepText.EndsWith("*"))
+        {
+            phaseStepText = phaseStepText.Replace("*", "");
+            beginningEvent = false;
+            endEvent = true;
+        }
+
+        yield return new WaitForSeconds(0.5f);
+        panelAnimator.SetBool("Small", tinyPanel);
+
         textBox.text = "";
         textToWrite = phaseStepText;
         panelAnimator.SetBool("Appear", true);
 
-        yield return new WaitForSeconds(1);
+        yield return new WaitForSeconds(0.7f);
+
+        if (beginningEvent) SpecialEvent();
 
         audioSource.Stop();
         audioSource.volume = SoundManager.instance.SFXVolume;
@@ -250,7 +301,7 @@ public class TutorialManager : MonoBehaviour
 
         audioSource.Stop();
 
-        if (isLast)
+        if (HUDImage.color.a > 0) // separated from isLast check due to there being cases in which the image must fade without it being last
         {
             while (HUDImage.color.a > 0)
             {
@@ -259,9 +310,11 @@ public class TutorialManager : MonoBehaviour
                 yield return new WaitForSeconds(0.1f * speedUpMult);
                 HUDImage.color = aColor;
             }
-
-            panelAnimator.SetBool("Appear", false);
         }
+
+        if (isLast) panelAnimator.SetBool("Appear", false);
+
+        if (endEvent) SpecialEvent();
 
         isRunning = false;
     }
@@ -272,5 +325,22 @@ public class TutorialManager : MonoBehaviour
 
         StartCoroutine(TutorialPhase(3));
         phase = 3;
+    }
+
+    public void SpecialEvent()
+    {
+        switch (phase)
+        {
+            case 1:
+                
+                break;
+            case 2:
+
+                break;
+            case 3:
+
+                break;
+            default: break;
+        }
     }
 }
