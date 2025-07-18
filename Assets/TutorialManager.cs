@@ -24,23 +24,29 @@ public class TutorialManager : MonoBehaviour
     [SerializeField] private Animator panelAnimator;
     [SerializeField] private string[] phaseOneMessages;
     [SerializeField] private string[] phaseTwoMessages;
+    [SerializeField] private string[] phaseThreeMessages;
     [SerializeField] private float secondsBetweenCharacters = 0.01f;
     [SerializeField] private float speedUpMult = 1;
 
     [SerializeField] Sprite[] phaseOneSprites;
     [SerializeField] Sprite[] phaseTwoSprites;
+    [SerializeField] Sprite[] phaseThreeSprites;
 
     [SerializeField] bool[] phaseOneTinyPanel;
     [SerializeField] bool[] phaseTwoTinyPanel;
+    [SerializeField] bool[] phaseThreeTinyPanel;
 
     private int phase = 0;
     private string textToWrite;
     private bool cont = false;
-    bool isRunning = false;
+    public bool isRunning = false;
 
     [Header("Enemies")]
     [SerializeField] private GameObject tutorialOverclockPrefab;
     [SerializeField] private Transform spawnPos;
+
+    [Header("PuzzleElements")]
+    [SerializeField] private Animator basementGate;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -81,7 +87,7 @@ public class TutorialManager : MonoBehaviour
 
     public void StartPhaseTwo()
     {
-        if (phase == 2) return;
+        if (phase >= 2) return;
 
         StartCoroutine(TutorialPhase(2));
         phase = 2;
@@ -121,9 +127,9 @@ public class TutorialManager : MonoBehaviour
                 arrayToReturn = phaseTwoMessages;
                 break;
 
-            // case 3:
-            // arrayToReturn = phaseThreeMessages;
-            // break;
+            case 3:
+                arrayToReturn = phaseThreeMessages;
+                break;
 
             default:
                 arrayToReturn[0] = "No array created for phase " + phaseNumber + ". Please create a new one and add it to the switch statement in GetPhaseMessages().";
@@ -148,6 +154,10 @@ public class TutorialManager : MonoBehaviour
                 arrayToReturn = phaseTwoSprites;
                 break;
 
+            case 3:
+                arrayToReturn = phaseThreeSprites;
+                break;
+
             default:
                 //No Sprite Array Created
                 break;
@@ -170,12 +180,12 @@ public class TutorialManager : MonoBehaviour
                 arrayToReturn = phaseTwoTinyPanel;
                 break;
 
-            // case 3:
-            // arrayToReturn = phaseThreeMessages;
-            // break;
+            case 3:
+                arrayToReturn = phaseThreeTinyPanel;
+                break;
 
             default:
-                
+
                 break;
         }
 
@@ -321,7 +331,7 @@ public class TutorialManager : MonoBehaviour
 
     public void StartPhaseThree()
     {
-        if (phase == 3) return;
+        if (phase >= 3) return;
 
         StartCoroutine(TutorialPhase(3));
         phase = 3;
@@ -332,10 +342,10 @@ public class TutorialManager : MonoBehaviour
         switch (phase)
         {
             case 1:
-                
+
                 break;
             case 2:
-
+                basementGate.SetBool("Open", true);
                 break;
             case 3:
 

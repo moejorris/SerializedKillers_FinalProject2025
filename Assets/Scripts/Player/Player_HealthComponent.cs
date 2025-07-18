@@ -66,4 +66,10 @@ public class Player_HealthComponent : Health
             yield return new WaitForSeconds(0.03f);
         }
     }
+
+    public bool HasMaxHealth()
+    {
+        if (currentHealth >= maxHealth) return true;
+        else return false;
+    }
 }

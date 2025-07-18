@@ -6025,8 +6025,12 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 09bfe6638baf2b34b92875736a41a3d8, type: 3}
   - {fileID: 21300000, guid: dc1297c2f2b1608438f16589b009f6b8, type: 3}
   phaseTwoSprites: []
+  phaseOneTinyPanel: 
+  phaseTwoTinyPanel: 
+  isRunning: 0
   tutorialOverclockPrefab: {fileID: 752360659633603987, guid: e3d8e4f6665600d47b94e563fd57b0be, type: 3}
   spawnPos: {fileID: 0}
+  basementGate: {fileID: 0}
 --- !u!82 &6108512005031891965
 AudioSource:
   m_ObjectHideFlags: 0
@@ -19781,7 +19785,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Script Power
+  m_text: Power
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: dc36b3fdc14f47ebb36fd484a67e268a, type: 2}
   m_sharedMaterial: {fileID: 2140032, guid: dc36b3fdc14f47ebb36fd484a67e268a, type: 2}

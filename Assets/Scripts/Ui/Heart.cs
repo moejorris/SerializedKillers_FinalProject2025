@@ -12,7 +12,7 @@ public class Heart : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other == PlayerController.instance.Collider)
+        if (other == PlayerController.instance.Collider && !PlayerController.instance.Health.HasMaxHealth())
         {
             PlayerController.instance.Health.Heal(healAmount);
             Destroy(gameObject);
@@ -28,7 +28,7 @@ public class Heart : MonoBehaviour
         Vector3 pos = transform.position;
         rollCycle += Mathf.PI / (Time.deltaTime * fineTuning);
         rollCycle = rollCycle % (Mathf.PI * 2);
-        pos.y = transform.position.y + 0.3f + Mathf.Sin(rollCycle) * hoverAmount;
+        pos.y = 0.1f + transform.position.y + 0.3f + Mathf.Sin(rollCycle) * hoverAmount;
         heart.position = pos;
 
         GetComponent<Rigidbody>().AddForce(Vector3.down / 2.5f);
