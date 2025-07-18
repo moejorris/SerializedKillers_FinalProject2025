@@ -118,7 +118,7 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
 
         bossRenderer = GetComponent<Renderer>();
         shieldHealth = maxShieldHealth; // Initialize the shield health to the maximum shield health
-        attackTimer = 5.0f;
+        attackTimer = 2.5f;
 
         // Invoke("SpawnWeakAndRandomEnemy", 7.0f);
 
@@ -573,7 +573,7 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
         if (isVulnerable) return; // Exit if the boss is already vulnerable
         shieldHealth = 0; // Reset shield health
         StopAllCoroutines(); // Stop any ongoing coroutines
-        handAnim.SetTrigger("Hand Stunned"); // Trigger the stunned animation
+        // handAnim.SetTrigger("Hand Stunned"); // Trigger the stunned animation
         anim.SetTrigger("Weak"); // Trigger the weak animation
         Debug.Log("Boss is about to become vulnerable!"); // Log the start of the vulnerable state
     }

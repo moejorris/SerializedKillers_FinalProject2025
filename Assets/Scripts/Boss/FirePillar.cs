@@ -64,7 +64,14 @@ public class FirePillar : MonoBehaviour
                 PlayerHealth playerHealth = GameObject.FindGameObjectWithTag("Canvas").GetComponent<PlayerHealth>();
                 if (playerHealth != null)
                 {
-                    Debug.Log("Player hit!");
+                    var playerController = PlayerController.instance;
+                    var scriptSteal = playerController.ScriptSteal;
+                    bool hasFireActive = scriptSteal.GetHeldBehavior() != null && scriptSteal.GetHeldBehavior().behaviorName == "fire" && scriptSteal.BehaviorActive();
+                    if (hasFireActive)
+                    {
+                        Debug.Log("Player has fire active, no damage taken");
+                        return;
+                    }
                     playerHealth.TakeDamage(damage);
                 }
 
