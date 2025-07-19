@@ -18,7 +18,7 @@ public class SoundManager : MonoBehaviour
     [SerializeField] AudioClip mainMenuMusic;
     [SerializeField] AudioClip levelsMusic;
 
-    [SerializeField] AudioSource sfxSource;
+    AudioSource sfxSource;
     [SerializeField] AudioSource musicSource;
 
     void Awake()
@@ -31,6 +31,8 @@ public class SoundManager : MonoBehaviour
 
         instance = this;
         DontDestroyOnLoad(gameObject);
+
+        sfxSource = GetComponent<AudioSource>();
 
         SetDefaults();
 
@@ -119,6 +121,7 @@ public class SoundManager : MonoBehaviour
         sfxSource.volume = sfxVolume * masterVolume;
         sfxSource.pitch = sfx.usesRandomPitch ? sfx.RandomPitch * Time.timeScale : 1 * Time.timeScale;
         sfxSource.PlayOneShot(sfx.SoundEffect());
+        sfxSource.pitch = 1;
     }
 
     public void PlaySoundEffectDelayed(SoundEffectSO sfx, float delay)
