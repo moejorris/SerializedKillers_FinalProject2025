@@ -7,6 +7,7 @@ public class InteractPopup : MonoBehaviour
     [SerializeField] private float dist = 3;
     private Image controllerIcon;
     private Image keyboardIcon;
+    public bool active = true;
     private Transform player => GameObject.FindGameObjectWithTag("Player").transform.Find("PlayerController");
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -23,7 +24,7 @@ public class InteractPopup : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Vector3.Distance(player.position, transform.position) < dist)
+        if (Vector3.Distance(player.position, transform.position) < dist && active)
         {
             animator.SetBool("Nearby", true);
             UpdateControls();

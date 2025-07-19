@@ -6,6 +6,21 @@ public class Lever : MonoBehaviour, IDamageable
     [SerializeField] private Collider[] invincibleAreas;
     private Animator leverAnimator => GetComponent<Animator>();
     private bool canInteract = true;
+    private InteractPopup interactPopup;
+    [SerializeField] private bool startDisabled = false;
+    private void Start()
+    {
+        if (transform.Find("LeverPopup") != null)
+        {
+            interactPopup = transform.Find("LeverPopup").GetComponent<InteractPopup>();
+        }
+
+        if (startDisabled)
+        {
+            canInteract = false;
+            if (interactPopup != null) interactPopup.active = false;
+        }
+    }
 
     public void TakeDamage(float damage = 0)
     {
@@ -27,6 +42,12 @@ public class Lever : MonoBehaviour, IDamageable
 
             Invoke("ResetInteract", 1);
         }
+    }
+
+    public void EnableLever()
+    {
+        canInteract = true;
+        if (interactPopup != null) interactPopup.active = true;
     }
 
     public void ResetInteract()

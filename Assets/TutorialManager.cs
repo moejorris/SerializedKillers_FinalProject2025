@@ -19,22 +19,26 @@ public class TutorialManager : MonoBehaviour
     private bool continuePressed = false;
 
     private bool tutorialFinished = false;
-
-    // [SerializeField] private TMP_Text textBox;
     [SerializeField] private Animator panelAnimator;
-    [SerializeField] private string[] phaseOneMessages;
-    [SerializeField] private string[] phaseTwoMessages;
-    [SerializeField] private string[] phaseThreeMessages;
     [SerializeField] private float secondsBetweenCharacters = 0.01f;
     [SerializeField] private float speedUpMult = 1;
 
+    [Header("Phase One")]
+    [SerializeField] private string[] phaseOneMessages;
     [SerializeField] Sprite[] phaseOneSprites;
-    [SerializeField] Sprite[] phaseTwoSprites;
-    [SerializeField] Sprite[] phaseThreeSprites;
-
     [SerializeField] bool[] phaseOneTinyPanel;
+
+
+    [Header("Phase Two")]
+    [SerializeField] private string[] phaseTwoMessages;
+    [SerializeField] Sprite[] phaseTwoSprites;
     [SerializeField] bool[] phaseTwoTinyPanel;
+
+    [Header("Phase Three")]
+    [SerializeField] private string[] phaseThreeMessages;
+    [SerializeField] Sprite[] phaseThreeSprites;
     [SerializeField] bool[] phaseThreeTinyPanel;
+    [SerializeField] private Lever basementCellLever;
 
     private int phase = 0;
     private string textToWrite;
@@ -277,11 +281,11 @@ public class TutorialManager : MonoBehaviour
                 }
             }
 
-            continueText.text = "Press [SPACE] to continue...";
+            continueText.text = "Press [A] to continue...";
         }
         else
         {
-            continueText.text = "Press [A] to continue...";
+            continueText.text = "Press [SPACE] to continue...";
         }
 
         yield return new WaitForSeconds(0.5f);
@@ -369,7 +373,7 @@ public class TutorialManager : MonoBehaviour
                 basementGate.SetBool("Open", true);
                 break;
             case 3:
-
+                basementCellLever.EnableLever();
                 break;
             default: break;
         }
