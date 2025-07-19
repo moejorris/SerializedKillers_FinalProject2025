@@ -157,8 +157,8 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
             }
             if (Input.GetKeyDown(KeyCode.K))
             {
-                handAnim.SetTrigger("Hand Smash");
-                Invoke("KeyboardSmash", 1.02f);
+                FallToGround();
+                Debug.Log("Boss falling to ground");
             }
         }
 
@@ -439,7 +439,7 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
         {
             int randomIndex = Random.Range(0, keysToSmashList.Count); // Get a random index from the keysToSmashList
             GameObject keyToSmash = keysToSmashList[randomIndex]; // Get the key to smash
-            Debug.Log("Key to smash: " + keyToSmash.name); // Log the key to smash
+            // Debug.Log("Key to smash: " + keyToSmash.name); // Log the key to smash
             keysToSmashList.RemoveAt(randomIndex); // Remove the key from the list
             keysToSmashRandom.Add(keyToSmash); // Add the key to the list of keys to smash
 
@@ -490,6 +490,44 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
         }
     }
 
+    void FallToGround()
+    {
+        StartCoroutine(FallToGroundCoroutine());
+    }
+
+    private IEnumerator FallToGroundCoroutine()
+    {
+        RaycastHit hit;
+        if (Physics.Raycast(transform.position, Vector3.down, out hit, 100f))
+        {
+            if (hit.collider.CompareTag("Ground"))
+            {
+                Vector3 startPosition = transform.position;
+                Vector3 targetPosition = hit.point + Vector3.up * 1.5f;
+                float distanceToGround = hit.distance;
+                Debug.Log("Distnace to ground: " + distanceToGround);
+                float fallDuration = Mathf.Sqrt(distanceToGround / 5f);
+                float elapsedTime = 0f;
+
+                while (elapsedTime < fallDuration)
+                {
+                    elapsedTime += Time.deltaTime;
+                    float t = elapsedTime / fallDuration;
+
+                    t = t * t;
+
+                    transform.position = Vector3.Lerp(startPosition, targetPosition, t);
+                    Debug.Log("Boss falling to ground");
+
+                    yield return null;
+                }
+
+                transform.position = targetPosition;
+                Debug.Log("Boss landed on ground");
+            }
+        }
+    }
+
     void Die()
     {
         SceneSwitcher.instance.Invoke("ReturnToMenu", 2.0f);
@@ -518,12 +556,13 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
             {
                 shieldHealth -= damageAmount * weaknessMultiplier; // Double the damage if the attack is a weakness
                 Debug.Log("Weakness detected! Shield damage doubled.");
-                StartVulnerable();
-                return;
+            }
+            else
+            {
+                shieldHealth -= damageAmount;
+                Debug.Log("Shield took " + damageAmount + " damage! Shield has " + shieldHealth + " health left!");
             }
 
-            shieldHealth -= damageAmount;
-            Debug.Log("Shield took " + damageAmount + " damage! Shield has " + shieldHealth + " health left!");
             if (shieldHealth <= 0)
             {
                 Debug.Log("Shield destroyed! Boss becoming vulnerable.");
@@ -602,7 +641,7 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
         shieldHealth = maxShieldHealth; // Reset shield health
         attacksUsed = 0;
         shieldRenderer.material = originalShieldMaterial; // Reset the shield material to the original
-        Invoke("ChangeState", 2f); // Change the state after a delay
+        // Invoke("ChangeState", 2f); // Change the state after a delay
     }
 
     void ChangeState()
