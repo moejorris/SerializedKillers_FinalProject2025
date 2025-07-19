@@ -29,7 +29,7 @@ public class LaserPuzzleRoom : PuzzleRoom
         while (laser.transform.localScale.y < 1)
         {
             Vector3 scale = laser.transform.localScale;
-            scale.y += 0.02f;
+            scale.y += 0.03f;
             laser.transform.localScale = scale;
             yield return new WaitForSeconds(0.01f);
         }

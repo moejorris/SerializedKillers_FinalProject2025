@@ -13,7 +13,7 @@ public class Heart : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other == PlayerController.instance.Collider && !PlayerController.instance.Health.HasMaxHealth())
+        if (other == PlayerController.instance.Collider)
         {
             PlayerController.instance.Health.Heal(healAmount);
             Instantiate(pickupPartcle, transform.position, Quaternion.identity);

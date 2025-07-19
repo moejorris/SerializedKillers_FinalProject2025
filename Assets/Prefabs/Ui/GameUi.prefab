@@ -1464,7 +1464,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &7336035254804250243
 RectTransform:
   m_ObjectHideFlags: 0
@@ -6016,6 +6016,7 @@ MonoBehaviour:
     Attacking and killing enemies fills this bar. Pressing (Q) toggles whether your
     Elemental Script is active and draining Script Power.
   phaseTwoMessages: []
+  phaseThreeMessages: []
   secondsBetweenCharacters: 0.01
   speedUpMult: 1
   phaseOneSprites:
@@ -6025,9 +6026,13 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 09bfe6638baf2b34b92875736a41a3d8, type: 3}
   - {fileID: 21300000, guid: dc1297c2f2b1608438f16589b009f6b8, type: 3}
   phaseTwoSprites: []
+  phaseThreeSprites: []
   phaseOneTinyPanel: 
   phaseTwoTinyPanel: 
+  phaseThreeTinyPanel: 
   isRunning: 0
+  keyboardInputs: []
+  controllerEquivalent: []
   tutorialOverclockPrefab: {fileID: 752360659633603987, guid: e3d8e4f6665600d47b94e563fd57b0be, type: 3}
   spawnPos: {fileID: 0}
   basementGate: {fileID: 0}

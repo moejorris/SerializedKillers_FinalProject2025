@@ -41,6 +41,10 @@ public class TutorialManager : MonoBehaviour
     private bool cont = false;
     public bool isRunning = false;
 
+    [Header("ControllerKeyboardExchange")]
+    [SerializeField] private string[] keyboardInputs;
+    [SerializeField] private string[] controllerEquivalent;
+
     [Header("Enemies")]
     [SerializeField] private GameObject tutorialOverclockPrefab;
     [SerializeField] private Transform spawnPos;
@@ -261,6 +265,23 @@ public class TutorialManager : MonoBehaviour
             phaseStepText = phaseStepText.Replace("*", "");
             beginningEvent = false;
             endEvent = true;
+        }
+
+        if (!PlayerController.instance.ScriptSteal.InputIsKeyboard())
+        {
+            for (int i = 0; i < keyboardInputs.Length; i++)
+            {
+                if (phaseStepText.Contains($"[{keyboardInputs[i]}]"))
+                {
+                    phaseStepText = phaseStepText.Replace($"[{keyboardInputs[i]}]", $"[{controllerEquivalent[i]}]");
+                }
+            }
+
+            continueText.text = "Press [SPACE] to continue...";
+        }
+        else
+        {
+            continueText.text = "Press [A] to continue...";
         }
 
         yield return new WaitForSeconds(0.5f);
