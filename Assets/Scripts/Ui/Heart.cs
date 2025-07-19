@@ -8,6 +8,7 @@ public class Heart : MonoBehaviour
     [SerializeField] private float fineTuning = 0.5f;
     public float rollCycle;
     private Transform heart => transform.Find("Heart");
+    [SerializeField] private GameObject pickupPartcle;
     //public Vector3 startPos;
 
     private void OnTriggerEnter(Collider other)
@@ -15,6 +16,7 @@ public class Heart : MonoBehaviour
         if (other == PlayerController.instance.Collider && !PlayerController.instance.Health.HasMaxHealth())
         {
             PlayerController.instance.Health.Heal(healAmount);
+            Instantiate(pickupPartcle, transform.position, Quaternion.identity);
             Destroy(gameObject);
         }
     }
@@ -26,7 +28,7 @@ public class Heart : MonoBehaviour
         heart.eulerAngles = rot;
 
         Vector3 pos = transform.position;
-        rollCycle += Mathf.PI / (Time.deltaTime * fineTuning);
+        rollCycle += Mathf.PI * (Time.deltaTime * fineTuning);
         rollCycle = rollCycle % (Mathf.PI * 2);
         pos.y = 0.1f + transform.position.y + 0.3f + Mathf.Sin(rollCycle) * hoverAmount;
         heart.position = pos;

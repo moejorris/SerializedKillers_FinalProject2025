@@ -1865,6 +1865,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: SobbySkull (2)
       objectReference: {fileID: 0}
+    - target: {fileID: 4806814001057205552, guid: efc5dc08c1f683f4c96096041a27d5c0, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6312084026052878854, guid: efc5dc08c1f683f4c96096041a27d5c0, type: 3}
       propertyPath: m_Enabled
       value: 1
@@ -2569,6 +2573,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: SobbySkull
       objectReference: {fileID: 0}
+    - target: {fileID: 4806814001057205552, guid: efc5dc08c1f683f4c96096041a27d5c0, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6312084026052878854, guid: efc5dc08c1f683f4c96096041a27d5c0, type: 3}
       propertyPath: m_Enabled
       value: 1
@@ -2805,6 +2813,10 @@ PrefabInstance:
     - target: {fileID: 4806814001057205552, guid: efc5dc08c1f683f4c96096041a27d5c0, type: 3}
       propertyPath: m_Name
       value: SobbySkull (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 4806814001057205552, guid: efc5dc08c1f683f4c96096041a27d5c0, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6312084026052878854, guid: efc5dc08c1f683f4c96096041a27d5c0, type: 3}
       propertyPath: m_Enabled
