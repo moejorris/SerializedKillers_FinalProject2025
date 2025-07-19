@@ -40,6 +40,11 @@ public class TutorialManager : MonoBehaviour
     [SerializeField] bool[] phaseThreeTinyPanel;
     [SerializeField] private Lever basementCellLever;
 
+    [Header("Phase Four")]
+    [SerializeField] private string[] phaseFourMessages;
+    [SerializeField] Sprite[] phaseFourSprites;
+    [SerializeField] bool[] phaseFourTinyPanel;
+
     private int phase = 0;
     private string textToWrite;
     private bool cont = false;
@@ -101,6 +106,21 @@ public class TutorialManager : MonoBehaviour
         phase = 2;
     }
 
+    public void StartPhaseThree()
+    {
+        if (phase >= 3) return;
+
+        StartCoroutine(TutorialPhase(3));
+        phase = 3;
+    }
+    public void StartPhaseFour()
+    {
+        if (phase >= 4) return;
+
+        StartCoroutine(TutorialPhase(4));
+        phase = 4;
+    }
+
     IEnumerator ContinuePromptFlash()
     {
         bool increasing = true;
@@ -139,6 +159,10 @@ public class TutorialManager : MonoBehaviour
                 arrayToReturn = phaseThreeMessages;
                 break;
 
+            case 4:
+                arrayToReturn = phaseFourMessages;
+                break;
+
             default:
                 arrayToReturn[0] = "No array created for phase " + phaseNumber + ". Please create a new one and add it to the switch statement in GetPhaseMessages().";
                 arrayToReturn[1] = "Try again!";
@@ -166,6 +190,10 @@ public class TutorialManager : MonoBehaviour
                 arrayToReturn = phaseThreeSprites;
                 break;
 
+            case 4:
+                arrayToReturn = phaseFourSprites;
+                break;
+
             default:
                 //No Sprite Array Created
                 break;
@@ -190,6 +218,9 @@ public class TutorialManager : MonoBehaviour
 
             case 3:
                 arrayToReturn = phaseThreeTinyPanel;
+                break;
+            case 4:
+                arrayToReturn = phaseFourTinyPanel;
                 break;
 
             default:
@@ -352,14 +383,6 @@ public class TutorialManager : MonoBehaviour
         if (endEvent) SpecialEvent();
 
         isRunning = false;
-    }
-
-    public void StartPhaseThree()
-    {
-        if (phase >= 3) return;
-
-        StartCoroutine(TutorialPhase(3));
-        phase = 3;
     }
 
     public void SpecialEvent()

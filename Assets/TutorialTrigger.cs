@@ -18,6 +18,8 @@ public class TutorialTrigger : MonoBehaviour
                     tutorialManager.StartPhaseTwo(); break;
                 case TutorialPhase.PhaseThree:
                     tutorialManager.StartPhaseThree(); break;
+                case TutorialPhase.PhaseFour:
+                    tutorialManager.StartPhaseFour(); break;
                 default: break;
             }
 

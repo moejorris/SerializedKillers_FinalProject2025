@@ -26,7 +26,7 @@ public class BreakableObject : MonoBehaviour, IDamageable
                 if (heldItem != null)
                 {
                     Vector3 spawnPos = transform.position;
-                    spawnPos.y += 1;
+                    spawnPos.y += 1f;
                     int num = Random.Range(1, 101);
                     if (num <= itemDropChance)
                     {
