@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class FirePillar : MonoBehaviour
+public class FirePillar : MonoBehaviour, IDamageable, IElemental
 {
     #region Unity Inspector Variables
     [Header("Fire Pillar Settings")]
@@ -12,7 +12,9 @@ public class FirePillar : MonoBehaviour
     [SerializeField] private GameObject pathOfFire;
     [SerializeField] private float pathSpawnInterval = 0.5f; // Interval for spawning fire paths
     [SerializeField] private float damageInterval = 0.75f; // Interval for dealing damage to the player
+    private Animator anim; // Animator for the fire pillar
     private float pathTimer; // Timer for the fire path
+    private bool isExtinguished = false; // Flag to indicate if the fire pillar is extinguished
 
     private float damageTimer = 0f;
     #endregion
@@ -26,6 +28,7 @@ public class FirePillar : MonoBehaviour
             Debug.LogError("Player not found! Make sure the player has the 'Player' tag assigned.");
             return; // Exit if the player is not found
         }
+        anim = GetComponent<Animator>(); // Get the animator component
     }
 
     void Update()
@@ -72,6 +75,8 @@ public class FirePillar : MonoBehaviour
                         Debug.Log("Player has fire active, no damage taken");
                         return;
                     }
+                    
+                    if (isExtinguished) return; // If the fire pillar is extinguished, do not deal damage
                     playerHealth.TakeDamage(damage);
                 }
 
@@ -94,6 +99,25 @@ public class FirePillar : MonoBehaviour
     {
         isChasing = true; // Start chasing the target
         Destroy(gameObject, lifeTime); // Ensure the fire pillar is destroyed after its lifetime
+    }
+
+    public void TakeDamage(float damage)
+    {
+        InteractElement();
+    }
+
+    public void InteractElement(Behavior behavior = null)
+    {
+        // Check if the player has the water behavior active
+        var playerController = PlayerController.instance;
+        var scriptSteal = playerController.ScriptSteal;
+        bool hasWaterActive = scriptSteal.GetHeldBehavior() != null && scriptSteal.GetHeldBehavior().behaviorName == "water" && scriptSteal.BehaviorActive();
+        if (hasWaterActive)
+        {
+            anim.SetTrigger("Extinguish"); // Trigger extinguish animation
+            isExtinguished = true; // Set the flag to indicate the fire pillar is extinguished
+            Destroy(gameObject, 0.5f); // Destroy the fire pillar after the extinguish animation
+        }
     }
     #endregion
 }
