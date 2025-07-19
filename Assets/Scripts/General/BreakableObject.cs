@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class BreakableObject : MonoBehaviour, IDamageable
@@ -11,7 +12,7 @@ public class BreakableObject : MonoBehaviour, IDamageable
     [SerializeField] private GameObject smokeParticle;
 
     [SerializeField] private GameObject requiredToBreakFirst;
-    
+
     public virtual void TakeDamage(float damage)
     {
         if (requiredToBreakFirst == null)
@@ -29,10 +30,19 @@ public class BreakableObject : MonoBehaviour, IDamageable
                     int num = Random.Range(1, 101);
                     if (num <= itemDropChance)
                     {
+                        float angle = 360 / heldHeartAmount;
+
                         for (int i = 0; i < heldHeartAmount; i++)
                         {
                             Rigidbody rb = Instantiate(heldItem, spawnPos, Quaternion.identity).GetComponent<Rigidbody>();
-                            rb.AddForce(new Vector3(Random.Range(-100f, 100), 100, Random.Range(-100f, 100f)));
+
+                            if (heldHeartAmount > 1)
+                            {
+                                Vector2 dir2D = DegreeToVector2(angle * (i + 1));
+                                Vector3 dir = new Vector3(dir2D.x, 1, dir2D.y);
+                                rb.AddForce(dir, ForceMode.Impulse);
+                            }
+                            else rb.AddForce(new Vector3(0, 1, 0), ForceMode.Impulse);
                         }
                     }
                 }
@@ -41,5 +51,15 @@ public class BreakableObject : MonoBehaviour, IDamageable
                 Destroy(gameObject);
             }
         }
+    }
+
+    Vector2 DegreeToVector2(float angleInDegrees)
+    {
+        float angleInRadians = angleInDegrees * Mathf.Deg2Rad;
+
+        float x = Mathf.Sin(angleInRadians);
+        float y = Mathf.Cos(angleInRadians);
+
+        return new Vector2(x, y);
     }
 }
