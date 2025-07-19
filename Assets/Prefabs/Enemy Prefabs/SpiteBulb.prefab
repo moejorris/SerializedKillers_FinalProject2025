@@ -1662,7 +1662,7 @@ MonoBehaviour:
   unlitBulbColor: {fileID: 2100000, guid: 617021ae713a8214593229571cc2fa4a, type: 2}
   idleAlertRange: 4
   blindFollowRange: 8
-  visionConeLength: 26
+  visionConeLength: 20
   visionConeWidth: 30
   playerLayer:
     serializedVersion: 2
@@ -1815,7 +1815,7 @@ MonoBehaviour:
     m_NumAlphaKeys: 2
   scaredFollowRange: 12
   scaredAttackTimer: 5
-  teleportTimer: 3
+  shadowAttackTimer: 8
   shadowClone: {fileID: 9103344086761907209, guid: d64e1d8752b6ec94580d2f62d6d884e9, type: 3}
   invisible: 0
   lightAnimator: {fileID: 0}

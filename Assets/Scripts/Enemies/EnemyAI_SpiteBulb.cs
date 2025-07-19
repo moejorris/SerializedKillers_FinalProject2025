@@ -235,7 +235,7 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
                 }
             }
 
-            if (!behaviorActive)
+            if (!behaviorActive && PlayerVisible()) // so it can't do it if player far
             {
                 shadowAttackTimer -= Time.deltaTime;
                 if (shadowAttackTimer <= 0)

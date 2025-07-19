@@ -72,7 +72,7 @@ public class TutorialManager : MonoBehaviour
     {
         if (tutorialFinished) return;
 
-        if (jumpAction.action.WasPerformedThisFrame() || Input.GetMouseButtonDown(0))
+        if (jumpAction.action.WasPerformedThisFrame())
         {
             if (continueAvailable)
             {
