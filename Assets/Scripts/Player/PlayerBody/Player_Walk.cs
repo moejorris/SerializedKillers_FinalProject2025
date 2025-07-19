@@ -46,7 +46,14 @@ public class Player_Walk : MonoBehaviour, IPlayerMover
         if (newWalkSpeed < 0.1f) return Vector3.zero;
 
         //Velocity Vector Change
-        return _walkVelocity = Vector3.ProjectOnPlane(PlayerController.instance.MovementMachine.ForwardDirection, PlayerController.instance.MovementMachine.GroundInformation.normal).normalized * newWalkSpeed;
+        if (PlayerController.instance.MovementMachine.isGrounded)
+        {
+            _walkVelocity = Vector3.ProjectOnPlane(PlayerController.instance.MovementMachine.ForwardDirection, PlayerController.instance.MovementMachine.GroundInformation.normal).normalized * newWalkSpeed;
+        }
+        else _walkVelocity = PlayerController.instance.MovementMachine.ForwardDirection.normalized * newWalkSpeed;
+
+
+        return _walkVelocity;
     }
 
     Vector3 IntendedMoveDirection()

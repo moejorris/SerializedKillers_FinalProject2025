@@ -12,7 +12,7 @@ public class Player_Gravity : MonoBehaviour, IPlayerMover
     bool _groundedPreviousFrame; //if the character controller was grounded in the previous frame relative to this script;
 
     public float GravityAcceleration { get => acceleration * gravityScale; }
-
+    public float CurrentGravity { get => _currentGravity;}
     public Action PlayerJustLanded; //jump script listens to this and when it goes off it resets the amount of jumps
 
     void OnEnable()
@@ -29,7 +29,7 @@ public class Player_Gravity : MonoBehaviour, IPlayerMover
             PlayerJustLanded();
             _currentGravity = 0;
         }
-        else if (PlayerController.instance.MovementMachine.GroundInformation.collider == null) //enemies will be set as the ground, but Grounded is still false so we don't want to apply gravity if the player isn't falling
+        else if (!PlayerController.instance.MovementMachine.isGrounded) //enemies will be set as the ground, but Grounded is still false so we don't want to apply gravity if the player isn't falling
         {
             _currentGravity += acceleration * gravityScale * PlayerController.instance.MovementMachine.DeltaTime;
         }

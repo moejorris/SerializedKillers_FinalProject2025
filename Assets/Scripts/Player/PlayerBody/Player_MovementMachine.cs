@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 //Joe Morris
@@ -151,7 +152,7 @@ public class Player_MovementMachine : MonoBehaviour
 
             case GroundCheckMethod.SphereCast:
 
-                _grounded = Physics.SphereCast(transform.position, PlayerController.instance.CharacterController.radius, Vector3.down, out _groundInfo, (PlayerController.instance.CharacterController.height / 2f) - PlayerController.instance.CharacterController.radius + 0.1f, ~0, QueryTriggerInteraction.Ignore);
+                _grounded = Physics.SphereCast(transform.position, PlayerController.instance.CharacterController.radius, Vector3.down, out _groundInfo, PlayerController.instance.CharacterController.height / 2f, ~0, QueryTriggerInteraction.Ignore);
 
                 EnemyCheck();
 
@@ -171,6 +172,30 @@ public class Player_MovementMachine : MonoBehaviour
         if (_grounded && _groundInfo.collider.transform != PlayerController.instance.ChildMover.Parent)
         {
             PlayerController.instance.ChildMover.UpdateParent(_groundInfo.collider.transform);
+        }
+
+        //Ground Snap/Y Position Correction
+        if (_grounded && PlayerController.instance.Gravity.CurrentGravity <= 0)
+        {
+            Vector3 distPosition = _groundInfo.point;
+            distPosition.y = 0;
+            Vector3 thisPosition = transform.position;
+            thisPosition.y = 0;
+
+            float radius = PlayerController.instance.CharacterController.radius;
+            float targetY = _groundInfo.point.y + (PlayerController.instance.CharacterController.height / 2f);
+            float diff = (_groundInfo.point.y + PlayerController.instance.CharacterController.height / 2f) - transform.position.y;
+            float xZdist = Vector3.Distance(distPosition, thisPosition);
+
+            if (targetY > transform.position.y && xZdist > radius / 2f)
+            {
+                // _grounded = false;
+                _groundInfo.normal = Vector3.up;
+            }
+            if (transform.position.y > targetY)
+            {
+                PlayerController.instance.CharacterController.Move(diff * Vector3.up);
+            }
         }
     }
 
@@ -199,19 +224,19 @@ public class Player_MovementMachine : MonoBehaviour
 
     void OnDrawGizmos()
     {
-        if (groundCheckMethod == GroundCheckMethod.SphereCast)
-        {
-            if (_groundInfo.point != Vector3.zero)
+        if (groundCheckMethod == GroundCheckMethod.SphereCast && PlayerController.instance != null)
             {
-                Gizmos.color = Color.red;
-                Gizmos.DrawWireSphere(_groundInfo.point, PlayerController.instance.CharacterController.radius);
+                if (_groundInfo.point != Vector3.zero)
+                {
+                    Gizmos.color = Color.red;
+                    Gizmos.DrawWireSphere(_groundInfo.point, PlayerController.instance.CharacterController.radius);
+                }
+                else if (PlayerController.instance != null)
+                {
+                    Gizmos.color = (Color.red + Color.white) / 2f;
+                    Gizmos.DrawWireSphere(transform.position - Vector3.up * PlayerController.instance.CharacterController.height / 2f, PlayerController.instance.CharacterController.radius);
+                }
             }
-            else if (PlayerController.instance != null)
-            {
-                Gizmos.color = (Color.red + Color.white) / 2f;
-                Gizmos.DrawWireSphere(transform.position - Vector3.up * PlayerController.instance.CharacterController.height / 2f, PlayerController.instance.CharacterController.radius);
-            }
-        }
     }
 }
 
