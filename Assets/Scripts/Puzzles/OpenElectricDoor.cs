@@ -8,6 +8,9 @@ public class OpenElectricDoor : MonoBehaviour, IElemental
     [Tooltip("Particle effect for blocked door")]
     [SerializeField] private ParticleSystem electricDoor;
 
+    [SerializeField] private Material glowingMat;
+    [SerializeField] private Renderer[] cords;
+
     public void InteractElement(Behavior behavior)
     {
         if (behavior == null) return;
@@ -20,6 +23,10 @@ public class OpenElectricDoor : MonoBehaviour, IElemental
     public void TakeDamage()
     {
         UnblockDoor();
+        foreach (Renderer meshy in cords)
+        {
+            meshy.material = glowingMat;
+        }
     }
 
     void UnblockDoor()
