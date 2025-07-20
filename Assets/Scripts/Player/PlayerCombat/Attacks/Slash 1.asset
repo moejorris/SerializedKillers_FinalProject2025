@@ -15,7 +15,7 @@ MonoBehaviour:
   damage: 10
   hitboxDelay: 0
   hitboxDuration: 0.1
-  animation: {fileID: -248790861026514517, guid: b776906fb39ec7244b78cd28c50e88a3, type: 3}
+  animation: {fileID: -1824250966117768383, guid: fa123b1ff1e342247b3b6f5a6b872a1f, type: 3}
   animationSpeed: 1
   overrideMotion: 0
   usesRootMotion: 0
