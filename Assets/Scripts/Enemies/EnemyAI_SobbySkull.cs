@@ -94,12 +94,14 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
         StartRolling();
         StartCoroutine("DoorCheckTimer");
 
-        if (PlayerController.instance.ScriptSteal.heldBehavior != null && PlayerController.instance.ScriptSteal.heldBehavior == heldBehavior) DeactivateBehavior();
 
         bounceTimer += Random.Range(2f, 8f);
         knockbackTimer = Random.Range(3f, 6f);
         navID = navMeshAgent.agentTypeID;
         navMeshAgent.agentTypeID = 0;
+
+        if (PlayerController.instance.ScriptSteal.heldBehavior != null && PlayerController.instance.ScriptSteal.heldBehavior == heldBehavior) Invoke("DeactivateBehavior", 0.2f);
+        //if (PlayerController.instance.ScriptSteal.heldBehavior != null && PlayerController.instance.ScriptSteal.heldBehavior == heldBehavior) DeactivateBehavior();
     }
 
     private void OnDrawGizmos()
@@ -412,7 +414,7 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
         movementState = "rolling";
         skullAnimator.Play("Fly-Idle", 0, 0);
         navMeshAgent.transform.position = skull.position;
-        StartCoroutine("AmbientWaterCheck");
+        //StartCoroutine("AmbientWaterCheck");
         PlaySound(sfx_knockback);
     }
 
@@ -449,9 +451,9 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
         rigidBody.maxLinearVelocity = 15;
         rigidBody.AddForce(skull.forward * 50 * Vector3.Distance(skull.position, playerTarget.position) * 5, ForceMode.Impulse);
 
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(0.3f);
         PlaySound(sfx_chomp);
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(0.8f);
         attacking = false;
     }
 
@@ -699,8 +701,9 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
     public override void DeactivateBehavior() // fly mode
     {
         base.DeactivateBehavior();
-        EndBounce();
         StartFlying();
+        bouncing = false;
+        navMeshAgent.agentTypeID = 0;
     }
 
     public override bool Invincible()
