@@ -15,7 +15,7 @@ public class MenuScript : MonoBehaviour
     public Animator FadeInOutAnimator;
     public Animator CameraTransformAnimator;
 
-    private void Start()
+    private void Start()    //On scene start
     {
         MainPanel.SetActive(true);
         SettingsPanel.SetActive(false);
@@ -25,12 +25,25 @@ public class MenuScript : MonoBehaviour
         Cursor.visible = true;
     }
 
-    public void StartBtn()
+    public void StartBtn()  //When start button is pressed
+    {SceneSwitcher.instance.LoadLevels();}
+
+    public void CreditsBtn() //When credits button is pressed
+    {FadeInOutAnimator.SetTrigger("FadeOutCreditsMenu");}
+
+    public void creditsPanelEnable()
     {
-        SceneSwitcher.instance.LoadLevels();
+        CameraTransformAnimator.SetBool("MoveToCredits", true);
+        MainPanel.SetActive(false);
+        SettingsPanel.SetActive(false);
+        HelpPanel.SetActive(false);
+        CreditsPanel.SetActive(true);
     }
 
-    public void HelpBtn()
+    public void HelpBtn()   //When help button is pressed
+    {FadeInOutAnimator.SetTrigger("FadeOutHelpMenu");}
+
+    public void helpPanelEnable()
     {
         MainPanel.SetActive(false);
         SettingsPanel.SetActive(false);
@@ -38,42 +51,28 @@ public class MenuScript : MonoBehaviour
         CreditsPanel.SetActive(false);
     }
 
-    public void SettingsBtn()
+    public void SettingsBtn()   //When settings button is pressed
+    { FadeInOutAnimator.SetTrigger("FadeOutSettingsMenu"); }
+
+    public void SettingsPanelEnable()
     {
         MainPanel.SetActive(false);
         SettingsPanel.SetActive(true);
         HelpPanel.SetActive(false);
         CreditsPanel.SetActive(false);
     }
+    public void BackBtn()   //When back button is pressed
+    { FadeInOutAnimator.SetTrigger("FadeOutReturn"); }
 
-    public void CreditsBtn()
+    public void homePanelEnable()
     {
-        /*
-        FadeInOutAnimator.SetTrigger("FadeOut");
-        CameraTransformAnimator.SetBool("MoveToCredits", true);
-        */
-
-        MainPanel.SetActive(false);
-        SettingsPanel.SetActive(false);
-        HelpPanel.SetActive(false);
-        CreditsPanel.SetActive(true);
-    }
-
-    public void BackBtnFade()
-    {
-        FadeInOutAnimator.SetTrigger("FadeOut");
         CameraTransformAnimator.SetBool("MoveToCredits", false);
-        BackBtn();
-    }
-
-
-    public void BackBtn()
-    {
         MainPanel.SetActive(true);
         SettingsPanel.SetActive(false);
         HelpPanel.SetActive(false);
         CreditsPanel.SetActive(false);
     }
+
     public void QuitBtn()
     {Application.Quit();}
 }
