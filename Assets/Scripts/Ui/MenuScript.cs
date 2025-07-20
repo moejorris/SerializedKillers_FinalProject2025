@@ -53,6 +53,7 @@ public class MenuScript : MonoBehaviour
 
     public void helpPanelEnable()
     {
+        CameraTransformAnimator.SetBool("MoveToHelp", true);
         MainPanel.SetActive(false);
         SettingsPanel.SetActive(false);
         HelpPanel.SetActive(true);
@@ -76,6 +77,7 @@ public class MenuScript : MonoBehaviour
     public void homePanelEnable()
     {
         CameraTransformAnimator.SetBool("MoveToCredits", false);
+        CameraTransformAnimator.SetBool("MoveToHelp", false);
         MainPanel.SetActive(true);
         SettingsPanel.SetActive(false);
         HelpPanel.SetActive(false);
