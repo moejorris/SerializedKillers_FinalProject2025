@@ -59,7 +59,7 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
     [Tooltip("Particle effect for the keyboard smash attack")]
     [SerializeField] private GameObject keyboardSmashFX; // Particle effect for the keyboard smash attack
     private ParticleSystem keyboardSmashPS; // Particle system for the keyboard smash effect
-    
+
     [Header("Shield Flash Effect")]
     [Tooltip("Shield Materials")]
     [SerializeField] private Material originalShieldMaterial;
@@ -68,14 +68,17 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
     [SerializeField] private float flashDuration = 0.2f;
     private Coroutine currentFlashCoroutine;
 
-    
+
 
     [Header("Testing Settings")]
     [Tooltip("Testing Flag")]
     [SerializeField] private bool testing = false;
-
     [Tooltip("Elemental State of the boss")]
     [SerializeField] private BossState currentState; // C rrent elemental state of the boss
+    [Header("SFX")]
+    [SerializeField] private SoundEffectSO sfx_keyboardClick;
+    [SerializeField] private SoundEffectSO sfx_keyboardSmash;
+
     private bool hasNoMoreAttacks = false;
     private Transform player; // Reference to the player's transform
     private bool lookAtPlayer = true; // Flag to control whether the boss should look at the player
@@ -86,13 +89,14 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
     private int attacksUsed = 0; // Number of attacks used by the boss
     private bool canTakeDamage = true;
     private bool isTransitioning = false;
+    private bool isDead = false; // Flag to control whether the boss is dead
     private Renderer bossRenderer; // Reference to the boss's renderer for color changes
     private List<BossState> availableStates = new List<BossState>(); // List of available states for the boss
     private List<BossState> unusedStates = new List<BossState>(); // List of unused states for the boss
     private List<GameObject> spawnedEnemies;
-   [Header("Targeting")]
-    public float TargetScore { get; set;}
-    public float TargetScoreWeight { get => 2f;} //boss is twice as likely to be targeted
+    [Header("Targeting")]
+    public float TargetScore { get; set; }
+    public float TargetScoreWeight { get => 2f; } //boss is twice as likely to be targeted
     #endregion
 
     #region Unity Methods
@@ -157,8 +161,7 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
             }
             if (Input.GetKeyDown(KeyCode.K))
             {
-                FallToGround();
-                Debug.Log("Boss falling to ground");
+                PlayKeyboardClick();
             }
         }
 
@@ -214,17 +217,17 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
         Gizmos.DrawWireSphere(transform.position, smashRadius);
     }
 
-        // Call this when the shield takes damage
+    // Call this when the shield takes damage
     private void FlashShieldRed()
     {
         if (shieldRenderer == null) return;
-        
+
         // Stop any existing flash coroutine
         if (currentFlashCoroutine != null)
         {
             StopCoroutine(currentFlashCoroutine);
         }
-        
+
         // Start new flash coroutine
         currentFlashCoroutine = StartCoroutine(FlashShieldCoroutine());
     }
@@ -233,13 +236,13 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
     {
         // Change to red material
         shieldRenderer.material = redFlashMaterial;
-        
+
         // Wait for flash duration
         yield return new WaitForSeconds(flashDuration);
-        
+
         // Change back to original material
         shieldRenderer.material = originalShieldMaterial;
-        
+
         currentFlashCoroutine = null;
     }
 
@@ -255,6 +258,11 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
         {
             Debug.LogError("Health bar reference not assigned! Please assign it in the inspector.");
         }
+    }
+
+    public void PlaySound(SoundEffectSO clip, Transform target)
+    {
+        SoundManager.instance.PlaySoundEffectOnObject(clip, transform);
     }
 
     #endregion
@@ -411,6 +419,19 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
         dir *= force;
         PlayerController.instance.ForceHandler.AddForce(dir, ForceMode.VelocityChange);
     }
+
+    public void TakeDamage(float damage = 0)
+    {
+        if (PlayerController.instance?.CombatMachine?.isAttacking == true)
+        {
+            InteractElement();
+        }
+        else
+        {
+            Debug.Log("Boss can only take damage from player attacks.");
+        }
+    }
+
     void KeyboardSmash()
     {
         // Create a physics overlap sphere to detect the player, then send the player flying away
@@ -426,12 +447,14 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
             }
         }
 
+        // Play the keyboard smash sound
+        PlayKeyboardSmash();
         // First check if the keysToSmash array is not empty
-            if (keysToSmash.Length == 0)
-            {
-                Debug.LogError("keysToSmash array is empty. Please assign keys to smash.");
-                return;
-            }
+        if (keysToSmash.Length == 0)
+        {
+            Debug.LogError("keysToSmash array is empty. Please assign keys to smash.");
+            return;
+        }
         // Choose 5 radom keys from the keysToSmash array
         List<GameObject> keysToSmashList = new List<GameObject>(keysToSmash);
         List<GameObject> keysToSmashRandom = new List<GameObject>();
@@ -530,9 +553,11 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
 
     void Die()
     {
+        if (isDead) return; // If the boss is already dead, return
         SceneSwitcher.instance.Invoke("ReturnToMenu", 2.0f);
         Debug.Log("Boss died!");
         anim.SetTrigger("Die");
+        isDead = true;
     }
 
     public void InteractElement(Behavior behavior = null)
@@ -605,13 +630,13 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
     private bool CheckElementalWeakness(Behavior behavior)
     {
         // Fix: Check behavior first, then behaviorName
-        if (behavior == null || string.IsNullOrEmpty(behavior.behaviorName)) 
+        if (behavior == null || string.IsNullOrEmpty(behavior.behaviorName))
             return false;
-        
+
         return currentState switch
         {
             BossState.Fire => behavior.behaviorName.ToLower() == "water",
-            BossState.Water => behavior.behaviorName.ToLower() == "electric", 
+            BossState.Water => behavior.behaviorName.ToLower() == "electric",
             BossState.Electric => behavior.behaviorName.ToLower() == "fire",
             BossState.None => false,
             _ => false
@@ -649,7 +674,7 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
         float healthPercentage = health / 100f; // Calculate the health percentage
         if (healthPercentage <= 0.75f && lastStateThreshold > 0.75f)
         {
-            SpawnHearts(3); 
+            SpawnHearts(3);
             lastStateThreshold = 0.75f;
             anim.SetTrigger("Change"); // Trigger the change animation
         }
@@ -853,16 +878,16 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
         Debug.Log("Boss is no longer vulnearble!");
     }
 
-    public void TakeDamage(float damage = 0)
+    void PlayKeyboardClick()
     {
-        if (PlayerController.instance?.CombatMachine?.isAttacking == true)
-        {
-            InteractElement();
-        }
-        else
-        {
-            Debug.Log("Boss can only take damage from player attacks.");
-        }
+        PlaySound(sfx_keyboardClick, transform); // Play the keyboard click sound effect
+        Debug.Log("Keyboard click sound played.");
+    }
+
+    void PlayKeyboardSmash()
+    {
+        PlaySound(sfx_keyboardSmash, transform); // Play the keyboard smash sound effect
+        Debug.Log("Keyboard smash sound played.");
     }
     #endregion
 }
