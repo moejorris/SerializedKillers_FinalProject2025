@@ -5,7 +5,8 @@ using UnityEngine.SceneManagement;
 public class SoundManager : MonoBehaviour
 {
     public static SoundManager instance;
-    
+
+    [SerializeField] private AnimationCurve spacialSoundCurve;
     public float MasterVolume { get { return masterVolume;}}
     public float SFXVolume { get { return masterVolume * sfxVolume;}}
     public float MusicVolume { get { return masterVolume * musicVolume;}}
@@ -137,6 +138,11 @@ public class SoundManager : MonoBehaviour
         AudioSource source = audioObject.AddComponent<AudioSource>();
         source.loop = false;
         source.spatialBlend = spatialBlend;
+
+        source.maxDistance = 35f; // sets the max distance the audio can be heard
+        source.rolloffMode = AudioRolloffMode.Custom; // switches it from log to custom curve
+        source.SetCustomCurve(AudioSourceCurveType.CustomRolloff, spacialSoundCurve); // switches that curve to the variable in the inspector, spacialSoundCurve
+
         source.volume = sfxVolume * masterVolume * sfx.volume;
         source.pitch = sfx.usesRandomPitch ? sfx.RandomPitch * Time.timeScale : 1 * Time.timeScale;
         source.clip = sfx.SoundEffect();
