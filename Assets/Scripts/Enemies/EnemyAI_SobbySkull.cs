@@ -51,6 +51,7 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
     [SerializeField] private GameObject resistantPrefab;
 
     private int navID;
+    private bool unGrounded = false;
 
     [Header("Sobby Skull Vision")]
     [SerializeField] private float idleAlertRange;
@@ -65,6 +66,15 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
     Rigidbody rigidBody;
     //public float rollSpeed = 0.2f;
     //public float rollCycle = 0;
+
+    [Header("SFX")]
+    [SerializeField] private SoundEffectSO sfx_ambientWater;
+    [SerializeField] private SoundEffectSO sfx_hurt;
+    [SerializeField] private SoundEffectSO sfx_knockback;
+    [SerializeField] private SoundEffectSO sfx_fwoosh;
+    [SerializeField] private SoundEffectSO sfx_lowSplash;
+    [SerializeField] private SoundEffectSO sfx_chomp;
+    [SerializeField] private SoundEffectSO sfx_flyingDamage;
 
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -188,7 +198,7 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
                 if (bounceTimer <= 0)
                 {
                     BouncyBoy();
-                    bounceTimer = Random.Range(4f,25f);
+                    bounceTimer = Random.Range(4f, 25f);
                 }
             }
         }
@@ -244,15 +254,23 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
 
                 if (!bouncing)
                 {
+                    
                     if (IsGrounded())
                     {
                         // Debug.Log("Grounded!");
                         newMaxVelocity = 3;
                         rigidBody.maxLinearVelocity = 3;
                         rigidBody.AddForce((navMeshAgent.transform.position - skull.position).normalized * rollSpeed, ForceMode.VelocityChange);
+
+                        if (unGrounded)
+                        {
+                            unGrounded = false;
+                            PlaySound(sfx_knockback);
+                        }
                     }
                     else
                     {
+                        unGrounded = true;
                         //Debug.Log("Not Grounded!");
                         newMaxVelocity = 15;
                         rigidBody.maxLinearVelocity = 15;
@@ -319,7 +337,9 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
 
     public void BouncyBoy()
     {
+        PlaySound(sfx_hurt);
         bouncing = true;
+        unGrounded = true;
 
         navMeshAgent.agentTypeID = navID;
 
@@ -327,7 +347,7 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
         Vector3 playerDir = (playerTarget.position - skull.position).normalized;
         playerDir /= 7;
         playerDir.y = 1;
-        rigidBody.AddForce(playerDir * Random.Range(6f,10f), ForceMode.VelocityChange);
+        rigidBody.AddForce(playerDir * Random.Range(6f, 10f), ForceMode.VelocityChange);
         Invoke("EndBounce", 2f);
     }
 
@@ -358,6 +378,18 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
         Die();
     }
 
+    IEnumerator AmbientWaterCheck()
+    {
+        yield return new WaitForSeconds(1);
+        //while (true)
+        //{
+        //    int random = Random.Range(0, 10);
+        //    yield return new WaitForSeconds(random);
+        //    PlaySound(sfx_ambientWater);
+        //    yield return new WaitForSeconds(60);
+        //}
+    }
+
     IEnumerator DoorCheckTimer()
     {
         while (true)
@@ -374,20 +406,26 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
     public void StartRolling()
     {
         attacking = false;
-        waterOrb.SetActive(true);
+        //waterOrb.SetActive(true);
+        waterOrb.GetComponent<Animator>().SetBool("Water", true);
         rigidBody.useGravity = true;
         movementState = "rolling";
         skullAnimator.Play("Fly-Idle", 0, 0);
         navMeshAgent.transform.position = skull.position;
+        StartCoroutine("AmbientWaterCheck");
+        PlaySound(sfx_knockback);
     }
 
     public void StartFlying()
     {
-        attackTimer = 2 + Random.Range(0f,5f);
-        waterOrb.SetActive(false);
+        attackTimer = 2 + Random.Range(0f, 5f);
+        //waterOrb.SetActive(false);
+        waterOrb.GetComponent<Animator>().SetBool("Water", false);
         rigidBody.useGravity = false;
         movementState = "flying";
         skullAnimator.Play("Idle-Fly", 0, 0);
+        StopCoroutine("AmbientWaterCheck");
+        PlaySound(sfx_lowSplash);
     }
 
     public void BeginDiveAttack()
@@ -410,7 +448,10 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
         newMaxVelocity = 15;
         rigidBody.maxLinearVelocity = 15;
         rigidBody.AddForce(skull.forward * 50 * Vector3.Distance(skull.position, playerTarget.position) * 5, ForceMode.Impulse);
-        yield return new WaitForSeconds(1);
+
+        yield return new WaitForSeconds(0.5f);
+        PlaySound(sfx_chomp);
+        yield return new WaitForSeconds(0.5f);
         attacking = false;
     }
 
@@ -516,10 +557,17 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
             {
                 knockbackTimer -= 1.5f;
             }
+
+            PlaySound(sfx_hurt);
         }
-        else if (!PlayerController.instance.MovementMachine.isGrounded)
+        else
         {
-            //Stunned()
+            PlaySound(sfx_flyingDamage);
+
+            if (!PlayerController.instance.MovementMachine.isGrounded)
+            {
+                //Stunned()
+            }
         }
 
         if (PlayerController.instance.ScriptSteal.BehaviorActive() && PlayerController.instance.ScriptSteal.GetHeldBehavior() == heldBehavior.weakness) damage *= 2f;
@@ -538,10 +586,10 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
 
         if (health <= maxHealth / 4 && !selfDestructing) //EnterSelfDestructMode();
 
-        if (health <= 0)
-        {
-            Die();
-        }
+            if (health <= 0)
+            {
+                Die();
+            }
     }
 
     void Stunned()
@@ -551,6 +599,7 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
 
     public void KnockPlayerBack(float force)
     {
+        PlaySound(sfx_knockback);
         Vector3 dir = (playerTarget.transform.position - transform.position).normalized;
         dir.y = 0.2f;
         dir *= force;
@@ -660,8 +709,8 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
         else return false;
     }
 
-    public override void PlaySound(SoundEffectSO clip)
+    public override void PlaySound(SoundEffectSO clip, bool flying = false)
     {
-        SoundManager.instance.PlaySoundEffectOnObject(clip, skull.transform);
+        SoundManager.instance.PlaySoundEffectOnObject(clip, skull);
     }
 }

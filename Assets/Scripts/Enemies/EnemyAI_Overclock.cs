@@ -85,6 +85,19 @@ public class EnemyAI_Overclock : EnemyAI_Base
     [SerializeField] float playerIceAttackSlowDuration = 5f;
     [SerializeField] float iceFieldPlayerSpeedMultiplier = 0.25f;
 
+    [Header("SFX")]
+    [SerializeField] private SoundEffectSO sfx_foosteps;
+    [SerializeField] private SoundEffectSO sfx_runsteps;
+    [SerializeField] private SoundEffectSO sfx_flamethrowerPrep;
+    [SerializeField] private SoundEffectSO sfx_flamethrowerFire;
+    [SerializeField] private SoundEffectSO sfx_dashPrep;
+    [SerializeField] private SoundEffectSO sfx_dashCharge;
+    [SerializeField] private SoundEffectSO sfx_damage;
+    [SerializeField] private SoundEffectSO sfx_iceDamage;
+    [SerializeField] private SoundEffectSO sfx_iceStrike;
+
+    [SerializeField] private SoundEffectSO sfx_iceStrikeLow;
+
     private bool spikesChangingSize = false;
 
 
@@ -362,10 +375,12 @@ public class EnemyAI_Overclock : EnemyAI_Base
 
     IEnumerator FlamethrowerAttack()
     {
+        PlaySound(sfx_flamethrowerPrep, true);
         bodyAnimator.Play("SweepATK_Start", 0, 0);
         attackOccuring = true;
         navMeshAgent.isStopped = true;
         yield return new WaitForSeconds(1.5f);
+        PlaySound(sfx_flamethrowerFire, true);
         bodyAnimator.Play("SweepATK_Sweeping", 0, 0);
 
         flamethrowerParticles.Play();
@@ -382,6 +397,8 @@ public class EnemyAI_Overclock : EnemyAI_Base
         navMeshAgent.stoppingDistance = 1;
 
         bodyAnimator.Play("Charge_Start", 0, 0);
+
+        PlaySound(sfx_dashPrep, true);
         attackState = "dash";
         navMeshAgent.isStopped = true;
     }
@@ -409,6 +426,7 @@ public class EnemyAI_Overclock : EnemyAI_Base
 
         dashAttackTimer = dashAttackLength;
         spawningFlames = true;
+        PlaySound(sfx_dashCharge, true);
         bodyAnimator.Play("Charging", 0, 0);
         navMeshAgent.isStopped = false;
         navMeshAgent.speed = dashSpeed;
@@ -443,6 +461,7 @@ public class EnemyAI_Overclock : EnemyAI_Base
     {
         yield return new WaitUntil(() => !spikesChangingSize);
 
+        PlaySound(sfx_iceStrike);
         bodyAnimator.Play("ScriptStolen", 0, 0);
 
         yield return new WaitForSeconds(1);
@@ -509,6 +528,7 @@ public class EnemyAI_Overclock : EnemyAI_Base
 
     public void DashHitCheck()
     {
+        PlaySound(sfx_iceStrikeLow);
         Debug.Log("HIT CHECK!");
 
         RaycastHit[] hits = Physics.SphereCastAll(transform.position, 1.8f, transform.forward, 2.5f, playerLayer);
@@ -862,6 +882,9 @@ public class EnemyAI_Overclock : EnemyAI_Base
 
         health -= damage;
 
+        if (behaviorActive) PlaySound(sfx_damage);
+        else PlaySound(sfx_iceDamage);
+
         if (!PlayerController.instance.ScriptSteal.BehaviorActive())
         {
             PlayerController.instance.Mana.GainMana(manaPerHit);
@@ -895,5 +918,14 @@ public class EnemyAI_Overclock : EnemyAI_Base
         StartCoroutine("SpikesAppear");
 
         ToggleParticles(flameParticles, false);
+    }
+    public override void PlaySound(SoundEffectSO clip, bool fireExclusive = false)
+    {
+        SoundManager.instance.PlaySoundEffectOnObject(clip, transform);
+    }
+    public void PlayFootstep()
+    {
+        if (attackOccuring) PlaySound(sfx_runsteps);
+        else PlaySound(sfx_foosteps);
     }
 }

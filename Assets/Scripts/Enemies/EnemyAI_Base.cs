@@ -178,7 +178,7 @@ public class EnemyAI_Base : MonoBehaviour, ITargetable, IDamageable, IComboTarge
         else return false;
     }
 
-    public virtual void PlaySound(SoundEffectSO clip)
+    public virtual void PlaySound(SoundEffectSO clip, bool ignore = false)
     {
         SoundManager.instance.PlaySoundEffectOnObject(clip, transform);
     }

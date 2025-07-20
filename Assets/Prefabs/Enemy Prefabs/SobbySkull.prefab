@@ -1023,6 +1023,7 @@ GameObject:
   - component: {fileID: 8404691653923974814}
   - component: {fileID: 2062000495834738786}
   - component: {fileID: 5120870637491948052}
+  - component: {fileID: 7958262820375225038}
   m_Layer: 4
   m_Name: WaterOrb
   m_TagString: Untagged
@@ -1041,7 +1042,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0.35, z: 0}
   m_LocalScale: {x: 0.97290623, y: 0.97290623, z: 0.97290623}
-  m_ConstrainProportionsScale: 0
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 2633819556000959380}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1119,6 +1120,28 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 1.07
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!95 &7958262820375225038
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5117382239589763894}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 9eca65d9e35a81247874aed514f3dfd9, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &5362716430709941361
 GameObject:
   m_ObjectHideFlags: 0
@@ -1327,6 +1350,13 @@ MonoBehaviour:
   obstacleLayer:
     serializedVersion: 2
     m_Bits: 1
+  sfx_ambientWater: {fileID: 11400000, guid: 66007cfa930b7a746af555ace233fbd6, type: 2}
+  sfx_hurt: {fileID: 11400000, guid: fe5de593471c5e7428672e7f5e187848, type: 2}
+  sfx_knockback: {fileID: 11400000, guid: d1ceffe75f9df54448435d0e0864d525, type: 2}
+  sfx_fwoosh: {fileID: 11400000, guid: 1147365e5d68b894d9761b913d9d96bc, type: 2}
+  sfx_lowSplash: {fileID: 11400000, guid: d990473cad81b334d86677b86c030217, type: 2}
+  sfx_chomp: {fileID: 11400000, guid: 5027f1a94b66cd04f910ecf7612dc5c2, type: 2}
+  sfx_flyingDamage: {fileID: 11400000, guid: 946ed2c65d3ff8f4ba9ea4c1975ff50d, type: 2}
 --- !u!1 &5989202259209751136
 GameObject:
   m_ObjectHideFlags: 0
@@ -1612,15 +1642,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -2057930525688658649, guid: 5e94e837338f1c14dba7a1643a99bbac, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
-      value: 63.4265
+      value: 2.6161387
       objectReference: {fileID: 0}
     - target: {fileID: -2057930525688658649, guid: 5e94e837338f1c14dba7a1643a99bbac, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: -0.000003817067
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -2057930525688658649, guid: 5e94e837338f1c14dba7a1643a99bbac, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
-      value: -91.161446
+      value: -90
       objectReference: {fileID: 0}
     - target: {fileID: -1909878425617812780, guid: 5e94e837338f1c14dba7a1643a99bbac, type: 3}
       propertyPath: m_Mesh
@@ -1632,27 +1662,27 @@ PrefabInstance:
       objectReference: {fileID: 2100000, guid: 495bca619686a5948ae8173a01be6e9f, type: 2}
     - target: {fileID: 406187729983092864, guid: 5e94e837338f1c14dba7a1643a99bbac, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
-      value: -27
+      value: -50.77321
       objectReference: {fileID: 0}
     - target: {fileID: 406187729983092864, guid: 5e94e837338f1c14dba7a1643a99bbac, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: -179.99998
+      value: 25.343687
       objectReference: {fileID: 0}
     - target: {fileID: 406187729983092864, guid: 5e94e837338f1c14dba7a1643a99bbac, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
+      value: 172.7231
       objectReference: {fileID: 0}
     - target: {fileID: 577511048837865028, guid: 5e94e837338f1c14dba7a1643a99bbac, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
-      value: -0.007803284
+      value: -0.019471694
       objectReference: {fileID: 0}
     - target: {fileID: 577511048837865028, guid: 5e94e837338f1c14dba7a1643a99bbac, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: -169.2834
+      value: -152.38693
       objectReference: {fileID: 0}
     - target: {fileID: 577511048837865028, guid: 5e94e837338f1c14dba7a1643a99bbac, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
-      value: 0.041305922
+      value: 5.3031836
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 5e94e837338f1c14dba7a1643a99bbac, type: 3}
       propertyPath: m_Name
@@ -1664,15 +1694,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2461240328512833738, guid: 5e94e837338f1c14dba7a1643a99bbac, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
-      value: -0.036807403
+      value: -0.036342677
       objectReference: {fileID: 0}
     - target: {fileID: 2461240328512833738, guid: 5e94e837338f1c14dba7a1643a99bbac, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: -61.116653
+      value: -59.831326
       objectReference: {fileID: 0}
     - target: {fileID: 2461240328512833738, guid: 5e94e837338f1c14dba7a1643a99bbac, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
-      value: -0.020304818
+      value: -0.021125345
       objectReference: {fileID: 0}
     - target: {fileID: 4279055092620941890, guid: 5e94e837338f1c14dba7a1643a99bbac, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
@@ -1689,6 +1719,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 5e94e837338f1c14dba7a1643a99bbac, type: 3}
       insertIndex: -1
       addedObject: {fileID: 5549211219282905989}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 5e94e837338f1c14dba7a1643a99bbac, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4470310384336034686}
   m_SourcePrefab: {fileID: 100100000, guid: 5e94e837338f1c14dba7a1643a99bbac, type: 3}
 --- !u!137 &4428054249594628507 stripped
 SkinnedMeshRenderer:
@@ -1727,6 +1760,21 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &4470310384336034686
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6110344007289415198}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 81078c1046f0114458007ac2e1821a6d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  footsteps: {fileID: 11400000, guid: 1147365e5d68b894d9761b913d9d96bc, type: 2}
+  enemyScript: {fileID: 5721938373866845946}
+  overclock: 0
 --- !u!4 &6883643370772397220 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 5e94e837338f1c14dba7a1643a99bbac, type: 3}
