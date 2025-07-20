@@ -139,9 +139,11 @@ public class Room : MonoBehaviour
             GameObject roomText = Instantiate(roomTextPrefab, GameObject.FindGameObjectWithTag("Canvas").transform).gameObject;
             roomText.transform.Find("Title").GetComponent<TMP_Text>().text = this.roomText;
 
-            if (transform.Find("PauseMenu") != null)
+            if (GameObject.FindGameObjectWithTag("Canvas").transform.Find("PauseMenu") != null)
             {
-                int index = transform.Find("PauseMenu").GetSiblingIndex();
+                int index = GameObject.FindGameObjectWithTag("Canvas").transform.Find("PauseMenu").GetSiblingIndex();
+                roomText.transform.SetSiblingIndex(index - 1);
+                Debug.Log(index + " this is the index!");
             }
             //if (roomType == RoomType.PuzzleRoom) roomText.transform.Find("RoomType").GetComponent<TMP_Text>().text = "[Puzzle Room]";
             //else roomText.transform.Find("RoomType").GetComponent<TMP_Text>().text = "[Combat Room]";
