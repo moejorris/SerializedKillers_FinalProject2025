@@ -2,10 +2,16 @@ using UnityEngine;
 
 public class ProjectileScript : MonoBehaviour
 {
+    [Header("Projectile Settings")]
     [SerializeField] private int damage = 10; // Damage dealt by the projectile
+    [SerializeField] private float explosionRadius = 5f; // Radius of the explosion
+
+    [Header("Projectile Components")]
     [SerializeField] private GameObject barrelExplosionFX; // Explosion effect when the projectile hits
     [SerializeField] private GameObject barrelObj;
-    [SerializeField] private float explosionRadius = 5f; // Radius of the explosion
+
+    [Header("Sound Effects")]
+    [SerializeField] private SoundEffectSO sfx_barrelExplosion; // Sound effect for the barrel explosion
     private ParticleSystem ps;
     private float lifeTime = 5f; // Lifetime of the projectile
 
@@ -25,12 +31,25 @@ public class ProjectileScript : MonoBehaviour
         }
     }
 
+    public void PlaySound(SoundEffectSO clip, Transform target)
+    {
+        SoundManager.instance.PlaySoundEffectOnObject(clip, target); // Play the sound effect on the projectile object
+        Debug.Log("Sound played: " + clip.name);
+    }
+
+    void PlayExplosionSFX()
+    {
+        PlaySound(sfx_barrelExplosion, transform); // Play the barrel explosion sound effect
+        Debug.Log("Barrel explosion sound played.");
+    }
+
     void Explode()
     {
         barrelObj.SetActive(false); // Deactivate the barrel object
         if (ps != null)
         {
             ps.Play(); // Play the explosion particle system
+            PlayExplosionSFX(); // Play the explosion sound effect
         }
         Destroy(gameObject, 1f); // Destroy the projectile after the particle system finishes
         Collider[] col = Physics.OverlapSphere(transform.position, explosionRadius, LayerMask.GetMask("Player"));

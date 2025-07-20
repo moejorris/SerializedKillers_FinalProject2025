@@ -238,8 +238,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   damage: 2
+  explosionRadius: 5
   barrelExplosionFX: {fileID: 2060686793324574890}
   barrelObj: {fileID: 2097628939520615428}
+  sfx_barrelExplosion: {fileID: 11400000, guid: 6f9db8d52c9847e47a8db6bec251bd86, type: 2}
 --- !u!1001 &2348536490216213419
 PrefabInstance:
   m_ObjectHideFlags: 0

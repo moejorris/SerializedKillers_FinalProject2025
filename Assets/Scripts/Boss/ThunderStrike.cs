@@ -14,11 +14,12 @@ public class ThunderStrike : MonoBehaviour
     [SerializeField] private Transform thunderBlast; // Position of the thunder blast
     [Tooltip("Radius of the thunder strike")]
     [SerializeField] private float radius = 2f; // Radius of the thunder strike
-    [SerializeField] private GameObject thunderFX;
-    private ParticleSystem thunderFXParticleSystem;
-
-
-
+    [Tooltip("Thunder FX Object")]
+    [SerializeField] private GameObject thunderFX; // Thunder FX prefab
+    [Header("Sound Effects")]
+    [Tooltip("Thunder Strike Sound Effect")]
+    [SerializeField] private SoundEffectSO sfx_thunderStrike; // Sound effect for the thunder strike
+    private ParticleSystem thunderFXParticleSystem; // Reference to the particle system of the thunder FX
 
     #endregion
     #region Unity Methods
@@ -47,9 +48,24 @@ public class ThunderStrike : MonoBehaviour
         if (isChasing && target != null)
         {
             Vector3 direction = target.position - transform.position; // Calculate direction to the target
-            direction.y = 0f; // Ignore vertical movement
             transform.position += direction.normalized * speed * Time.deltaTime; // Move towards the target
+            // Use a raycast ti check for the ground
+            RaycastHit hit;
+            if (Physics.Raycast(transform.position, Vector3.down, out hit, Mathf.Infinity))
+            {
+                if (hit.collider.CompareTag("Ground"))
+                {
+                    // set the y position of the thunder strike to the ground
+                    transform.position = new Vector3(transform.position.x, hit.point.y, transform.position.z);
+                }
+            }
         }
+    }
+
+    public void PlaySound(SoundEffectSO clip, Transform transform)
+    {
+        SoundManager.instance.PlaySoundEffectOnObject(clip, transform); // Play the sound effect on the thunder strike object
+        Debug.Log("Sound played: " + clip.name);
     }
 
     #endregion
@@ -63,6 +79,12 @@ public class ThunderStrike : MonoBehaviour
     void StopChasing()
     {
         isChasing = false; // Stop chasing the target
+    }
+
+    void PlayThunderSFX()
+    {
+        PlaySound(sfx_thunderStrike, transform); // Play the thunder strike sound effect
+        Debug.Log("Thunder strike sound played.");
     }
 
     void ThunderBlast()
@@ -82,7 +104,7 @@ public class ThunderStrike : MonoBehaviour
                     Debug.Log("Player has electric active, no damage taken");
                     return;
                 }
-                
+
                 if (playerHealth != null)
                 {
                     playerHealth.TakeDamage(damage);
@@ -93,12 +115,8 @@ public class ThunderStrike : MonoBehaviour
 
     void PlayThunderFX()
     {
-        // Play the thunder FX particle system
-        if (thunderFXParticleSystem != null)
-        {
-            thunderFXParticleSystem.Play();
-        }
+        // Play the thunder FX
+        thunderFXParticleSystem.Play();
     }
-
     #endregion
 }

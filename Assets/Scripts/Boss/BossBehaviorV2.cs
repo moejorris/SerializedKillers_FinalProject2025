@@ -145,7 +145,7 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
         {
             if (Input.GetKeyDown(KeyCode.P))
             {
-                anim.SetTrigger("Move");
+                Attack();
             }
             if (Input.GetKeyDown(KeyCode.O))
             {
@@ -719,7 +719,7 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
     {
         attacksUsed++;
         anim.SetTrigger("Summon"); // Trigger the summon animation
-        handAnim.SetTrigger("Hand Summon"); // Trigger the hand summon animation
+        // handAnim.SetTrigger("Hand Summon"); // Trigger the hand summon animation
         attackTimer = 0f; // Reset the attack timer
         if (attacksUsed >= maxAttacks) // If the maximum number of attacks has been used
         {

@@ -32,8 +32,7 @@ Transform:
   m_LocalPosition: {x: 0, y: 438.247, z: 0}
   m_LocalScale: {x: 0.2667449, y: 159.36255, z: 0.2667449}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 102074868378578850}
+  m_Children: []
   m_Father: {fileID: 5025052686389344318}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &6415031051644034149
@@ -282,11 +281,11 @@ Transform:
   m_GameObject: {fileID: 6900121685799780893}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.01, y: 0.001, z: 0.05}
-  m_LocalScale: {x: 1, y: 3.313739, z: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 4.0352025, y: 1.3291633, z: 3.337545}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 5392607408859993273}
+  m_Father: {fileID: 3677150868996322406}
   m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
 --- !u!198 &35858069445172865
 ParticleSystem:
@@ -542,7 +541,7 @@ ParticleSystem:
     startSize:
       serializedVersion: 2
       minMaxState: 3
-      scalar: 1
+      scalar: 0.5
       minScalar: 0.2
       maxCurve:
         serializedVersion: 2
@@ -5330,7 +5329,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 6551980472708351932, guid: 9d67d08fe45e01e4c8b0272dcc5fb16f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 102074868378578850}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9d67d08fe45e01e4c8b0272dcc5fb16f, type: 3}
 --- !u!4 &3677150868996322406 stripped
