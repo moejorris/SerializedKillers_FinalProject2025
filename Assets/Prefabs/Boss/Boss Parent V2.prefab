@@ -11192,7 +11192,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 650a24a553aa482478c91723cfeef5dc, type: 2}
+  - {fileID: 2100000, guid: 0bd247043b5d21c4f993ecfe53d19589, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -17682,8 +17682,8 @@ MonoBehaviour:
   - {fileID: 6174572842642043167}
   handAnim: {fileID: 5781754925148430033}
   keyboardSmashFX: {fileID: 331622526231180889, guid: c1bae86f690d6d240936a920bea3b77a, type: 3}
-  originalShieldMaterial: {fileID: 2100000, guid: 650a24a553aa482478c91723cfeef5dc, type: 2}
-  redFlashMaterial: {fileID: 2100000, guid: e94629539b49a8e4ba800a3e15c3c773, type: 2}
+  originalShieldMaterial: {fileID: 2100000, guid: 0bd247043b5d21c4f993ecfe53d19589, type: 2}
+  redFlashMaterial: {fileID: 2100000, guid: 75a17e23d0e19ca44ac7141e9d011bfc, type: 2}
   shieldRenderer: {fileID: 8902761865993362216}
   flashDuration: 0.2
   testing: 1
