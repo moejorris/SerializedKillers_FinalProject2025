@@ -5,7 +5,7 @@ using UnityEngine;
 public class SoundEffectSO : ScriptableObject
 {
     public List<AudioClip> soundVariations = new();
-
+    public float volume = 1f;
     public bool usesRandomPitch = false;
     [SerializeField] float minPitch = 0.9f;
     [SerializeField] float maxPitch = 1.1f;

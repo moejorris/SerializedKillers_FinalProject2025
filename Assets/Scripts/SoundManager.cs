@@ -118,10 +118,12 @@ public class SoundManager : MonoBehaviour
     public void PlaySoundEffect(SoundEffectSO sfx)
     {
         sfxSource.loop = false;
-        sfxSource.volume = sfxVolume * masterVolume;
+        sfxSource.volume = sfxVolume * masterVolume * sfx.volume;
         sfxSource.pitch = sfx.usesRandomPitch ? sfx.RandomPitch * Time.timeScale : 1 * Time.timeScale;
         sfxSource.PlayOneShot(sfx.SoundEffect());
         sfxSource.pitch = 1;
+
+        sfxSource.volume = sfxVolume * masterVolume;
     }
 
     public void PlaySoundEffectOnObject(SoundEffectSO sfx, Transform parentObject)
@@ -134,7 +136,7 @@ public class SoundManager : MonoBehaviour
 
         AudioSource source = audioObject.AddComponent<AudioSource>();
         source.loop = false;
-        source.volume = sfxVolume * masterVolume;
+        source.volume = sfxVolume * masterVolume * sfx.volume;
         source.pitch = sfx.usesRandomPitch ? sfx.RandomPitch * Time.timeScale : 1 * Time.timeScale;
         source.clip = sfx.SoundEffect();
 
