@@ -9,6 +9,7 @@ public class RotatePuzzleV2 : MonoBehaviour, IDamageable
     private bool isCorrect;
 
     private bool isRotating = false;
+    [SerializeField] private SoundEffectSO tileRotateSFX;
 
     void Awake()
     {
@@ -20,6 +21,7 @@ public class RotatePuzzleV2 : MonoBehaviour, IDamageable
         if (isRotating) return;
         anim.SetTrigger("Activate");
 
+        SoundManager.instance.PlaySoundEffectOnObject(tileRotateSFX, transform);
         isRotating = true;
 
         currentRotations++;

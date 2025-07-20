@@ -12,6 +12,7 @@ public class BreakableObject : MonoBehaviour, IDamageable
     [SerializeField] private GameObject smokeParticle;
 
     [SerializeField] private GameObject requiredToBreakFirst;
+    [SerializeField] private SoundEffectSO sfx_destroyed;
 
     public virtual void TakeDamage(float damage)
     {
@@ -47,6 +48,7 @@ public class BreakableObject : MonoBehaviour, IDamageable
                     }
                 }
 
+                if (sfx_destroyed != null) SoundManager.instance.PlaySoundEffect(sfx_destroyed);
                 Instantiate(smokeParticle, transform.position, Quaternion.identity);
                 Destroy(gameObject);
             }

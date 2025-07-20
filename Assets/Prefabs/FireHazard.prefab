@@ -117,6 +117,7 @@ MonoBehaviour:
   fireOutLayer:
     serializedVersion: 2
     m_Bits: 4294967295
+  fireDouseSFX: {fileID: 11400000, guid: 2940c9c3c0b459d4bac6ecdd710bc206, type: 2}
 --- !u!65 &3728047271126893495
 BoxCollider:
   m_ObjectHideFlags: 0

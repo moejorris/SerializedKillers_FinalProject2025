@@ -12,6 +12,7 @@ public class FireHazard : MonoBehaviour, IElemental
     private float displayTime = 0;
     public float fireDuration = 5;
     Vector3 cube = new Vector3(3.5f, 0.85f, 3.5f);
+    [SerializeField] private SoundEffectSO douseSFX;
 
     private void Start()
     {
@@ -28,6 +29,7 @@ public class FireHazard : MonoBehaviour, IElemental
     {
         StopCoroutine("HitCheckTimer");
         fireActive = false;
+        SoundManager.instance.PlaySoundEffectOnObject(douseSFX, transform);
         timeElapsed = fireDuration;
     }
 

@@ -130,6 +130,7 @@ MonoBehaviour:
   health: 1
   smokeParticle: {fileID: 2297818276127815767, guid: 19274f71c3c7dd34396871302526e574, type: 3}
   requiredToBreakFirst: {fileID: 0}
+  sfx_destroyed: {fileID: 11400000, guid: 41e4d2634a8f4664bb75f9aa86fad49f, type: 2}
 --- !u!208 &542777409781541573
 NavMeshObstacle:
   m_ObjectHideFlags: 0

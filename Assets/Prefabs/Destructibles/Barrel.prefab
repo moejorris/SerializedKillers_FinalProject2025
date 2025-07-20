@@ -142,6 +142,7 @@ MonoBehaviour:
   health: 2
   smokeParticle: {fileID: 2297818276127815767, guid: 19274f71c3c7dd34396871302526e574, type: 3}
   requiredToBreakFirst: {fileID: 0}
+  sfx_destroyed: {fileID: 11400000, guid: 0b988707af6e80d478839bfcb789c879, type: 2}
 --- !u!114 &8410513943898802826
 MonoBehaviour:
   m_ObjectHideFlags: 0

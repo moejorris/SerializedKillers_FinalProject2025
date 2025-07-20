@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c4c30e521a962a448d563e5bc3a21a1, type: 3}
+  m_Name: PotBreak
+  m_EditorClassIdentifier: 
+  soundVariations:
+  - {fileID: 8300000, guid: 65d01e735c076ce4a9159cf0f4257e7c, type: 3}
+  - {fileID: 8300000, guid: 7af74220a8f4ea4469dbdbdba6b416c2, type: 3}
+  - {fileID: 8300000, guid: 4dfb57ba7e9dacb448bf8a3e11988fdd, type: 3}
+  volume: 1
+  usesRandomPitch: 1
+  minPitch: 0.9
+  maxPitch: 1.2

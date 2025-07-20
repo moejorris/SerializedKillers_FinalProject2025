@@ -9,6 +9,7 @@ public class IceChunk : MonoBehaviour, IElemental
     public ParticleSystem snow;
     public Vector3 newScale = Vector3.one;
     public Vector3 startScale = Vector3.one;
+    [SerializeField] private SoundEffectSO iceDamaged;
     private void Start()
     {
         startScale = transform.localScale;
@@ -29,7 +30,7 @@ public class IceChunk : MonoBehaviour, IElemental
         hits--;
         newScale = new Vector3 (startScale.x, startScale.y * (hits / maxHits), startScale.z);
         transform.Find("IceChunk").GetComponent<Animator>().Play("ObjectShake", 0, 0);
-
+        if (iceDamaged != null) SoundManager.instance.PlaySoundEffect(iceDamaged);
 
         if (hits <= healthForAction)
         {

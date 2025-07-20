@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c4c30e521a962a448d563e5bc3a21a1, type: 3}
+  m_Name: IceDamaged
+  m_EditorClassIdentifier: 
+  soundVariations:
+  - {fileID: 8300000, guid: 3eba22836b30fe74385a8e2161bd480f, type: 3}
+  - {fileID: 8300000, guid: b5f2e4f76787d3f45a13211424dfc4be, type: 3}
+  - {fileID: 8300000, guid: b71aed7983c9ddc49a2d0431c0a6ff3f, type: 3}
+  volume: 0.8
+  usesRandomPitch: 1
+  minPitch: 0.8
+  maxPitch: 1.2

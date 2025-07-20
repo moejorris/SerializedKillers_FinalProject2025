@@ -6,6 +6,7 @@ public class LaserPuzzleRoom : PuzzleRoom
     public int weightsFallen = 0;
     public GameObject laser;
     [SerializeField] Animator[] gates;
+    [SerializeField] private SoundEffectSO laserSound;
 
 
     public void WeightFallen()
@@ -40,6 +41,17 @@ public class LaserPuzzleRoom : PuzzleRoom
         {
             yield return new WaitForSeconds(0.2f);
             gate.SetBool("Open", true);
+        }
+
+        StartCoroutine("LaserSFXLoop");
+    }
+
+    IEnumerator LaserSFXLoop()
+    {
+        while (true)
+        {
+            SoundManager.instance.PlaySoundEffectOnObject(laserSound, laser.transform);
+            yield return new WaitForSeconds(12);
         }
     }
 }

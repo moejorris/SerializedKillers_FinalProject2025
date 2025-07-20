@@ -21,6 +21,7 @@ public class FireSpewer : MonoBehaviour, IElemental
     private Collider playerCollider;
     [SerializeField] private LayerMask fireActiveLayer;
     [SerializeField] private LayerMask fireOutLayer;
+    [SerializeField] private SoundEffectSO fireDouseSFX;
 
     private void Start()
     {
@@ -41,7 +42,7 @@ public class FireSpewer : MonoBehaviour, IElemental
         if (!fireActive) return;
 
         health--;
-
+        SoundManager.instance.PlaySoundEffectOnObject(fireDouseSFX, transform);
         enemyExtinguishTimer = 1;
 
         Vector3 newPos = smoke.transform.localPosition;
