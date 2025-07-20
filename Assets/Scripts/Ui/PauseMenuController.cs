@@ -10,6 +10,7 @@ public class PauseMenuController : MonoBehaviour
     [SerializeField] Slider masterVolume;
     [SerializeField] Slider sfx;
     [SerializeField] Slider music;
+    [SerializeField] Slider sensitivitySlider;
 
     void Start()
     {
@@ -40,14 +41,13 @@ public class PauseMenuController : MonoBehaviour
 
         for (int i = 0; i < transform.childCount; i++)
         {
-            Debug.Log(i);
             transform.GetChild(i)?.gameObject?.SetActive(isPaused);
         }
         optionsMenu.SetActive(false);
 
         if (isPaused)
         {
-            UpdateSoundSliders();
+            UpdateSliders();
         }
 
     }
@@ -58,11 +58,15 @@ public class PauseMenuController : MonoBehaviour
         ChangePausedState();
     }
 
-    public void RestartButton()
+    public void RestartLevelButton()
     {
         SceneSwitcher.instance.RestartLevel();
     }
-
+    public void RestartCheckpointButton()
+    {
+        PlayerController.instance.Respawn.Respawn();
+        UnPause();
+    }
     public void QuitToMenu()
     {
         SceneSwitcher.instance.ReturnToMenu();
@@ -83,13 +87,16 @@ public class PauseMenuController : MonoBehaviour
 
     public void UpdateCameraSensitivity(float sensitivity)
     {
-        
+        PlayerPrefs.SetFloat("CamSens", sensitivity);
+        PlayerCamRotate.instance.gameSensitivity = sensitivity;
     }
 
-    void UpdateSoundSliders()
+    void UpdateSliders()
     {
         masterVolume.value = SoundManager.instance.GetMasterVolume();
         sfx.value = SoundManager.instance.GetSFXVolume();
         music.value = SoundManager.instance.GetMusicVolume();
+        sensitivitySlider.value = PlayerPrefs.GetFloat("CamSens");
+        PlayerCamRotate.instance.gameSensitivity = sensitivitySlider.value;
     }
 }

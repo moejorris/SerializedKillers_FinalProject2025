@@ -1,5 +1,7 @@
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class MenuScript : MonoBehaviour
 {
@@ -14,6 +16,12 @@ public class MenuScript : MonoBehaviour
     [Header("Animators")]
     public Animator FadeInOutAnimator;
     public Animator CameraTransformAnimator;
+
+    [Header("Settings")]
+    [SerializeField] Slider masterVolume;
+    [SerializeField] Slider sfx;
+    [SerializeField] Slider music;
+    [SerializeField] Slider sensitivity;
 
     private void Start()    //On scene start
     {
@@ -60,6 +68,7 @@ public class MenuScript : MonoBehaviour
         SettingsPanel.SetActive(true);
         HelpPanel.SetActive(false);
         CreditsPanel.SetActive(false);
+        UpdateSliders();
     }
     public void BackBtn()   //When back button is pressed
     { FadeInOutAnimator.SetTrigger("FadeOutReturn"); }
@@ -75,4 +84,36 @@ public class MenuScript : MonoBehaviour
 
     public void QuitBtn()
     {Application.Quit();}
+
+    void UpdateSliders()
+    {
+        masterVolume.value = SoundManager.instance.GetMasterVolume();
+        sfx.value = SoundManager.instance.GetSFXVolume();
+        music.value = SoundManager.instance.GetMusicVolume();
+
+        if (!PlayerPrefs.HasKey("CamSens"))
+        {
+            PlayerPrefs.SetFloat("CamSens", 0.5f);
+        }
+
+        sensitivity.value = PlayerPrefs.GetFloat("CamSens");
+    }
+
+    public void UpdateMasterVolume(float volume)
+    {
+        SoundManager.instance.UpdateMasterVolume(volume);
+    }
+    public void UpdateMusicVolume(float volume)
+    {
+        SoundManager.instance.UpdateMusicVolume(volume);
+    }
+    public void UpdateSoundEffectVolume(float volume)
+    {
+        SoundManager.instance.UpdateSoundEffectVolume(volume);
+    }
+
+    public void UpdateCameraSensitivity(float sens)
+    {
+        PlayerPrefs.SetFloat("CamSens", sens);
+    }
 }

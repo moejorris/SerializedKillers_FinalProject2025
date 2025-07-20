@@ -16,10 +16,11 @@ public class Player_Animation : MonoBehaviour
 
         if (foursTimer >= 0.1f) // 0.1f in between updates to emulate choppy feeling 
         {
-            playerMeshTransform.forward = PlayerController.instance.MovementMachine.ForwardDirection;
             playerMeshAnimator.SetFloat("NormalizedWalkSpeed", PlayerController.instance.Walk.GetNormalizedSpeed() * PlayerController.instance.MovementMachine.MovementMultiplier);
             foursTimer = 0;
         }
+
+        playerMeshTransform.forward = PlayerController.instance.MovementMachine.ForwardDirection; //Undid choppy rotation, it looked bad when rotating the camera
 
         playerMeshTransform.position = transform.position - Vector3.up; //tried making position choppy, but man it looked awful!
     }

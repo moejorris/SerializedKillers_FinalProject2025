@@ -39,16 +39,17 @@ public class PlayerCamRotate : MonoBehaviour
     CamMode currentMode = CamMode.Manual;
     Vector2 input;
 
+    public float gameSensitivity;
+
     void Awake()
     {
         if (instance != null)
         {
             Destroy(gameObject);
             return;
-
         }
 
-        instance = this;   
+        instance = this;
     }
 
     void Start()
@@ -58,8 +59,12 @@ public class PlayerCamRotate : MonoBehaviour
         yRot = transform.eulerAngles.y;
         camLocalPos = cameraTargetPosition.localPosition;
 
-        // Hi joe I added this because mouse go way off screen otherwise teehee sorry! - caleb
-        // Cursor.lockState = CursorLockMode.Locked;
+        if (PlayerPrefs.HasKey("CamSens"))
+        {
+            PlayerPrefs.SetFloat("CamSens", 0.5f);
+        }
+
+        gameSensitivity = PlayerPrefs.GetFloat("CamSens", 0.5f);
     }
 
     // Update is called once per frame
@@ -116,11 +121,11 @@ public class PlayerCamRotate : MonoBehaviour
 
         if (GetComponent<PlayerInput>()?.currentControlScheme != "Keyboard&Mouse") //magnitude should only exceed 1 if using the mouse
         {
-            input *= joystickSensitivity;
+            input *= (joystickSensitivity * gameSensitivity) + 1;
         }
         else
         {
-            input *= mouseSensitivity;
+            input *= (mouseSensitivity * gameSensitivity) + 1;
         }
 
         AutoCamCheck();

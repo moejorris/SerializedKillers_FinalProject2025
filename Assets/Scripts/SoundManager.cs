@@ -126,7 +126,7 @@ public class SoundManager : MonoBehaviour
         sfxSource.volume = sfxVolume * masterVolume;
     }
 
-    public void PlaySoundEffectOnObject(SoundEffectSO sfx, Transform parentObject)
+    public void PlaySoundEffectOnObject(SoundEffectSO sfx, Transform parentObject, float spatialBlend = 1f)
     {
         GameObject audioObject = new GameObject();
         audioObject.name = sfx.name;
@@ -136,6 +136,7 @@ public class SoundManager : MonoBehaviour
 
         AudioSource source = audioObject.AddComponent<AudioSource>();
         source.loop = false;
+        source.spatialBlend = spatialBlend;
         source.volume = sfxVolume * masterVolume * sfx.volume;
         source.pitch = sfx.usesRandomPitch ? sfx.RandomPitch * Time.timeScale : 1 * Time.timeScale;
         source.clip = sfx.SoundEffect();
