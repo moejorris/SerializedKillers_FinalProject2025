@@ -124,6 +124,26 @@ public class SoundManager : MonoBehaviour
         sfxSource.pitch = 1;
     }
 
+    public void PlaySoundEffectOnObject(SoundEffectSO sfx, Transform parentObject)
+    {
+        GameObject audioObject = new GameObject();
+        audioObject.name = sfx.name;
+        audioObject.transform.parent = parentObject;
+        audioObject.transform.localPosition = Vector3.zero;
+
+
+        AudioSource source = audioObject.AddComponent<AudioSource>();
+        source.loop = false;
+        source.volume = sfxVolume * masterVolume;
+        source.pitch = sfx.usesRandomPitch ? sfx.RandomPitch * Time.timeScale : 1 * Time.timeScale;
+        source.clip = sfx.SoundEffect();
+
+        source.Play();
+        Destroy(audioObject, source.clip.length + 0.1f);
+    }
+
+
+
     public void PlaySoundEffectDelayed(SoundEffectSO sfx, float delay)
     {
         StartCoroutine(DelayedSound(sfx, delay));
