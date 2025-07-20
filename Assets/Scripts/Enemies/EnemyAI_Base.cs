@@ -177,4 +177,9 @@ public class EnemyAI_Base : MonoBehaviour, ITargetable, IDamageable, IComboTarge
         if (Physics.CheckSphere(transform.position, 1.5f, gateLayer, QueryTriggerInteraction.Collide)) return true;
         else return false;
     }
+
+    public virtual void PlaySound(SoundEffectSO clip)
+    {
+        SoundManager.instance.PlaySoundEffectOnObject(clip, transform);
+    }
 }

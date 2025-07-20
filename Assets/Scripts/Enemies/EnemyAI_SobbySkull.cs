@@ -659,4 +659,9 @@ public class EnemyAI_SobbySkull : EnemyAI_Base
         if (Physics.CheckSphere(skull.position, 1.5f, gateLayer, QueryTriggerInteraction.Collide)) return true;
         else return false;
     }
+
+    public override void PlaySound(SoundEffectSO clip)
+    {
+        SoundManager.instance.PlaySoundEffectOnObject(clip, skull.transform);
+    }
 }

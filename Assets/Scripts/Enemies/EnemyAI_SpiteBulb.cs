@@ -91,6 +91,14 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
     //private bool shockwave_inProgress = false;
     [SerializeField] private Animator shockwaveAnimator => transform.Find("ShockwaveAttack").GetComponent<Animator>();
 
+    [Header("SFX")]
+    [SerializeField] private SoundEffectSO sfx_shockwaveCharge;
+    [SerializeField] private SoundEffectSO sfx_shockwaveFire;
+    [SerializeField] private SoundEffectSO sfx_damaged;
+    [SerializeField] private SoundEffectSO sfx_laserTargeting;
+    [SerializeField] private SoundEffectSO sfx_laserFire;
+    [SerializeField] private SoundEffectSO sfx_meleeSlash;
+    [SerializeField] private SoundEffectSO sfx_shadowMode;
 
     [Header("Lighting")]
     [SerializeField] private Animator lightAnimator;
@@ -401,6 +409,7 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
         bulbBodyAnimator.Play("Crouch");
         yield return new WaitForSeconds(0.5f);
         Instantiate(shadowClone, bulbBodyAnimator.transform.position, bulbBodyAnimator.transform.rotation);
+        PlaySound(sfx_shadowMode);
 
         invisible = true;
         foreach (Renderer mesh in meshes)
@@ -471,6 +480,7 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
         rotation.y += 30;
         transform.eulerAngles = rotation;
 
+        PlaySound(sfx_meleeSlash);
         MeleeHitCheck();
         yield return new WaitForSeconds(0.1f);
         foreach (SpriteRenderer slash in slashes)
@@ -580,6 +590,7 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
         rotation.y += 30;
         transform.eulerAngles = rotation;
 
+        PlaySound(sfx_meleeSlash);
         MeleeHitCheck();
         yield return new WaitForSeconds(0.1f);
         foreach (SpriteRenderer slash in slashes)
@@ -644,7 +655,9 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
 
         shockwaveAnimator.Play("ShockwaveTest");
 
+        PlaySound(sfx_shockwaveCharge);
         yield return new WaitForSeconds(1.34f);
+        PlaySound(sfx_shockwaveFire);
         ShockwaveHitCheck();
         yield return new WaitForSeconds(1.46f);
 
@@ -708,6 +721,7 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
 
         yield return new WaitForSeconds(1);
 
+        PlaySound(sfx_laserTargeting);
         laser_lineRenderer.gameObject.SetActive(true);
         laser_endSphere.SetActive(true);
         laser_inProgress = true;
@@ -720,7 +734,7 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
         laser_endSphere.SetActive(false);
         yield return new WaitForSeconds(0.3f);
 
-
+        PlaySound(sfx_laserFire);
         laserEndPoint = LaserHitCheck();
         StartCoroutine("LightningBolt");
 
@@ -970,6 +984,8 @@ public class EnemyAI_SpiteBulb : EnemyAI_Base
         }
 
         health -= damage;
+
+        PlaySound(sfx_damaged);
 
         StopCoroutine("MaterialFade");
         StartCoroutine("MaterialFade");
