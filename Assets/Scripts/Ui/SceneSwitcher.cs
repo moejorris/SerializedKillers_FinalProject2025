@@ -32,12 +32,16 @@ public class SceneSwitcher : MonoBehaviour
 
     public void LoadLevels()
     {
+        if(isTransitioning) return;
+
         Time.timeScale = 1;
         StartCoroutine(ChangeSceneFancy("Levels"));
     }
 
     public void ReturnToMenu()
     {
+        if(isTransitioning) return;
+
         Time.timeScale = 1;
         StartCoroutine(ChangeSceneFancy("MainMenu"));
 
@@ -45,6 +49,8 @@ public class SceneSwitcher : MonoBehaviour
 
     public void RestartLevel()
     {
+        if(isTransitioning) return;
+
         Time.timeScale = 1;
         StartCoroutine(ChangeSceneFancy(SceneManager.GetActiveScene().name));
     }
@@ -60,13 +66,13 @@ public class SceneSwitcher : MonoBehaviour
         {
             yield break;
         }
+        isTransitioning = true;
 
         Scene currentScene = SceneManager.GetActiveScene();
 
         loadingText.text = "Loading";
         loadingBar.value = 0f;
 
-        isTransitioning = true;
         fadeInOutPanel.blocksRaycasts = true;
         Time.timeScale = 0;
 
