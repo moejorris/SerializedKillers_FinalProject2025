@@ -48,15 +48,15 @@ public class SoundManager : MonoBehaviour
         sfxVolume = PlayerPrefs.GetFloat("SFXVolume");
         musicVolume = PlayerPrefs.GetFloat("MusicVolume");
 
-        if (masterVolume == 0)
+        if (!PlayerPrefs.HasKey("MasterVolume"))
         {
             PlayerPrefs.SetFloat("MasterVolume", 1f);
         }
-        if (sfxVolume == 0)
+        if (!PlayerPrefs.HasKey("SFXVolume"))
         {
             PlayerPrefs.SetFloat("SFXVolume", 1f);
         }
-        if (musicVolume == 0)
+        if (!PlayerPrefs.HasKey("MusicVolume"))
         {
             PlayerPrefs.SetFloat("MusicVolume", 1f);
         }
