@@ -348,7 +348,7 @@ public class TutorialManager : MonoBehaviour
 
         audioSource.Stop();
 
-        yield return new WaitForSeconds(1);
+        yield return new WaitForSeconds(0.3f);
 
         continuePressed = false;
         continueAvailable = true;
