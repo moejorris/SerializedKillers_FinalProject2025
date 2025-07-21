@@ -158,7 +158,7 @@ public class Room : MonoBehaviour
 
     public void OpenDoors(List<Animator> doors)
     {
-        if (sfx_doorOpen != null) SoundManager.instance.PlaySoundEffect(sfx_doorOpen);
+        if (sfx_doorOpen != null) SoundManager.instance.PlaySoundEffectOnObject(sfx_doorOpen, transform);
 
         foreach (Animator door in doors)
         {

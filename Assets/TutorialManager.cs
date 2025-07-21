@@ -97,6 +97,7 @@ public class TutorialManager : MonoBehaviour
         {
             if (PlayerController.instance.ScriptSteal.GetHeldBehavior() == null)
             {
+                dropScript = false;
                 exitGate.SetBool("Open", true);
                 SoundManager.instance.PlaySoundEffect(gateOpenSFX);
             }

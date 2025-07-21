@@ -16,7 +16,7 @@ public class OpenDoor : MonoBehaviour
         var playerController = PlayerController.instance;
         if (playerController != null && other == playerController.Collider)
         {
-            if (doorOpenSFX != null && !anim.GetBool("Open")) SoundManager.instance.PlaySoundEffect(doorOpenSFX);
+            if (doorOpenSFX != null && !anim.GetBool("Open")) SoundManager.instance.PlaySoundEffectOnObject(doorOpenSFX, anim.transform);
 
             anim.SetBool("Open", true);
         }
