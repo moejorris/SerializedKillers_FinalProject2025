@@ -8,7 +8,8 @@ public class Player_HealthComponent : Health
     [SerializeField] private Renderer[] meshes;
     [SerializeField] private List<Material> materialList;
     [SerializeField] float takeDamageBonusManaMultiplier = 0.5f;
-    bool isDead = false;
+    [SerializeField] Animator deathScreenAnimator;
+    public bool isDead = false;
     private void Start()
     {
         foreach (Renderer mesh in meshes)
@@ -62,7 +63,15 @@ public class Player_HealthComponent : Health
         PlayerController.instance.PlayerInput.DeactivateInput();
         PlayerController.instance.Animation.PlayDeathAnimation();
 
-        yield return new WaitForSeconds(3);
+        yield return new WaitForSeconds(2);
+
+        //set trigger
+        if (deathScreenAnimator != null)
+        {
+            deathScreenAnimator.SetTrigger("StartCutscene");
+
+            yield return new WaitForSeconds(1.38f);
+        }
 
         PlayerController.instance.Respawn.Respawn();
 
