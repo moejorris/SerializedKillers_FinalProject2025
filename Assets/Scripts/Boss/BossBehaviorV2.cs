@@ -270,6 +270,8 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
         healthBar.parent.gameObject.SetActive(true);
         anim.enabled = true;
         attackTimer = 2.5f; // Start the attack timer
+
+        SpawnWeakandStrongEnemy(); // Spawn weak and strong enemies at the start of the fight
     }
 
     void SpawnBoss()
@@ -606,10 +608,6 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
             Debug.Log("Boss teleported to: " + currentTeleportPosition.position); // Log the teleport
 
             attackTimer = 0f; // Reset the attack timer after teleporting
-            if (currentState == BossState.None)
-            {
-                SpawnWeakandStrongEnemy(); // Spawn weak and strong enemies if the boss is in the None state
-            }
         }
     }
 
