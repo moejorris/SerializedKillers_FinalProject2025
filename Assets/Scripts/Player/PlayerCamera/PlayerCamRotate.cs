@@ -121,7 +121,7 @@ public class PlayerCamRotate : MonoBehaviour
 
         if (GetComponent<PlayerInput>()?.currentControlScheme != "Keyboard&Mouse") //magnitude should only exceed 1 if using the mouse
         {
-            input *= (joystickSensitivity * gameSensitivity) + 1;
+            input *= (joystickSensitivity * 3f * gameSensitivity) + 1;
         }
         else
         {

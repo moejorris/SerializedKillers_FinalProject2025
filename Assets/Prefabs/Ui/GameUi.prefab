@@ -7048,8 +7048,8 @@ MonoBehaviour:
   sfx: {fileID: 7338635089552503533}
   music: {fileID: 5159763700218558540}
   sensitivitySlider: {fileID: 2053616384571249357}
-  pauseFirstButton: {fileID: 0}
-  settingsFirstButton: {fileID: 0}
+  pauseFirstButton: {fileID: 6090126804803151167}
+  settingsFirstButton: {fileID: 4463254806305927261}
 --- !u!1 &3707721438022404577
 GameObject:
   m_ObjectHideFlags: 0
@@ -16924,12 +16924,17 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 3945275962320559405, guid: 4a025a70fba4218419caa37f41d29030, type: 3}
   m_PrefabInstance: {fileID: 1518875093426991769}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 4463254806305927261}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &4463254806305927261 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2946632067817669316, guid: 4a025a70fba4218419caa37f41d29030, type: 3}
+  m_PrefabInstance: {fileID: 1518875093426991769}
+  m_PrefabAsset: {fileID: 0}
 --- !u!114 &5159763700218558540 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 5948983969920584405, guid: 4a025a70fba4218419caa37f41d29030, type: 3}
