@@ -239,11 +239,15 @@ public class TutorialManager : MonoBehaviour
         Sprite[] phaseSprites = GetPhaseSprites(phaseNumber);
         bool[] phasePanelSizes = GetPhaseSizes(phaseNumber);
 
+        PlayerController.instance.PlayerInput.DeactivateInput();
+
         for (int i = 0; i < phaseMessages.Length; i++)
         {
             StopCoroutine("TypePhaseText");
             yield return TypePhaseText(phaseMessages[i], phaseSprites[i], i == phaseMessages.Length - 1, phasePanelSizes[i]);
         }
+
+        PlayerController.instance.PlayerInput.ActivateInput();
     }
 
     IEnumerator TypePhaseText(string phaseStepText, Sprite sprite, bool isLast = false, bool tinyPanel = false) //this is the logic used for all phases. This is run for each element in the phaseMessages array per phase. 
