@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: OC_IceStrikeLow
   m_EditorClassIdentifier: 
   soundVariations:
-  - {fileID: 8300000, guid: 256da903db7630744a29e8fbb05fdfb9, type: 3}
+  - {fileID: 8300000, guid: 44792a8d63e30db4d86e70607e93ddb5, type: 3}
   volume: 1
   usesRandomPitch: 1
-  minPitch: 0.4
-  maxPitch: 0.8
+  minPitch: 0.6
+  maxPitch: 0.1
