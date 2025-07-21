@@ -439,6 +439,7 @@ public class EnemyAI_Overclock : EnemyAI_Base
 
         yield return new WaitForSeconds(1.2f);
 
+        PlaySound(sfx_iceStrikeLow);
         DashHitCheck();
 
         yield return new WaitForSeconds(0.5f);
@@ -528,7 +529,6 @@ public class EnemyAI_Overclock : EnemyAI_Base
 
     public void DashHitCheck()
     {
-        PlaySound(sfx_iceStrikeLow);
         Debug.Log("HIT CHECK!");
 
         RaycastHit[] hits = Physics.SphereCastAll(transform.position, 1.8f, transform.forward, 2.5f, playerLayer);
