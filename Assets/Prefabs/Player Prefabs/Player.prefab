@@ -21226,6 +21226,7 @@ MonoBehaviour:
   enemyManager: {fileID: 0}
   fireStatusEffect: {fileID: 8131181348710889001}
   fireHazardColliders: []
+  sfx_scriptSteal: {fileID: 0}
 --- !u!114 &2006342760427608853
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -21442,6 +21443,9 @@ MonoBehaviour:
   timerToggleKey: 116
   scriptActive: 0
   manaBarLerpSpeed: 0
+  sfx_scriptOn: {fileID: 11400000, guid: 0f70547558a17194792c5fdc205f747d, type: 2}
+  sfx_scriptOff: {fileID: 11400000, guid: 81a7b89001bb9b34b93a4cde5c4ec641, type: 2}
+  sfx_manaHum: {fileID: 11400000, guid: ede29ae3a6ce0fc45a18adf4477ba9f7, type: 2}
 --- !u!114 &3564040541836418881
 MonoBehaviour:
   m_ObjectHideFlags: 0

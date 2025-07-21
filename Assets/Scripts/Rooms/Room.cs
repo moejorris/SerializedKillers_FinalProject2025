@@ -20,6 +20,11 @@ public class Room : MonoBehaviour
 
     public bool roomCompleted = false;
 
+    public SoundEffectSO sfx_gateOpen;
+    public SoundEffectSO sfx_gateClose;
+    public SoundEffectSO sfx_doorOpen;
+    public SoundEffectSO sfx_doorClose;
+
     [SerializeField] private GameObject roomTextPrefab;
     [SerializeField] private string roomText = "Room Title Here";
     [SerializeField] private RoomType roomType;
@@ -55,7 +60,7 @@ public class Room : MonoBehaviour
 
     public virtual void CheckEnemies()
     {
-        
+
     }
 
     public virtual void SpawnEnemy(GameObject enemy, Transform position)
@@ -153,6 +158,8 @@ public class Room : MonoBehaviour
 
     public void OpenDoors(List<Animator> doors)
     {
+        if (sfx_doorOpen != null) SoundManager.instance.PlaySoundEffect(sfx_doorOpen);
+
         foreach (Animator door in doors)
         {
             door.SetBool("Open", true);
@@ -161,6 +168,8 @@ public class Room : MonoBehaviour
 
     public void CloseDoors(List<Animator> doors)
     {
+        if (sfx_doorClose != null) SoundManager.instance.PlaySoundEffect(sfx_doorClose);
+
         foreach (Animator door in doors)
         {
             door.SetBool("Open", false);

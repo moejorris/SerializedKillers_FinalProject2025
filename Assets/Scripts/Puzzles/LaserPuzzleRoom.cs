@@ -40,6 +40,7 @@ public class LaserPuzzleRoom : PuzzleRoom
         foreach (Animator gate in gates)
         {
             yield return new WaitForSeconds(0.2f);
+            if (sfx_gateOpen != null) SoundManager.instance.PlaySoundEffectOnObject(sfx_gateOpen, gate.transform);
             gate.SetBool("Open", true);
         }
 

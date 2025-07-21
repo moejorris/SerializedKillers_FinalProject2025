@@ -3,6 +3,7 @@ using UnityEngine;
 public class OpenDoor : MonoBehaviour
 {
     private Animator anim;
+    [SerializeField] private SoundEffectSO doorOpenSFX;
 
     void Awake()
     {
@@ -15,6 +16,8 @@ public class OpenDoor : MonoBehaviour
         var playerController = PlayerController.instance;
         if (playerController != null && other == playerController.Collider)
         {
+            if (doorOpenSFX != null && !anim.GetBool("Open")) SoundManager.instance.PlaySoundEffect(doorOpenSFX);
+
             anim.SetBool("Open", true);
         }
     }

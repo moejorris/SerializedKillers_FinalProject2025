@@ -8,6 +8,10 @@ public class Lever : MonoBehaviour, IDamageable
     private bool canInteract = true;
     private InteractPopup interactPopup;
     [SerializeField] private bool startDisabled = false;
+    [SerializeField] private SoundEffectSO leverOnSFX;
+    [SerializeField] private SoundEffectSO leverOffSFX;
+    [SerializeField] private SoundEffectSO gateOpenSFX;
+    [SerializeField] private SoundEffectSO gateCloseSFX;
     private void Start()
     {
         if (transform.Find("LeverPopup") != null)
@@ -40,7 +44,19 @@ public class Lever : MonoBehaviour, IDamageable
                 col.gameObject.SetActive(!leverAnimator.GetBool("On"));
             }
 
-            Invoke("ResetInteract", 1);
+            if (leverAnimator.GetBool("On"))
+            {
+                SoundManager.instance.PlaySoundEffect(gateOpenSFX);
+                SoundManager.instance.PlaySoundEffect(leverOffSFX);
+            }
+            else
+            {
+                SoundManager.instance.PlaySoundEffect(gateCloseSFX);
+                SoundManager.instance.PlaySoundEffect(leverOnSFX);
+            }
+
+
+                Invoke("ResetInteract", 1);
         }
     }
 

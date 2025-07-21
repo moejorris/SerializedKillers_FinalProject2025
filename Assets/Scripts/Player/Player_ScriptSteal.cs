@@ -42,6 +42,9 @@ public class Player_ScriptSteal : MonoBehaviour
 
     public List<BoxCollider> fireHazardColliders;
 
+    [Header("SFX")]
+    [SerializeField] private SoundEffectSO sfx_scriptSteal;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {

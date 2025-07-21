@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using System.Collections;
 
 public class Player_Mana : MonoBehaviour
 {
@@ -34,10 +35,19 @@ public class Player_Mana : MonoBehaviour
     private RectTransform whiteManaBar => GameObject.FindGameObjectWithTag("Canvas").transform.Find("HUD/Mana/WhiteBar").GetComponent<RectTransform>();
     [SerializeField] private float manaBarLerpSpeed = 0f;
 
+    [Header("SFX")]
+    private AudioSource manaAudio;
+    [SerializeField] private SoundEffectSO sfx_scriptOn;
+    [SerializeField] private SoundEffectSO sfx_scriptOff;
+    [SerializeField] private SoundEffectSO sfx_manaHum;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         UpdateUI();
+        StartCoroutine("ManaOnLoop");
+        manaAudio = GameObject.FindGameObjectWithTag("Canvas").transform.Find("HUD/Mana").GetComponent<AudioSource>();
+        manaAudio.volume = SoundManager.instance.GetSFXVolume();
     }
 
     // Update is called once per frame
@@ -85,12 +95,18 @@ public class Player_Mana : MonoBehaviour
         if (PlayerController.instance.ScriptSteal.heldBehavior != null && currentMana > 0)
         {
             scriptActive = !scriptActive;
+
+            if (scriptActive) ScriptActivateSound();
+            else ScriptDeactivateSound();
+
             barAnimator.SetBool("Active", scriptActive);
             //PlayerController.instance.ScriptSteal.UpdateUI();
             PlayerController.instance.ScriptSteal.ApplyScriptEffects();
         }
         else
         {
+            ScriptDeactivateSound();
+
             barAnimator.SetBool("Active", false);
             scriptActive = false;
             //PlayerController.instance.ScriptSteal.UpdateUI();
@@ -134,5 +150,27 @@ public class Player_Mana : MonoBehaviour
     {
         if (usageType == UsageType.PerUse && currentMana >= generalCost || usageType == UsageType.Timer && currentMana >= 0) return true;
         else return false;
+    }
+
+    IEnumerator ManaOnLoop()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(0.5f);
+            manaAudio.pitch = Mathf.Lerp(0.8f, 1.5f, (currentMana / 100));
+            manaAudio.volume = SoundManager.instance.GetSFXVolume();
+        }
+    }
+
+    public void ScriptActivateSound()
+    {
+        SoundManager.instance.PlaySoundEffect(sfx_scriptOn);
+        manaAudio.Play();
+    }
+
+    public void ScriptDeactivateSound()
+    {
+        SoundManager.instance.PlaySoundEffect(sfx_scriptOff);
+        manaAudio.Pause();
     }
 }

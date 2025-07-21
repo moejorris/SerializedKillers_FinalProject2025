@@ -285,6 +285,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   elevator: {fileID: 8239686051638184126}
   leverTransform: {fileID: 6114264111490583774}
+  leverOnSFX: {fileID: 11400000, guid: e92f9dad12b696a45806766fe1710dc7, type: 2}
 --- !u!65 &4322647168834325687
 BoxCollider:
   m_ObjectHideFlags: 0

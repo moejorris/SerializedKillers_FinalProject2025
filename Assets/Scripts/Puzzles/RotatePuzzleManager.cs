@@ -6,6 +6,7 @@ public class RotatePuzzleManager : MonoBehaviour
     [SerializeField] private Collider[] invincibleAreas;
     public int correctRotations = 0;
     private bool complete = false;
+    [SerializeField] private SoundEffectSO gateOpenSFX;
 
     public void AddToCounter()
     {
@@ -29,6 +30,7 @@ public class RotatePuzzleManager : MonoBehaviour
             foreach (Animator anim in gates)
             {
                 anim.SetBool("Open", true);
+                SoundManager.instance.PlaySoundEffect(gateOpenSFX);
             }
 
             foreach (Collider collider in invincibleAreas)

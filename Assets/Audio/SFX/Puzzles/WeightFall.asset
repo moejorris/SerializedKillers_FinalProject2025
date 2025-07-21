@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   soundVariations:
   - {fileID: 8300000, guid: 544226f75c53fef46986ef9638a624a5, type: 3}
-  volume: 0.8
+  volume: 1.2
   usesRandomPitch: 1
-  minPitch: 0.8
-  maxPitch: 1.2
+  minPitch: 1.1
+  maxPitch: 1.4
