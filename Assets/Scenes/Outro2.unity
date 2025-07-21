@@ -617,7 +617,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &812232078
 RectTransform:
   m_ObjectHideFlags: 0
@@ -890,14 +890,27 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'The Developer is dead.
+  m_text: 'Using the very scripts he made, you fought him and won.
 
+    
 
-    Perhaps the real script was the friends we
-    made along the way.
+    And
+    your world remains. It has not, and will not, be deleted.
 
+    
 
-    Script is scrapped, my ass is tired.'
+    Because
+    you showed the Developer that you were more than a waste of storage on a hard
+    drive.
+
+    
+
+    You have soul. You have spirit.
+
+    
+
+    And now, you
+    have a castle to yourself.'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 91f653489bc49574ab6ae510cb45510d, type: 2}
   m_sharedMaterial: {fileID: 6059227041301982924, guid: 91f653489bc49574ab6ae510cb45510d, type: 2}
