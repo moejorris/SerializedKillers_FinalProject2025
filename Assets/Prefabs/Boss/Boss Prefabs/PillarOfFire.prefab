@@ -4971,6 +4971,7 @@ MonoBehaviour:
   pathSpawnInterval: 0.5
   damageInterval: 0.33
   smokeObj: {fileID: 6324751662010014592}
+  sfx_douseSFX: {fileID: 11400000, guid: 2940c9c3c0b459d4bac6ecdd710bc206, type: 2}
 --- !u!65 &8815310045910150574
 BoxCollider:
   m_ObjectHideFlags: 0

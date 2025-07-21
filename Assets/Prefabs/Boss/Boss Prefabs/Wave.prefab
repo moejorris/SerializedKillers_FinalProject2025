@@ -127,6 +127,7 @@ MonoBehaviour:
   lifetime: 1.5
   damage: 1
   speed: 30
+  sfx_waveDamage: {fileID: 11400000, guid: fe5de593471c5e7428672e7f5e187848, type: 2}
 --- !u!95 &2687517667928635455
 Animator:
   serializedVersion: 7
