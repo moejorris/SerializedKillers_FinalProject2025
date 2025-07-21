@@ -11,6 +11,7 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
     [Header("Boss Settings")]
     [Tooltip("Max health of the boss")]
     [SerializeField] private float health = 100f;
+    private float maxHealth = 100f;
     [Tooltip("Shield Health of the boss")]
     [SerializeField] private float maxShieldHealth = 30f;
     [Tooltip("Amount of damage the shield takes from the player")]
@@ -61,6 +62,8 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
     private ParticleSystem keyboardSmashPS; // Particle system for the keyboard smash effect
     [Tooltip("Particle Effect for the boss spawning in")]
     [SerializeField] private GameObject bossSpawnFX;
+    [Tooltip(" Refrence to parent object for the boss")]
+    [SerializeField] private GameObject bossParent; // Refrence to parent object for the boss
     
     private ParticleSystem bossSpawnPS; // Particle system for the boss spawning in
 
@@ -83,6 +86,7 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
     [SerializeField] private SoundEffectSO sfx_keyboardClick;
     [SerializeField] private SoundEffectSO sfx_keyboardSmash;
     private Collider bossDoor;    
+    private Collider bossTrigger;
 
     private bool hasNoMoreAttacks = false;
     private Transform player; // Reference to the player's transform
@@ -148,8 +152,12 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
         bossDoor = GameObject.FindGameObjectWithTag("BossDoor").GetComponent<Collider>();
         bossDoor.isTrigger = false;
 
+        bossTrigger = GameObject.FindGameObjectWithTag("BossTrigger").GetComponent<Collider>();
+
         bossRenderer = GetComponent<Renderer>();
+        health = maxHealth; // Initialize the health to the maximum health
         shieldHealth = maxShieldHealth; // Initialize the shield health to the maximum shield health
+        UpdateUI();
         SpawnBoss();
 
     }
@@ -222,8 +230,9 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
         attackTimer = 0f;
         lookAtPlayer = false; // Stop the boss from looking at the player
         bossDoor.isTrigger = true; // Set the boss door to be a trigger
-
-        Destroy(gameObject, 0.5f);
+        bossTrigger.enabled = true; // Enable the boss trigger to allow the player to respawn the boss
+        healthBar.parent.gameObject.SetActive(false); // Hide the health bar
+        Destroy(bossParent, 0.5f); // Destroy the boss parent object after a delay
     }
 
     private bool HasDefeatedPlayer()
@@ -648,6 +657,7 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
     void Die()
     {
         if (isDead) return; // If the boss is already dead, return
+        healthBar.parent.gameObject.SetActive(false); // Disable the health bar
         SceneSwitcher.instance.Invoke("ReturnToMenu", 2.0f);
         Debug.Log("Boss died!");
         anim.SetTrigger("Die");
@@ -829,7 +839,7 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
         {
             // Boss will play fake death animation, then reemerge then fight harder.
             Debug.Log("Boss has reached the second phase!"); // Log the second phase
-            Destroy(gameObject, 5f); // Destroy the boss after 5 seconds
+            Die(); // Call the die method to handle the boss's death
             return; // Exit the method
         }
     }

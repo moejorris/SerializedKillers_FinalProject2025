@@ -12,6 +12,7 @@ TagManager:
   - FireHazard
   - BossHealth
   - BossDoor
+  - BossTrigger
   layers:
   - Default
   - TransparentFX

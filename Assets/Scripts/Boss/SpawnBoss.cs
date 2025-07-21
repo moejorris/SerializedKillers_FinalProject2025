@@ -15,6 +15,7 @@ public class SpawnBoss : MonoBehaviour
             if (bossPrefab != null && spawnPoint != null)
             {
                 Debug.Log("Player entered the spawn area. Spawning boss..."); // Log the event
+                gameObject.GetComponent<BoxCollider>().enabled = false; // Disable the collider to prevent further spawns
                 Invoke(nameof(SpawnBossMethod), spawnDelay); // Invoke the SpawnBossMethod after the specified delay
             }
             else
@@ -28,6 +29,6 @@ public class SpawnBoss : MonoBehaviour
     {
         GameObject boss = Instantiate(bossPrefab, spawnPoint.position, Quaternion.identity); // Instantiate the boss at the spawn point
         Debug.Log("Boss spawned at " + spawnPoint.position); // Log the spawn position
-        Destroy(gameObject, 5f); // Destroy the spawn area after 5 seconds to prevent further spawns
+        hasSpawned = false; // Set the flag to let the boss respawn if the player dies and respawns
     }
 }
