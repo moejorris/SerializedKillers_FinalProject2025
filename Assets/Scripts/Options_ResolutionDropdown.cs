@@ -27,7 +27,7 @@ public class Options_ResolutionDropdown : MonoBehaviour
         int height = PlayerPrefs.GetInt("ResolutionY");
         string fullScreen = PlayerPrefs.GetString("FullscreenMode");
 
-        Screen.SetResolution(width, height, (FullScreenMode)Enum.Parse(typeof(FullScreenMode), fullScreen));
+        // Screen.SetResolution(width, height, (FullScreenMode)Enum.Parse(typeof(FullScreenMode), fullScreen));
     }
 
     void SetDefaults()
@@ -52,9 +52,9 @@ public class Options_ResolutionDropdown : MonoBehaviour
 
     void OnEnable() //We update this info every onenable to ensure the settings are accurate and in the event the user switches monitors
     {
-        InitResolutionDropdown();
+        // InitResolutionDropdown();
         InitFPSLimitDropDown();
-        InitWindowModeDropDown();
+        // InitWindowModeDropDown();
         UpdateDropdowns();
     }
 
@@ -132,17 +132,17 @@ public class Options_ResolutionDropdown : MonoBehaviour
 
     public void UpdateResolution(int index = 999)
     {
-        if (index > resolutions.Count) index = 0;
+        // if (index > resolutions.Count) index = 0;
 
-        int width = resolutions[index].width;
-        int height = resolutions[index].height;
+        // int width = resolutions[index].width;
+        // int height = resolutions[index].height;
 
-        PlayerPrefs.SetInt("ResolutionX", width);
-        PlayerPrefs.SetInt("ResolutionY", height);
+        // PlayerPrefs.SetInt("ResolutionX", width);
+        // PlayerPrefs.SetInt("ResolutionY", height);
 
-        Debug.Log(resolutions[index]);
+        // Debug.Log(resolutions[index]);
 
-        Screen.SetResolution(width, height, Screen.fullScreenMode);
+        // Screen.SetResolution(width, height, Screen.fullScreenMode);
 
     }
 
@@ -263,8 +263,8 @@ public class Options_ResolutionDropdown : MonoBehaviour
 
     public void UpdateFullscreenMode(int index)
     {
-        Screen.fullScreenMode = fullScreenModes[index];
-        PlayerPrefs.SetString("FullscreenMode", Screen.fullScreenMode.ToString());
+        // Screen.fullScreenMode = fullScreenModes[index];
+        // PlayerPrefs.SetString("FullscreenMode", Screen.fullScreenMode.ToString());
 
     }
 }
