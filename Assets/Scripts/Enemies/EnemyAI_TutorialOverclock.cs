@@ -45,6 +45,6 @@ public class EnemyAI_TutorialOverclock : EnemyAI_Overclock
     {
         base.DeactivateBehavior();
 
-        if (!tutorialManager.isRunning && behaviorActive && tutorialManager.phase < 5) tutorialManager.StartPhaseFive();
+        if (!tutorialManager.isRunning && !behaviorActive && tutorialManager.phase < 5) tutorialManager.StartPhaseFive();
     }
 }

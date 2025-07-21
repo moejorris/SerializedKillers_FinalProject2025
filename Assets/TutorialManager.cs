@@ -341,7 +341,7 @@ public class TutorialManager : MonoBehaviour
 
     IEnumerator TutorialPhase(int phaseNumber = 1)
     {
-        yield return new WaitForSeconds(1);
+        yield return new WaitForSeconds(0.3f);
 
         string[] phaseMessages = GetPhaseMessages(phaseNumber);
         Sprite[] phaseSprites = GetPhaseSprites(phaseNumber);
