@@ -2,6 +2,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 public class MenuScript : MonoBehaviour
 {
@@ -23,6 +24,12 @@ public class MenuScript : MonoBehaviour
     [SerializeField] Slider music;
     [SerializeField] Slider sensitivity;
 
+    [Header("ControllerSelectedButtons")]
+    [SerializeField] GameObject mainMenuFirstButton;
+    [SerializeField] GameObject helpFirstButton;
+    [SerializeField] GameObject creditsFirstButton;
+    [SerializeField] GameObject settingsFirstButton;
+
     private void Start()    //On scene start
     {
         MainPanel.SetActive(true);
@@ -31,6 +38,8 @@ public class MenuScript : MonoBehaviour
         CreditsPanel.SetActive(false);
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
+        EventSystem.current.SetSelectedGameObject(null);
+        EventSystem.current.SetSelectedGameObject(mainMenuFirstButton);
     }
 
     public void StartBtn()  //When start button is pressed
@@ -46,6 +55,9 @@ public class MenuScript : MonoBehaviour
         SettingsPanel.SetActive(false);
         HelpPanel.SetActive(false);
         CreditsPanel.SetActive(true);
+
+        EventSystem.current.SetSelectedGameObject(null);
+        EventSystem.current.SetSelectedGameObject(creditsFirstButton);
     }
 
     public void HelpBtn()   //When help button is pressed
@@ -58,6 +70,9 @@ public class MenuScript : MonoBehaviour
         SettingsPanel.SetActive(false);
         HelpPanel.SetActive(true);
         CreditsPanel.SetActive(false);
+
+        EventSystem.current.SetSelectedGameObject(null);
+        EventSystem.current.SetSelectedGameObject(helpFirstButton);
     }
 
     public void SettingsBtn()   //When settings button is pressed
@@ -70,6 +85,8 @@ public class MenuScript : MonoBehaviour
         HelpPanel.SetActive(false);
         CreditsPanel.SetActive(false);
         UpdateSliders();
+        EventSystem.current.SetSelectedGameObject(null);
+        EventSystem.current.SetSelectedGameObject(settingsFirstButton);
     }
     public void BackBtn()   //When back button is pressed
     { FadeInOutAnimator.SetTrigger("FadeOutReturn"); }
@@ -82,6 +99,8 @@ public class MenuScript : MonoBehaviour
         SettingsPanel.SetActive(false);
         HelpPanel.SetActive(false);
         CreditsPanel.SetActive(false);
+        EventSystem.current.SetSelectedGameObject(null);
+        EventSystem.current.SetSelectedGameObject(mainMenuFirstButton);
     }
 
     public void QuitBtn()
