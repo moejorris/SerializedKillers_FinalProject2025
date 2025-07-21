@@ -27,7 +27,9 @@ public class FireHazard : MonoBehaviour, IElemental
 
     public void PutOutFire()
     {
+        if (!fireActive) return;
         StopCoroutine("HitCheckTimer");
+        particles.Stop();
         fireActive = false;
         SoundManager.instance.PlaySoundEffectOnObject(douseSFX, transform);
         timeElapsed = fireDuration;
@@ -41,7 +43,7 @@ public class FireHazard : MonoBehaviour, IElemental
             particles.Stop();
             if (particles.particleCount <= 0)
             {
-                Destroy(gameObject);
+                Destroy(gameObject, 1);
             }
         }
 
@@ -58,7 +60,7 @@ public class FireHazard : MonoBehaviour, IElemental
         while (true)
         {
             yield return new WaitForSeconds(1f);
-            HitCheck();
+            if (fireActive) HitCheck();
         }
     }
 

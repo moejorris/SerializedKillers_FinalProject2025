@@ -43,7 +43,7 @@ ParticleSystem:
   serializedVersion: 8
   lengthInSec: 1
   simulationSpeed: 1
-  stopAction: 2
+  stopAction: 0
   cullingMode: 0
   ringBufferMode: 0
   ringBufferLoopRange: {x: 0, y: 1}
@@ -4904,3 +4904,4 @@ MonoBehaviour:
   fireEffect: {fileID: 2025842942695824325, guid: f3931ba7fbaa8d04c9d6cb80f828d482, type: 3}
   fps: 14
   fireDuration: 5
+  douseSFX: {fileID: 11400000, guid: 2940c9c3c0b459d4bac6ecdd710bc206, type: 2}

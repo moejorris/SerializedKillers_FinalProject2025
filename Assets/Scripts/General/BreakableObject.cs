@@ -22,6 +22,8 @@ public class BreakableObject : MonoBehaviour, IDamageable
 
             if (transform.GetComponent<Animator>() != null) transform.GetComponent<Animator>().Play("DestructableObject", 0, 0);
 
+            if (sfx_destroyed != null) SoundManager.instance.PlaySoundEffect(sfx_destroyed);
+
             if (health <= 0)
             {
                 if (heldItem != null)
@@ -48,7 +50,6 @@ public class BreakableObject : MonoBehaviour, IDamageable
                     }
                 }
 
-                if (sfx_destroyed != null) SoundManager.instance.PlaySoundEffect(sfx_destroyed);
                 Instantiate(smokeParticle, transform.position, Quaternion.identity);
                 Destroy(gameObject);
             }
