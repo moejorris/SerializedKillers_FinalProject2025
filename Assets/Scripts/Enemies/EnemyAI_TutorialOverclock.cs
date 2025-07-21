@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class EnemyAI_TutorialOverclock : EnemyAI_Overclock
 {
-    private TutorialManager tutorialManager => GameObject.Find("Canvas").transform.Find("TutorialManager").GetComponent<TutorialManager>();
+    private TutorialManager tutorialManager => GameObject.Find("Canvas").transform.Find("Tutorial").GetComponent<TutorialManager>();
 
     public override void Start()
     {
