@@ -21251,6 +21251,8 @@ MonoBehaviour:
   - {fileID: 855651479079340701}
   materialList: []
   takeDamageBonusManaMultiplier: 0.5
+  deathScreenAnimator: {fileID: 0}
+  isDead: 0
 --- !u!96 &3610208228449994613
 TrailRenderer:
   serializedVersion: 3
