@@ -2,15 +2,13 @@ using UnityEngine;
 
 public class IntroOutro : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public void StartGame()
     {
-        
+        SceneSwitcher.instance.LoadLevels();
     }
 
-    // Update is called once per frame
-    void Update()
+    public void MainMenu()
     {
-        
+        SceneSwitcher.instance.ReturnToMenu();
     }
 }

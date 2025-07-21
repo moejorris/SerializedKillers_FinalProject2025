@@ -43,7 +43,7 @@ public class MenuScript : MonoBehaviour
     }
 
     public void StartBtn()  //When start button is pressed
-    {SceneSwitcher.instance.LoadLevels();}
+    {SceneSwitcher.instance.LoadIntro();}
 
     public void CreditsBtn() //When credits button is pressed
     {FadeInOutAnimator.SetTrigger("FadeOutCreditsMenu");}

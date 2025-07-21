@@ -29,10 +29,29 @@ public class SceneSwitcher : MonoBehaviour
             fadeInOutPanel = GetComponentInChildren<CanvasGroup>();
         }
     }
+    
+    public void LoadIntro()
+    {
+        if(isTransitioning) return;
+
+        Time.timeScale = 1;
+        StartCoroutine(ChangeSceneFancy("Intro2"));
+    }
+
+    public void LoadOutro()
+    {
+        if(isTransitioning) return;
+        
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+
+        Time.timeScale = 1;
+        StartCoroutine(ChangeSceneFancy("Outro2"));
+    }
 
     public void LoadLevels()
     {
-        if(isTransitioning) return;
+        if (isTransitioning) return;
 
         Time.timeScale = 1;
         StartCoroutine(ChangeSceneFancy("Levels"));
@@ -41,6 +60,9 @@ public class SceneSwitcher : MonoBehaviour
     public void ReturnToMenu()
     {
         if(isTransitioning) return;
+
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
 
         Time.timeScale = 1;
         StartCoroutine(ChangeSceneFancy("MainMenu"));

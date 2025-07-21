@@ -662,7 +662,7 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
     {
         if (isDead) return; // If the boss is already dead, return
         healthBar.parent.gameObject.SetActive(false); // Disable the health bar
-        SceneSwitcher.instance.Invoke("ReturnToMenu", 2.0f);
+        SceneSwitcher.instance.Invoke("LoadOutro", 3.0f);
         Debug.Log("Boss died!");
         anim.SetTrigger("Die");
         isDead = true;

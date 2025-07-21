@@ -93,7 +93,7 @@ public class SoundManager : MonoBehaviour
     private void ChangeSong(Scene scene, LoadSceneMode mode = LoadSceneMode.Single)
     {
         if (mainMenuMusic == null && levelsMusic == null) return;
-
+        bool isIntro = false;
         musicSource.loop = true;
         musicSource.Stop();
         switch (scene.name)
@@ -106,9 +106,19 @@ public class SoundManager : MonoBehaviour
                 musicSource.clip = mainMenuMusic;
                 musicSource.Play();
                 break;
+            case "Intro2":
+                musicSource.clip = null;
+                musicSource.Play();
+                isIntro = true;
+                break;
+            case "Outro2":
+                musicSource.clip = null;
+                musicSource.Play();
+                isIntro = true;
+                break;
         }
 
-        if (!musicSource.isPlaying)
+        if (!musicSource.isPlaying && !isIntro)
         {
             Debug.LogWarning("No Music is assigned to this scene. Playing Main Menu Music instead");
             musicSource.clip = mainMenuMusic;

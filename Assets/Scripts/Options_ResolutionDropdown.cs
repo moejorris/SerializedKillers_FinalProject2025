@@ -189,10 +189,10 @@ public class Options_ResolutionDropdown : MonoBehaviour
 
         int curIndex = listAvailableStrings.IndexOf(Screen.width + "x" + Screen.height);
 
-        if (resolutionDropdown.value != curIndex)
-        {
-            resolutionDropdown.value = curIndex;
-        }
+        // if (resolutionDropdown.value != curIndex)
+        // {
+        //     resolutionDropdown.value = curIndex;
+        // }
 
         listAvailableStrings.Clear();
 
@@ -226,13 +226,13 @@ public class Options_ResolutionDropdown : MonoBehaviour
 
 
         //get current windowed mode
-        listAvailableStrings = fullscreenDropdown.options.Select(option => option.text).ToList();
-        curIndex = Array.IndexOf(fullScreenModes, Screen.fullScreenMode);
+        // listAvailableStrings = fullscreenDropdown.options.Select(option => option.text).ToList();
+        // curIndex = Array.IndexOf(fullScreenModes, Screen.fullScreenMode);
 
-        if (resolutionDropdown.value != curIndex)
-        {
-            resolutionDropdown.value = curIndex;
-        }
+        // if (resolutionDropdown.value != curIndex)
+        // {
+        //     resolutionDropdown.value = curIndex;
+        // }
     }
 
     public void UpdateVsyncUI(bool on)

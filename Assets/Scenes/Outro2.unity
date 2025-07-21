@@ -476,7 +476,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 112389201}
         m_TargetAssemblyTypeName: IntroOutro, Assembly-CSharp
-        m_MethodName: StartGame
+        m_MethodName: MainMenu
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -617,7 +617,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &812232078
 RectTransform:
   m_ObjectHideFlags: 0
@@ -732,7 +732,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 2.8966064}
-  m_SizeDelta: {x: 0, y: -5.7932}
+  m_SizeDelta: {x: 0, y: -29.2843}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1078311864
 MonoBehaviour:
@@ -754,7 +754,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Begin
+  m_text: Main Menu
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 0053a12c14c46884b80f960b29c3eb2b, type: 2}
   m_sharedMaterial: {fileID: 6059227041301982924, guid: 0053a12c14c46884b80f960b29c3eb2b, type: 2}
@@ -781,10 +781,10 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 24
+  m_fontSize: 20.15
   m_fontSizeBase: 24
   m_fontWeight: 400
-  m_enableAutoSizing: 0
+  m_enableAutoSizing: 1
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 1
@@ -890,34 +890,14 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'The Developer.
+  m_text: 'The Developer is dead.
 
 
-    The one who created you.
+    Perhaps the real script was the friends we
+    made along the way.
 
 
-    Has abandoned you
-    and your world.
-
-
-    And soon plans to delete it, as if you are worthless.
-
-
-
-
-    But
-    you are not ready to give up on your game.
-
-
-    Even if your creator has.
-
-
-    You''re
-    going to prove to him you are more.
-
-
-    You''re going to storm the corrupted
-    castle he sits atop and confront him yourself.'
+    Script is scrapped, my ass is tired.'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 91f653489bc49574ab6ae510cb45510d, type: 2}
   m_sharedMaterial: {fileID: 6059227041301982924, guid: 91f653489bc49574ab6ae510cb45510d, type: 2}
