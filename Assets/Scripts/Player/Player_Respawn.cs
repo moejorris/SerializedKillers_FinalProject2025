@@ -15,7 +15,12 @@ public class Player_Respawn : MonoBehaviour
     {
         if (respawnPoint == null) return;
 
+        //Death animation
+        PlayerController.instance.Animation.EndDeathAnimation();
+        PlayerController.instance.PlayerInput.ActivateInput();
+
         //Reset Health
+        PlayerController.instance.MovementMachine.RemoveMovementMultiplier();
         PlayerController.instance.Health.ResetHealth();
         PlayerController.instance.Health.UpdatePlayerHealth();
         PlayerController.instance.ScriptSteal.ReturnScript();

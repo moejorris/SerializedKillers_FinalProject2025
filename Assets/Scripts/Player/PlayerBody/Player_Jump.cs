@@ -81,6 +81,8 @@ public class Player_Jump : MonoBehaviour
 
         PlayerController.instance.ForceHandler.AddForce(direction.Value * value, ForceMode.VelocityChange, overrideMode);
 
+        SoundManager.instance.PlaySoundEffect(PlayerController.instance.SoundBank.GetSoundByName("JumpSound"));
+
         if (jumpSmokeParticle)
         {
             Instantiate(jumpSmokeParticle, transform.position - Vector3.up, Quaternion.Euler(Vector3.right * 90f));

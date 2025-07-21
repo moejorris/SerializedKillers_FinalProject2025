@@ -8,7 +8,7 @@ public class Player_HealthComponent : Health
     [SerializeField] private Renderer[] meshes;
     [SerializeField] private List<Material> materialList;
     [SerializeField] float takeDamageBonusManaMultiplier = 0.5f;
-
+    bool isDead = false;
     private void Start()
     {
         foreach (Renderer mesh in meshes)
@@ -49,7 +49,24 @@ public class Player_HealthComponent : Health
 
     public override void Die()
     {
+        if(isDead) return;
+        StartCoroutine(DeathSequence());
+    }
+
+    IEnumerator DeathSequence()
+    {
+        if(isDead) yield break;
+
+        isDead = true;
+
+        PlayerController.instance.PlayerInput.DeactivateInput();
+        PlayerController.instance.Animation.PlayDeathAnimation();
+
+        yield return new WaitForSeconds(3);
+
         PlayerController.instance.Respawn.Respawn();
+
+        isDead = false;
     }
 
     IEnumerator MaterialFade()

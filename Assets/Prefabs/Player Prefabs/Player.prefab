@@ -21459,6 +21459,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   onlyAllowOnePlayer: 1
+  SoundBank: {fileID: 11400000, guid: 60608ddfd8403d5499bc91b6e7c4c0f6, type: 2}
 --- !u!208 &8442324205232225776
 NavMeshObstacle:
   m_ObjectHideFlags: 0
@@ -23955,6 +23956,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: fa123b1ff1e342247b3b6f5a6b872a1f, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2176767570358612131}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: fa123b1ff1e342247b3b6f5a6b872a1f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6185731667106186766}
   m_SourcePrefab: {fileID: 100100000, guid: fa123b1ff1e342247b3b6f5a6b872a1f, type: 3}
 --- !u!1 &499500651697921162 stripped
 GameObject:
@@ -23983,6 +23987,18 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &6185731667106186766
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 499500651697921162}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1b8837f017845ad439c3ddc6b1a4849e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &983268641362904624 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: fa123b1ff1e342247b3b6f5a6b872a1f, type: 3}
@@ -24753,7 +24769,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2025842942695824325, guid: f3931ba7fbaa8d04c9d6cb80f828d482, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6919941025762659304, guid: f3931ba7fbaa8d04c9d6cb80f828d482, type: 3}
       propertyPath: m_LocalScale.x

@@ -73,6 +73,8 @@ public class Player_Dash : MonoBehaviour, IPlayerMover
 
         EnableTrail();
 
+        SoundManager.instance.PlaySoundEffect(PlayerController.instance.SoundBank.GetSoundByName("DashSound"));
+
         Vector3 forwardDir = destination - transform.position;
 
         forwardDir.y = 0;

@@ -36,6 +36,16 @@ public class Player_Animation : MonoBehaviour
         playerMeshAnimator.Play("Jump");
     }
 
+    public void PlayDeathAnimation()
+    {
+        playerMeshAnimator.SetBool("DEAD", true);
+    }
+
+    public void EndDeathAnimation()
+    {
+        playerMeshAnimator.SetBool("DEAD", false);
+    }
+
     public void PlayAirJumpAnimation()
     {
         playerMeshAnimator.Play("Air Jump");

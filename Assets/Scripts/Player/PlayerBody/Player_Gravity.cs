@@ -28,6 +28,8 @@ public class Player_Gravity : MonoBehaviour, IPlayerMover
         {
             PlayerJustLanded();
             _currentGravity = 0;
+            SoundManager.instance.PlaySoundEffect(PlayerController.instance.SoundBank.GetSoundByName("LandSound"));
+
         }
         else if (!PlayerController.instance.MovementMachine.isGrounded) //enemies will be set as the ground, but Grounded is still false so we don't want to apply gravity if the player isn't falling
         {
