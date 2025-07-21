@@ -295,7 +295,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 76c392e42b5098c458856cdf6ecaaaa1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_FirstSelected: {fileID: 0}
+  m_FirstSelected: {fileID: 733796469}
   m_sendNavigationEvents: 1
   m_DragThreshold: 10
 --- !u!4 &414066066
@@ -892,25 +892,24 @@ MonoBehaviour:
       m_Calls: []
   m_text: 'Using the very scripts he made, you fought him and won.
 
-    
 
-    And
-    your world remains. It has not, and will not, be deleted.
 
-    
+    And your
+    world remains. It has not, and will not, be deleted.
 
-    Because
-    you showed the Developer that you were more than a waste of storage on a hard
-    drive.
 
-    
 
-    You have soul. You have spirit.
+    Because you showed
+    the Developer that you were more than a waste of storage on a hard drive.
 
-    
 
-    And now, you
-    have a castle to yourself.'
+
+    You
+    have soul. You have spirit.
+
+
+
+    And now, you have a castle to yourself.'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 91f653489bc49574ab6ae510cb45510d, type: 2}
   m_sharedMaterial: {fileID: 6059227041301982924, guid: 91f653489bc49574ab6ae510cb45510d, type: 2}

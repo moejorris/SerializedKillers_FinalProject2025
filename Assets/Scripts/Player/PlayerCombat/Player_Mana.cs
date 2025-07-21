@@ -53,20 +53,25 @@ public class Player_Mana : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (currentMana == 0 && manaAudio.isPlaying)
+        {
+            manaAudio.Stop();
+        }
+
         if (manaBar.localScale.x < whiteManaBar.localScale.x)
-        {
-            float lerpScale = Mathf.Lerp(manaBar.localScale.x, whiteManaBar.localScale.x, manaBarLerpSpeed);
-            Vector3 manaBarScale = manaBar.localScale;
-            manaBarScale.x = lerpScale;
-            manaBar.localScale = manaBarScale;
-            if (manaBar.localScale.x >= whiteManaBar.localScale.x - 0.005f) manaBar.localScale = whiteManaBar.localScale;
-            manaBarLerpSpeed += (Time.deltaTime / 15f);
-        }
-        else if (manaBar.localScale.x >= whiteManaBar.localScale.x)
-        {
-            manaBar.localScale = whiteManaBar.localScale;
-            manaBarLerpSpeed = 0;
-        }
+            {
+                float lerpScale = Mathf.Lerp(manaBar.localScale.x, whiteManaBar.localScale.x, manaBarLerpSpeed);
+                Vector3 manaBarScale = manaBar.localScale;
+                manaBarScale.x = lerpScale;
+                manaBar.localScale = manaBarScale;
+                if (manaBar.localScale.x >= whiteManaBar.localScale.x - 0.005f) manaBar.localScale = whiteManaBar.localScale;
+                manaBarLerpSpeed += (Time.deltaTime / 15f);
+            }
+            else if (manaBar.localScale.x >= whiteManaBar.localScale.x)
+            {
+                manaBar.localScale = whiteManaBar.localScale;
+                manaBarLerpSpeed = 0;
+            }
 
         if (usageType == UsageType.Timer)
         {

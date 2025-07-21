@@ -31,11 +31,25 @@ public class Player_Respawn : MonoBehaviour
         if (currentRoom != null && !currentRoom.roomCompleted) currentRoom.ResetRoom(); // newly added, hopefully won't be jank
 
         //Change Position
-        
+
         TeleportPlayer(respawnPoint);
 
         //Remove Script / Status Effects
         PlayerController.instance.ScriptSteal.ReturnScript();
+
+        //reset boss
+        GameObject[] bossObjects = GameObject.FindGameObjectsWithTag("BOSS");
+
+        foreach (GameObject go in bossObjects)
+        {
+            if (go != null)
+            {
+                Destroy(go, 3f);
+            }
+        }
+
+        Collider bossDoor = GameObject.FindWithTag("BossDoor").GetComponent<Collider>();
+        bossDoor.isTrigger = true;
     }
 
     public void TeleportPlayer(Vector3 _respawnPoint)

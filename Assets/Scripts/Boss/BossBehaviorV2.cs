@@ -162,7 +162,6 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
         shieldHealth = maxShieldHealth; // Initialize the shield health to the maximum shield health
         UpdateUI();
         SpawnBoss();
-
     }
 
     void Update()
@@ -961,6 +960,9 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
 
         GameObject enemy1 = Instantiate(enemiesToSpawn[resistedEnemyIndex], enemySpawnPoints[firstSpawnIndex].position, Quaternion.identity);
         GameObject enemy2 = Instantiate(enemiesToSpawn[weaknessEnemyIndex], enemySpawnPoints[secondSpawnIndex].position, Quaternion.identity);
+
+        enemy1.tag = "BOSS";
+        enemy2.tag = "BOSS";
 
         spawnedInEnemies.Add(enemy1);
         spawnedInEnemies.Add(enemy2);

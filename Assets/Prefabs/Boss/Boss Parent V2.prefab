@@ -9475,7 +9475,7 @@ GameObject:
   - component: {fileID: 947911528412504875}
   m_Layer: 0
   m_Name: Boss Parent V2
-  m_TagString: Untagged
+  m_TagString: BOSS
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -17694,6 +17694,7 @@ MonoBehaviour:
   currentState: 0
   sfx_keyboardClick: {fileID: 11400000, guid: f76d79f4baddb054ab4e9a013696e984, type: 2}
   sfx_keyboardSmash: {fileID: 11400000, guid: 52f120c621e09de45843c272beb29631, type: 2}
+  spawnedInEnemies: []
 --- !u!114 &8307154367038906562
 MonoBehaviour:
   m_ObjectHideFlags: 0

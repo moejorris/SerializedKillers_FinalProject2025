@@ -13,6 +13,7 @@ TagManager:
   - BossHealth
   - BossDoor
   - BossTrigger
+  - BOSS
   layers:
   - Default
   - TransparentFX
