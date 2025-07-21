@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 public class PauseMenuController : MonoBehaviour
 {
@@ -11,6 +12,11 @@ public class PauseMenuController : MonoBehaviour
     [SerializeField] Slider sfx;
     [SerializeField] Slider music;
     [SerializeField] Slider sensitivitySlider;
+
+    [SerializeField] GameObject pauseFirstButton;
+    [SerializeField] GameObject settingsFirstButton;
+
+    bool isPlayerAlreadyPaused = false;
 
     void Start()
     {
@@ -45,9 +51,30 @@ public class PauseMenuController : MonoBehaviour
         }
         optionsMenu.SetActive(false);
 
+        EventSystem.current.SetSelectedGameObject(null);
+
         if (isPaused)
         {
             UpdateSliders();
+            EventSystem.current.SetSelectedGameObject(pauseFirstButton);
+
+            if (PlayerController.instance.PlayerInput.inputIsActive)
+            {
+                PlayerController.instance.PlayerInput.DeactivateInput();
+                isPlayerAlreadyPaused = false;
+            }
+            else
+            {
+                isPlayerAlreadyPaused = true;
+            }
+        }
+        else
+        {
+            if (!isPlayerAlreadyPaused)
+            {
+                PlayerController.instance.PlayerInput.ActivateInput();
+                isPlayerAlreadyPaused = false;
+            }
         }
 
     }
@@ -56,6 +83,19 @@ public class PauseMenuController : MonoBehaviour
     {
         isPaused = false;
         ChangePausedState();
+    }
+
+    public void SettingsButton()
+    {
+        EventSystem.current.SetSelectedGameObject(null);
+        EventSystem.current.SetSelectedGameObject(settingsFirstButton);
+    }
+
+    public void BackButton()
+    {
+        EventSystem.current.SetSelectedGameObject(null);
+        EventSystem.current.SetSelectedGameObject(pauseFirstButton);
+
     }
 
     public void RestartLevelButton()

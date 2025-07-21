@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 //Joe Morris
 //Use this whenever needing a reference to a player component
@@ -27,8 +29,13 @@ public class PlayerController : MonoBehaviour
     Collider _coll;
     CharacterController _controller;
     Player_RootMotion _rootMotion;
+    PlayerInput _playerInput;
+
+    [Header("Sound Bank")]
+    public SoundBankSO SoundBank;
 
     //Public Getters
+    [Header("Public Getters")]
     public Player_MovementMachine MovementMachine { get { return _movementMachine; } }
     public Player_Walk Walk { get { return _walk; } }
     public Player_Dash Dash { get { return _dash; } }
@@ -46,7 +53,7 @@ public class PlayerController : MonoBehaviour
     public Player_RootMotion RootMotion { get { return _rootMotion; } }
     public Collider Collider { get { return _coll; } }
     public CharacterController CharacterController { get { return _controller;}}
-
+    public PlayerInput PlayerInput { get { return _playerInput;}}
     void Awake()
     {
         HandleInstance();
@@ -81,5 +88,6 @@ public class PlayerController : MonoBehaviour
         _coll = GetComponent<Collider>();
         _controller = GetComponent<CharacterController>();
         _rootMotion = GetComponent<Player_RootMotion>();
+        _playerInput = GetComponent<PlayerInput>();
     }
 }
