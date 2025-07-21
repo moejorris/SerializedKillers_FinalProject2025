@@ -16,7 +16,7 @@ MonoBehaviour:
   hitboxDelay: 0.2
   hitboxDuration: 0.15
   animation: {fileID: -22504752236823208, guid: fa123b1ff1e342247b3b6f5a6b872a1f, type: 3}
-  animationSpeed: 1
+  animationSpeed: 2.5
   overrideMotion: 0
   usesRootMotion: 0
   vectorForce: {x: 0, y: 0, z: 0}

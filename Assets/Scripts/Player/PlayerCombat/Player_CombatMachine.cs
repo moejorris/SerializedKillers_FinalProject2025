@@ -48,6 +48,11 @@ public class Player_CombatMachine : MonoBehaviour
     [SerializeField] bool comboResetOnWhiff = true;
     [SerializeField] float comboManaBonusMultiplier = 0.25f;
 
+    void Start()
+    {
+        currentAnim = 1;
+    }
+
     void Update()
     {
         if (attackInput.action.WasPressedThisFrame())
@@ -75,6 +80,7 @@ public class Player_CombatMachine : MonoBehaviour
     IEnumerator Attack()
     {
         if (OutOfRangeCheck()) yield break;
+        CancelInvoke("ResetCombo");
 
         //TODO:
         //Also standard targeting method
@@ -115,9 +121,8 @@ public class Player_CombatMachine : MonoBehaviour
         HandleSound();
         HandleParticle();
 
-        CancelInvoke("AttackIsDone");
-        Invoke("AttackIsDone", attackTime * 0.75f);
-
+        yield return new WaitForSeconds(attackTime);
+        AttackIsDone();
 
         CancelInvoke("ResetCombo");
         Invoke("ResetCombo", comboResetTime + attackTime);
@@ -306,10 +311,18 @@ public class Player_CombatMachine : MonoBehaviour
 
     void HandleAnimation()
     {
+        currentAnim++;
+
+        if (currentAnim > 3)
+        {
+            currentAnim = 1;
+        }
+
         animatorOverride["AttackPlaceholder" + currentAnim] = currentAttack.animation;
         animator.runtimeAnimatorController = animatorOverride;
 
         animator.CrossFade("Attack" + currentAnim, 0.025f);
+        // animator.Play("Attack" + currentAnim);
         animator.speed = currentAttack.animationSpeed;
     }
 
@@ -333,7 +346,9 @@ public class Player_CombatMachine : MonoBehaviour
         else ResetCombo();
 
         //toggle between using anim states 1 and 2 for transitionary purposes as opposed to using one anim state for attacks
-        currentAnim = currentAnim == 1 ? 2 : 1;
+        // currentAnim = currentAnim == 1 ? 2 : 1;
+
+
     }
 
     void ResetCombo()

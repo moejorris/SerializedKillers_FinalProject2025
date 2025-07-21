@@ -16,12 +16,12 @@ MonoBehaviour:
   hitboxDelay: 0
   hitboxDuration: 0.1
   animation: {fileID: -1824250966117768383, guid: fa123b1ff1e342247b3b6f5a6b872a1f, type: 3}
-  animationSpeed: 1
+  animationSpeed: 2.5
   overrideMotion: 0
   usesRootMotion: 0
   vectorForce: {x: 0, y: 0, z: 0}
   lockRotation: 0
   knockback: 0
-  particleEffect: {fileID: 301108566982556721, guid: 35da1ca6f83118f46a7bc27de9a9c18e, type: 3}
+  particleEffect: {fileID: 7918061776453713448, guid: 7fc09d661d6898642b6a527b96bd0c78, type: 3}
   swingSound: {fileID: 11400000, guid: ec9d478dac8e19a4eaf753f1da222aa7, type: 2}
   impactSound: {fileID: 11400000, guid: d17eff48ec48814469041aee0ec167d4, type: 2}
