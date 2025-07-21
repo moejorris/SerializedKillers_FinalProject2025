@@ -148,21 +148,21 @@ MonoBehaviour:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 0
-      inSlope: 2
-      outSlope: 2
+      value: 1
+      inSlope: -2.2259934
+      outSlope: -2.2259934
       tangentMode: 0
       weightedMode: 0
       inWeight: 0
-      outWeight: 0
+      outWeight: 0.0599289
     - serializedVersion: 3
       time: 1
-      value: 1
-      inSlope: 0
-      outSlope: 0
+      value: 0
+      inSlope: -0.11948654
+      outSlope: -0.11948654
       tangentMode: 0
       weightedMode: 0
-      inWeight: 0
+      inWeight: 0.29030508
       outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
@@ -172,7 +172,7 @@ MonoBehaviour:
   musicVolume: 1
   mainMenuMusic: {fileID: 8300000, guid: af199b7b469b647438d21c4fd6833bc4, type: 3}
   levelsMusic: {fileID: 0}
-  musicSource: {fileID: 0}
+  musicSource: {fileID: 4060755858930210282}
 --- !u!1 &6363201271307581334
 GameObject:
   m_ObjectHideFlags: 0
