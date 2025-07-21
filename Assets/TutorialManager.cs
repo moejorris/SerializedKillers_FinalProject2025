@@ -45,7 +45,22 @@ public class TutorialManager : MonoBehaviour
     [SerializeField] Sprite[] phaseFourSprites;
     [SerializeField] bool[] phaseFourTinyPanel;
 
-    private int phase = 0;
+    [Header("Phase Five")]
+    [SerializeField] private string[] phaseFiveMessages;
+    [SerializeField] Sprite[] phaseFiveSprites;
+    [SerializeField] bool[] phaseFiveTinyPanel;
+
+    [Header("Phase Six")]
+    [SerializeField] private string[] phaseSixMessages;
+    [SerializeField] Sprite[] phaseSixSprites;
+    [SerializeField] bool[] phaseSixTinyPanel;
+
+    [Header("Phase Seven")]
+    [SerializeField] private string[] phaseSevenMessages;
+    [SerializeField] Sprite[] phaseSevenSprites;
+    [SerializeField] bool[] phaseSevenTinyPanel;
+
+    public int phase = 0;
     private string textToWrite;
     private bool cont = false;
     public bool isRunning = false;
@@ -60,6 +75,12 @@ public class TutorialManager : MonoBehaviour
 
     [Header("PuzzleElements")]
     [SerializeField] private Animator basementGate;
+    [SerializeField] private Animator exitGate;
+    [SerializeField] private Animator firePotGate;
+    [SerializeField] private SoundEffectSO gateOpenSFX;
+    [SerializeField] private SoundEffectSO gateCloseSFX;
+
+    private bool dropScript = false;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -71,6 +92,15 @@ public class TutorialManager : MonoBehaviour
     void Update()
     {
         if (tutorialFinished) return;
+
+        if (dropScript)
+        {
+            if (PlayerController.instance.ScriptSteal.GetHeldBehavior() == null)
+            {
+                exitGate.SetBool("Open", true);
+                SoundManager.instance.PlaySoundEffect(gateOpenSFX);
+            }
+        }
 
         if (jumpAction.action.WasPerformedThisFrame())
         {
@@ -113,12 +143,54 @@ public class TutorialManager : MonoBehaviour
         StartCoroutine(TutorialPhase(3));
         phase = 3;
     }
+
+    public void StartPhaseThreePt2()
+    {
+        if (phase >= 3) return;
+
+        StartCoroutine(TutorialPhase(3));
+        phase = 3;
+    }
+
     public void StartPhaseFour()
     {
         if (phase >= 4) return;
 
         StartCoroutine(TutorialPhase(4));
         phase = 4;
+    }
+
+    public void StartPhaseFive()
+    {
+        if (phase >= 5) return;
+
+        StartCoroutine(TutorialPhase(5));
+        phase = 5;
+    }
+
+    public void StartPhaseSix()
+    {
+        if (phase >= 6) return;
+
+        StartCoroutine(TutorialPhase(6));
+        phase = 6;
+    }
+
+    public void StartPhaseSeven()
+    {
+        if (phase >= 7) return;
+
+        StartCoroutine(TutorialPhase(7));
+        firePotGate.SetBool("Open", false);
+        SoundManager.instance.PlaySoundEffect(gateCloseSFX);
+        phase = 7;
+    }
+
+    public void StartPhaseEight()
+    {
+        exitGate.SetBool("Open", false);
+        SoundManager.instance.PlaySoundEffect(gateCloseSFX);
+        tutorialFinished = true;
     }
 
     IEnumerator ContinuePromptFlash()
@@ -163,6 +235,18 @@ public class TutorialManager : MonoBehaviour
                 arrayToReturn = phaseFourMessages;
                 break;
 
+            case 5:
+                arrayToReturn = phaseFiveMessages;
+                break;
+
+            case 6:
+                arrayToReturn = phaseSixMessages;
+                break;
+
+            case 7:
+                arrayToReturn = phaseSevenMessages;
+                break;
+
             default:
                 arrayToReturn[0] = "No array created for phase " + phaseNumber + ". Please create a new one and add it to the switch statement in GetPhaseMessages().";
                 arrayToReturn[1] = "Try again!";
@@ -194,6 +278,18 @@ public class TutorialManager : MonoBehaviour
                 arrayToReturn = phaseFourSprites;
                 break;
 
+            case 5:
+                arrayToReturn = phaseFiveSprites;
+                break;
+
+            case 6:
+                arrayToReturn = phaseSixSprites;
+                break;
+
+            case 7:
+                arrayToReturn = phaseSevenSprites;
+                break;
+
             default:
                 //No Sprite Array Created
                 break;
@@ -219,12 +315,24 @@ public class TutorialManager : MonoBehaviour
             case 3:
                 arrayToReturn = phaseThreeTinyPanel;
                 break;
+
             case 4:
                 arrayToReturn = phaseFourTinyPanel;
                 break;
 
-            default:
+            case 5:
+                arrayToReturn = phaseFiveTinyPanel;
+                break;
 
+            case 6:
+                arrayToReturn = phaseSixTinyPanel;
+                break;
+
+            case 7:
+                arrayToReturn = phaseSevenTinyPanel;
+                break;
+
+            default:
                 break;
         }
 
@@ -397,10 +505,15 @@ public class TutorialManager : MonoBehaviour
 
                 break;
             case 2:
+
                 basementGate.SetBool("Open", true);
+                SoundManager.instance.PlaySoundEffect(gateOpenSFX);
                 break;
             case 3:
                 basementCellLever.EnableLever();
+                break;
+            case 7:
+                dropScript = true;
                 break;
             default: break;
         }

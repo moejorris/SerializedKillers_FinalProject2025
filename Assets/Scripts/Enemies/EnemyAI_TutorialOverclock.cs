@@ -4,6 +4,12 @@ public class EnemyAI_TutorialOverclock : EnemyAI_Overclock
 {
     private TutorialManager tutorialManager => GameObject.Find("Canvas").transform.Find("TutorialManager").GetComponent<TutorialManager>();
 
+    public override void Start()
+    {
+        base.Start();
+        AttackCooldown(2500);
+    }
+
     public override void TakeDamage(float damage)
     {
         if (!healthBar || !whiteHealthBar || Invincible()) return; // in case no thing exists
@@ -20,7 +26,9 @@ public class EnemyAI_TutorialOverclock : EnemyAI_Overclock
             PlayerController.instance.Mana.GainMana(manaPerHit);
         }
 
-        //tutorialManager.StartPhaseTwo();
+        movementState = "stop";
+        
+        if (!tutorialManager.isRunning && behaviorActive && tutorialManager.phase < 4) tutorialManager.StartPhaseFour();
 
         StopCoroutine("MaterialFade");
         StartCoroutine("MaterialFade");
@@ -31,5 +39,12 @@ public class EnemyAI_TutorialOverclock : EnemyAI_Overclock
         {
             Die();
         }
+    }
+
+    public override void DeactivateBehavior()
+    {
+        base.DeactivateBehavior();
+
+        if (!tutorialManager.isRunning && behaviorActive && tutorialManager.phase < 5) tutorialManager.StartPhaseFive();
     }
 }

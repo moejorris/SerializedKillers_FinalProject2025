@@ -177,13 +177,14 @@ MonoBehaviour:
   playerTarget: {fileID: 0}
   attackRange: 0
   navMeshAgent: {fileID: 3646714697739182453}
-  heldBehavior: {fileID: 0}
+  heldBehavior: {fileID: 11400000, guid: 459b7ba3e2c104d48b3c3eb892dcff0b, type: 2}
   behaviorActive: 1
   selectedIcon: {fileID: 0}
   manaOnDeath: 10
   manaPerHit: 5
   maxHealth: 130
   health: 130
+  heartPrefab: {fileID: 7148735774821552614, guid: 6119c701b6ae20245841a51a34be0eb7, type: 3}
   healthBar: {fileID: 0}
   whiteHealthBar: {fileID: 0}
   meshes:
@@ -216,10 +217,10 @@ MonoBehaviour:
   visionConeWidth: 45
   playerLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 8
   obstacleLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 1
   wanderDistance: 5
   wanderLookDirection: {x: 0, y: 0, z: 0}
   preparingAttack: 0
@@ -266,6 +267,16 @@ MonoBehaviour:
   playerIsSlowedByIceAttack: 1
   playerIceAttackSlowDuration: 5
   iceFieldPlayerSpeedMultiplier: 0.25
+  sfx_foosteps: {fileID: 11400000, guid: 137da91eea1f7ae45af5998442e59e44, type: 2}
+  sfx_runsteps: {fileID: 11400000, guid: 3a3cfb1c9c4917d4b9fa8a16a376bc80, type: 2}
+  sfx_flamethrowerPrep: {fileID: 11400000, guid: 7ad32f3a5567ec74caf6ad28a1cbea84, type: 2}
+  sfx_flamethrowerFire: {fileID: 11400000, guid: 9e9c4d625ce110d44aa6236ddb870c4f, type: 2}
+  sfx_dashPrep: {fileID: 11400000, guid: 49bf5420b0b13f44dbc54f0cee5ad262, type: 2}
+  sfx_dashCharge: {fileID: 11400000, guid: 810e332a441908d4294f2a262f3ea79c, type: 2}
+  sfx_damage: {fileID: 11400000, guid: 4afb9e40803d0d540a6e7430be1633d8, type: 2}
+  sfx_iceDamage: {fileID: 11400000, guid: dc8ff370f3742874690707a2bc9b2d41, type: 2}
+  sfx_iceStrike: {fileID: 11400000, guid: 326945bbc6f3e844bb477a1777075658, type: 2}
+  sfx_iceStrikeLow: {fileID: 11400000, guid: e8c7d2cfb16b2b345b00e7331bdaf4e8, type: 2}
   testBool: 0
 --- !u!136 &7361482598505038802
 CapsuleCollider:
@@ -51061,11 +51072,11 @@ PrefabInstance:
     - target: {fileID: 6855603350235510171, guid: f1f298ed0f763834483d1ac7e48c01f5, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: 26c44cf8e9898db4fbbd74fb1d9e0b08, type: 2}
+      objectReference: {fileID: 2100000, guid: cac06872e400f8a45a483816635e4a07, type: 2}
     - target: {fileID: 6855603350235510171, guid: f1f298ed0f763834483d1ac7e48c01f5, type: 3}
       propertyPath: 'm_Materials.Array.data[1]'
       value: 
-      objectReference: {fileID: 2100000, guid: 8b4850eab3f37ef4fb0d28c278ed7bc8, type: 2}
+      objectReference: {fileID: 2100000, guid: e034fc5845e3c904da642b79ea17d20a, type: 2}
     - target: {fileID: 6952157952504523198, guid: f1f298ed0f763834483d1ac7e48c01f5, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
       value: 0.000000010136759
