@@ -471,7 +471,7 @@ Transform:
   m_GameObject: {fileID: 179641557197260100}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 13, y: -4, z: -19}
+  m_LocalPosition: {x: 10, y: -4, z: -24}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -11994,7 +11994,7 @@ Transform:
   m_GameObject: {fileID: 6201544099019379999}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -15, y: -4, z: -19}
+  m_LocalPosition: {x: -10, y: -4, z: -24}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -17581,8 +17581,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   health: 100
   maxShieldHealth: 50
-  shieldDamage: 2.5
-  vulnerableDamage: 1
+  shieldDamage: 5
+  vulnerableDamage: 2
   weaknessMultiplier: 2
   attackInterval: 10
   vulnerableDuration: 5

@@ -59,6 +59,10 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
     [Tooltip("Particle effect for the keyboard smash attack")]
     [SerializeField] private GameObject keyboardSmashFX; // Particle effect for the keyboard smash attack
     private ParticleSystem keyboardSmashPS; // Particle system for the keyboard smash effect
+    [Tooltip("Particle Effect for the boss spawning in")]
+    [SerializeField] private GameObject bossSpawnFX;
+    
+    private ParticleSystem bossSpawnPS; // Particle system for the boss spawning in
 
     [Header("Shield Flash Effect")]
     [Tooltip("Shield Materials")]
@@ -78,6 +82,7 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
     [Header("SFX")]
     [SerializeField] private SoundEffectSO sfx_keyboardClick;
     [SerializeField] private SoundEffectSO sfx_keyboardSmash;
+    private Collider bossDoor;    
 
     private bool hasNoMoreAttacks = false;
     private Transform player; // Reference to the player's transform
@@ -91,6 +96,9 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
     private bool isTransitioning = false;
     private bool isDead = false; // Flag to control whether the boss is dead
     private Renderer bossRenderer; // Reference to the boss's renderer for color changes
+    private Vector3 originalPosition;
+    private Quaternion originalRotation;
+    private bool readyToFight = false; 
     private List<BossState> availableStates = new List<BossState>(); // List of available states for the boss
     private List<BossState> unusedStates = new List<BossState>(); // List of unused states for the boss
     private List<GameObject> spawnedEnemies;
@@ -113,6 +121,11 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
         {
             Debug.LogError("Animator component not found on the boss! Make sure the boss has an Animator component attached!");
         }
+        else
+        {
+            anim.enabled = false; // Disable the animator by default
+            Debug.Log("Boss animator disabled until fight starts.");
+        }
 
         currentTeleportPosition = teleportPositions[0]; // Initialize the current teleport position to the first position in the array
         if (teleportPositions.Length == 0) // Check if teleport positions are assigned
@@ -128,19 +141,30 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
         }
 
         healthBar = GameObject.FindGameObjectWithTag("Canvas").transform.Find("BossHealth/Health").GetComponent<RectTransform>();
-        healthBar.parent.gameObject.SetActive(true);
 
         keyboardSmashPS = keyboardSmashFX.GetComponent<ParticleSystem>();
+        bossSpawnPS = bossSpawnFX.GetComponent<ParticleSystem>();
+
+        bossDoor = GameObject.FindGameObjectWithTag("BossDoor").GetComponent<Collider>();
+        bossDoor.isTrigger = false;
 
         bossRenderer = GetComponent<Renderer>();
         shieldHealth = maxShieldHealth; // Initialize the shield health to the maximum shield health
-        attackTimer = 2.5f;
+        SpawnBoss();
 
     }
 
     void Update()
     {
+        if (!readyToFight) return;
         if (player == null) return; // Exit if the player is not found
+
+        if (HasDefeatedPlayer())
+        {
+            OnPlayerDefeated();
+            return;
+        }
+
         if (testing)
         {
             if (Input.GetKeyDown(KeyCode.P))
@@ -169,7 +193,6 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
         {
             vulnerableTimer -= Time.deltaTime; // Decrease the vulnerable timer
             attackTimer = 0f; // Reset the attack timer while vulnerable
-            Debug.Log("Vulnerable Timer: " + vulnerableTimer);
             if (vulnerableTimer <= 0f) // If the vulnerable timer has reached zero
             {
                 EndVulnerable(); // End the vulnerable State
@@ -190,12 +213,35 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
                 Debug.Log("Boss is attacking in one seccond");
             }
         }
+    }
 
+    void OnPlayerDefeated()
+    {
+        Debug.Log("Player defeated!");
+        StopAllCoroutines();
+        attackTimer = 0f;
+        lookAtPlayer = false; // Stop the boss from looking at the player
+        bossDoor.isTrigger = true; // Set the boss door to be a trigger
 
+        Destroy(gameObject, 0.5f);
+    }
+
+    private bool HasDefeatedPlayer()
+    {
+        if (player == null) return false;
+
+        Player_HealthComponent playerHealth = player.GetComponent<Player_HealthComponent>();
+        if (playerHealth != null)
+        {
+            return playerHealth.isDead;
+        }
+
+        return false;
     }
 
     void LateUpdate()
     {
+        if (!readyToFight) return;
         if (player == null) return; // Exit if the player is not found
         if (!lookAtPlayer) return; // Exit if the boss should not look at the player
         Vector3 direction = player.position - transform.position; // Calculate direction to the player
@@ -204,6 +250,43 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
         transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * 5f); // Smoothly rotate towards the target rotation
     }
 
+    void StartFight()
+    {
+        Debug.Log("StartFight called");
+        readyToFight = true;
+        healthBar.parent.gameObject.SetActive(true);
+        anim.enabled = true;
+        attackTimer = 2.5f; // Start the attack timer
+    }
+
+    void SpawnBoss()
+    {
+        bossSpawnPS.Play();
+        StartCoroutine(SpawnBossCoroutine());
+    }
+
+
+    IEnumerator SpawnBossCoroutine()
+    {
+        // lerp Scale boss to 13, 0.5, 5
+        Vector3 targetScale = new Vector3(13f, 0.5f, 5f);
+        Vector3 shurnkScale = new Vector3(0.01f, 0.01f, 0.01f);
+
+        yield return null;
+        transform.localScale = shurnkScale;
+        float lerpDuration = 1f;
+        float timeElapsed = 0f;
+        Vector3 initialScale = transform.localScale;
+        while (timeElapsed < lerpDuration)
+        {
+            float t = Mathf.Clamp01(timeElapsed / lerpDuration);
+            transform.localScale = Vector3.Lerp(initialScale, targetScale, t);
+            timeElapsed += Time.deltaTime;
+            yield return null;
+        }
+        transform.localScale = targetScale;
+        StartFight();
+    }
     void OnDrawGizmosSelected()
     {
         if (player != null)
@@ -510,6 +593,10 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
             Debug.Log("Boss teleported to: " + currentTeleportPosition.position); // Log the teleport
 
             attackTimer = 0f; // Reset the attack timer after teleporting
+            if (currentState == BossState.None)
+            {
+                SpawnWeakandStrongEnemy(); // Spawn weak and strong enemies if the boss is in the None state
+            }
         }
     }
 
@@ -527,8 +614,13 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
             {
                 Vector3 startPosition = transform.position;
                 Vector3 targetPosition = hit.point + Vector3.up * 1.5f;
+
+                // Move slightly forward (in the boss's forward direction) while falling
+                Vector3 forwardOffset = transform.forward * 3f; // Adjust 2f as needed for more/less forward movement
+                targetPosition += forwardOffset;
+
                 float distanceToGround = hit.distance;
-                Debug.Log("Distnace to ground: " + distanceToGround);
+                Debug.Log("Distance to ground: " + distanceToGround);
                 float fallDuration = Mathf.Sqrt(distanceToGround / 5f);
                 float elapsedTime = 0f;
 
@@ -546,6 +638,8 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
                 }
 
                 transform.position = targetPosition;
+                originalPosition = transform.position;
+                originalRotation = transform.rotation;
                 Debug.Log("Boss landed on ground");
             }
         }
@@ -610,13 +704,14 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
             Debug.Log("Weakness detected! Damage doubled.");
         }
 
+        PlayerController.instance.Mana.GainMana(5f);
         health -= damageAmount;
         vulnAttacks++;
 
         Debug.Log("Boss took damage: " + damageAmount + ". Current health: " + health); // Log the damage taken
-
         // Trigger Animations
         anim.SetTrigger("Hit"); // Trigger the hit animation
+        StartCoroutine(ResetPositionAfterDelay(0.7f)); // Reset the boss's position and rotation after a delay
 
         UpdateUI();
 
@@ -625,6 +720,44 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
             Debug.Log("Boss has been defeated!");
             Die();
         }
+    }
+
+
+    private IEnumerator ResetPositionAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay); // Wait for specified delay
+        StartCoroutine(SmoothResetPosition()); // Start the smooth reset coroutine
+    }
+
+    private IEnumerator SmoothResetPosition()
+    {
+        Vector3 startPosition = transform.position;
+        Quaternion startRotation = transform.rotation;
+
+        float duration = 0.15f;
+        float elapsedTime = 0f;
+
+        bool wasLookingAtPlayer = lookAtPlayer; // Store the current lookAtPlayer state
+        lookAtPlayer = false; // Set lookAtPlayer to false
+
+        while (elapsedTime < duration)
+        {
+            elapsedTime += Time.deltaTime;
+            float t = elapsedTime / duration;
+            t = t * t;
+
+            transform.position = Vector3.Lerp(startPosition, originalPosition, t);
+            transform.rotation = Quaternion.Lerp(startRotation, originalRotation, t);
+
+            yield return null; // Wait for the next frame
+        }
+
+        transform.position = originalPosition;
+        transform.rotation = originalRotation;
+
+        lookAtPlayer = wasLookingAtPlayer; // Restore the original lookAtPlayer state
+
+        Debug.Log("Boss position and rotation reset to original values.");
     }
 
     private bool CheckElementalWeakness(Behavior behavior)
@@ -648,6 +781,7 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
         if (isVulnerable) return; // Exit if the boss is already vulnerable
         shieldHealth = 0; // Reset shield health
         StopAllCoroutines(); // Stop any ongoing coroutines
+        attackTimer = 0f; // Reset the attack timer
         anim.SetTrigger("Weak"); // Trigger the weak animation
         Debug.Log("Boss is about to become vulnerable!"); // Log the start of the vulnerable state
     }
@@ -665,6 +799,7 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
         anim.SetTrigger("Move"); // Trigger the move animation to teleport the boss after vulnerability ends
         shieldHealth = maxShieldHealth; // Reset shield health
         attacksUsed = 0;
+        attackTimer = 0f;
         shieldRenderer.material = originalShieldMaterial; // Reset the shield material to the original
         // Invoke("ChangeState", 2f); // Change the state after a delay
     }

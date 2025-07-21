@@ -254,6 +254,7 @@ MonoBehaviour:
   thunderBlast: {fileID: 303334430383947468}
   radius: 2
   thunderFX: {fileID: 3522630936163606358}
+  sfx_thunderStrike: {fileID: 11400000, guid: eb1132e53b85f9e41805cc8ef560a6a0, type: 2}
 --- !u!1 &6900121685799780893
 GameObject:
   m_ObjectHideFlags: 0

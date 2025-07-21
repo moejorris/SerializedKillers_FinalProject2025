@@ -12,6 +12,8 @@ public class FirePillar : MonoBehaviour, IDamageable, IElemental
     [SerializeField] private GameObject pathOfFire;
     [SerializeField] private float pathSpawnInterval = 0.5f; // Interval for spawning fire paths
     [SerializeField] private float damageInterval = 0.75f; // Interval for dealing damage to the player
+    [SerializeField] private GameObject smokeObj;
+    private ParticleSystem smokePS;
     private Animator anim; // Animator for the fire pillar
     private float pathTimer; // Timer for the fire path
     private bool isExtinguished = false; // Flag to indicate if the fire pillar is extinguished
@@ -29,6 +31,7 @@ public class FirePillar : MonoBehaviour, IDamageable, IElemental
             return; // Exit if the player is not found
         }
         anim = GetComponent<Animator>(); // Get the animator component
+        smokePS = smokeObj.GetComponent<ParticleSystem>();
     }
 
     void Update()
@@ -92,6 +95,14 @@ public class FirePillar : MonoBehaviour, IDamageable, IElemental
             damageTimer = 0f;
         }
     }
+
+    void Extinguish()
+    {
+        anim.SetTrigger("Extinguish"); // Trigger extinguish animation
+        isExtinguished = true; // Set the flag to indicate the fire pillar is extinguished
+        smokePS.Play(); // Play the smoke particle system
+        Destroy(gameObject, 0.5f); // Destroy the fire pillar after the extinguish animation
+    }
     #endregion
 
     #region Animation Event Methods
@@ -114,9 +125,7 @@ public class FirePillar : MonoBehaviour, IDamageable, IElemental
         bool hasWaterActive = scriptSteal.GetHeldBehavior() != null && scriptSteal.GetHeldBehavior().behaviorName == "water" && scriptSteal.BehaviorActive();
         if (hasWaterActive)
         {
-            anim.SetTrigger("Extinguish"); // Trigger extinguish animation
-            isExtinguished = true; // Set the flag to indicate the fire pillar is extinguished
-            Destroy(gameObject, 0.5f); // Destroy the fire pillar after the extinguish animation
+            Extinguish();
         }
     }
     #endregion
