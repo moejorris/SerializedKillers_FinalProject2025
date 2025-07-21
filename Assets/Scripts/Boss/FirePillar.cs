@@ -13,6 +13,7 @@ public class FirePillar : MonoBehaviour, IDamageable, IElemental
     [SerializeField] private float pathSpawnInterval = 0.5f; // Interval for spawning fire paths
     [SerializeField] private float damageInterval = 0.75f; // Interval for dealing damage to the player
     [SerializeField] private GameObject smokeObj;
+    [SerializeField] private SoundEffectSO sfx_douseSFX; // Sound effect for extinguishing the fire pillar
     private ParticleSystem smokePS;
     private Animator anim; // Animator for the fire pillar
     private float pathTimer; // Timer for the fire path
@@ -33,6 +34,14 @@ public class FirePillar : MonoBehaviour, IDamageable, IElemental
         anim = GetComponent<Animator>(); // Get the animator component
         smokePS = smokeObj.GetComponent<ParticleSystem>();
     }
+
+    public void PlaySound(SoundEffectSO clip, Transform target)
+    {
+        SoundManager.instance.PlaySoundEffectOnObject(clip, target); // Play the sound effect on the fire pillar object
+        Debug.Log("Sound played: " + clip.name);
+    }
+
+
 
     void Update()
     {
@@ -101,6 +110,7 @@ public class FirePillar : MonoBehaviour, IDamageable, IElemental
         anim.SetTrigger("Extinguish"); // Trigger extinguish animation
         isExtinguished = true; // Set the flag to indicate the fire pillar is extinguished
         smokePS.Play(); // Play the smoke particle system
+        PlaySound(sfx_douseSFX, transform); // Play the extinguish sound effect
         Destroy(gameObject, 0.5f); // Destroy the fire pillar after the extinguish animation
     }
     #endregion

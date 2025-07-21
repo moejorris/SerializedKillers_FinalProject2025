@@ -6,6 +6,7 @@ public class WaveCrash : MonoBehaviour
     [SerializeField] private float lifetime = 3f;
     [SerializeField] private int damage = 10;
     [SerializeField] private float speed = 5f;
+    [SerializeField] private SoundEffectSO sfx_waveDamage; // Sound effect for wave damage
     private bool isMoving = false;
 
     private Vector3 moveDirection;
@@ -50,10 +51,18 @@ public class WaveCrash : MonoBehaviour
             if (playerHealth != null)
             {
                 playerHealth.TakeDamage(damage);
+                PlaySound(sfx_waveDamage, transform); // Play the sound effect on the wave object
                 Debug.Log("Wave hit the player!"); // Log message for debugging
             }
         }
     }
+
+    public void PlaySound(SoundEffectSO clip, Transform target)
+    {
+        SoundManager.instance.PlaySoundEffectOnObject(clip, target); // Play the sound effect on the wave object
+        Debug.Log("Sound played: " + clip.name);
+    }
+
 
     void StartMoving()
     {
