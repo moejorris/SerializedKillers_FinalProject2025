@@ -109,6 +109,9 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
     [Header("Targeting")]
     public float TargetScore { get; set; }
     public float TargetScoreWeight { get => 2f; } //boss is twice as likely to be targeted
+
+
+    [SerializeField] private List<GameObject> spawnedInEnemies;
     #endregion
 
     #region Unity Methods
@@ -232,6 +235,7 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
         bossDoor.isTrigger = true; // Set the boss door to be a trigger
         bossTrigger.enabled = true; // Enable the boss trigger to allow the player to respawn the boss
         healthBar.parent.gameObject.SetActive(false); // Hide the health bar
+        KillAllEnemies();
         Destroy(bossParent, 0.5f); // Destroy the boss parent object after a delay
     }
 
@@ -910,6 +914,14 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
         }
     }
 
+    public void KillAllEnemies()
+    {
+        foreach (GameObject enemy in spawnedInEnemies)
+        {
+            if (enemy != null) Destroy(enemy);
+        }
+    }
+
     void SpawnWeakandStrongEnemy()
     {
         if (enemySpawnPoints.Length < 2 || enemiesToSpawn.Length < 3)
@@ -948,8 +960,12 @@ public class BossBehaviorV2 : MonoBehaviour, IElemental, IDamageable, ITargetabl
             secondSpawnIndex = Random.Range(0, enemySpawnPoints.Length);
         } while (secondSpawnIndex == firstSpawnIndex);
 
-        Instantiate(enemiesToSpawn[resistedEnemyIndex], enemySpawnPoints[firstSpawnIndex].position, Quaternion.identity);
-        Instantiate(enemiesToSpawn[weaknessEnemyIndex], enemySpawnPoints[secondSpawnIndex].position, Quaternion.identity);
+
+        GameObject enemy1 = Instantiate(enemiesToSpawn[resistedEnemyIndex], enemySpawnPoints[firstSpawnIndex].position, Quaternion.identity);
+        GameObject enemy2 = Instantiate(enemiesToSpawn[weaknessEnemyIndex], enemySpawnPoints[secondSpawnIndex].position, Quaternion.identity);
+
+        spawnedInEnemies.Add(enemy1);
+        spawnedInEnemies.Add(enemy2);
     }
     #endregion
     #region Animation Events
