@@ -21224,6 +21224,14 @@ MonoBehaviour:
   heldBehavior: {fileID: 0}
   emptySlot: {fileID: 960495944, guid: 05aa7f1155a3bb94c89ba5cf30ef0e06, type: 3}
   enemyManager: {fileID: 0}
+  neutralCape: {fileID: 2100000, guid: d33e3460295cb1d479c90067de27bbfb, type: 2}
+  fireCape: {fileID: 2100000, guid: f48eb857f5a026d40b2f058921990db6, type: 2}
+  waterCape: {fileID: 2100000, guid: 1e0229266a95c124fbbea7eb65018e2b, type: 2}
+  electricCape: {fileID: 2100000, guid: b842ca20f56127c459895fcc6bf52146, type: 2}
+  capeMaterials:
+  - {fileID: 2734912700956934330}
+  - {fileID: 9165114661508463108}
+  - {fileID: 1428201589222247766}
   fireStatusEffect: {fileID: 8131181348710889001}
   fireHazardColliders: []
   sfx_scriptSteal: {fileID: 0}
@@ -24004,6 +24012,21 @@ MonoBehaviour:
 --- !u!4 &983268641362904624 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: fa123b1ff1e342247b3b6f5a6b872a1f, type: 3}
+  m_PrefabInstance: {fileID: 734083319822213595}
+  m_PrefabAsset: {fileID: 0}
+--- !u!137 &1428201589222247766 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -7350436285263680371, guid: fa123b1ff1e342247b3b6f5a6b872a1f, type: 3}
+  m_PrefabInstance: {fileID: 734083319822213595}
+  m_PrefabAsset: {fileID: 0}
+--- !u!137 &2734912700956934330 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -5774845628346211999, guid: fa123b1ff1e342247b3b6f5a6b872a1f, type: 3}
+  m_PrefabInstance: {fileID: 734083319822213595}
+  m_PrefabAsset: {fileID: 0}
+--- !u!137 &9165114661508463108 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 8439459665819294687, guid: fa123b1ff1e342247b3b6f5a6b872a1f, type: 3}
   m_PrefabInstance: {fileID: 734083319822213595}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1306575334257763856

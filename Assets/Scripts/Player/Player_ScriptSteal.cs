@@ -37,6 +37,13 @@ public class Player_ScriptSteal : MonoBehaviour
     private GameObject returnScriptButton;
 
 
+    public Material neutralCape;
+    public Material fireCape;
+    public Material waterCape;
+    public Material electricCape;
+
+    [SerializeField] private SkinnedMeshRenderer[] capeMaterials;
+
     [Header("Status Effects")]
     [SerializeField] private FireDamageEffect fireStatusEffect;
 
@@ -61,7 +68,7 @@ public class Player_ScriptSteal : MonoBehaviour
         foreach (GameObject hazard in hazards)
         {
             BoxCollider[] colliders = hazard.GetComponents<BoxCollider>();
-            foreach (BoxCollider collider in colliders) 
+            foreach (BoxCollider collider in colliders)
             {
                 if (collider.isTrigger) continue;
                 fireHazardColliders.Add(collider);
@@ -206,6 +213,40 @@ public class Player_ScriptSteal : MonoBehaviour
             FireHazardToggle(true);
             scriptEffectColor = Color.white;
         }
+
+        if (heldBehavior != null)
+        {
+            if (heldBehavior.behaviorName == "electric")
+            {
+                foreach (SkinnedMeshRenderer capePiece in capeMaterials)
+                {
+                    capePiece.material = electricCape;
+                }
+            }
+            else if (heldBehavior.behaviorName == "fire")
+            {
+                foreach (SkinnedMeshRenderer capePiece in capeMaterials)
+                {
+                    capePiece.material = fireCape;
+                }
+            }
+            else if (heldBehavior.behaviorName == "water")
+            {
+                foreach (SkinnedMeshRenderer capePiece in capeMaterials)
+                {
+                    capePiece.material = waterCape;
+                }
+            }
+        }
+        else
+        {
+            foreach (SkinnedMeshRenderer capePiece in capeMaterials)
+            {
+                capePiece.material = neutralCape;
+            }
+        }
+
+
         UpdateUI();
     }
 
@@ -230,17 +271,32 @@ public class Player_ScriptSteal : MonoBehaviour
 
                 stolenScriptAnimationInt = 0;
                 stolenScriptAnimation.sprite = heldBehavior.animation[0];
+
+                foreach (SkinnedMeshRenderer capePiece in capeMaterials)
+                {
+                    capePiece.material.SetFloat("_ScriptOn", 0);
+                }
             }
             else
             {
                 stolenScriptAnimation.enabled = false;
                 stolenScriptSlot.sprite = heldBehavior.deactivatedBehaviorIcon;
+
+                foreach (SkinnedMeshRenderer capePiece in capeMaterials)
+                {
+                    capePiece.material.SetFloat("_ScriptOn", 1);
+                }
             }
         }
         else
         {
             stolenScriptAnimation.enabled = false;
             stolenScriptSlot.sprite = emptySlot;
+
+            foreach (SkinnedMeshRenderer capePiece in capeMaterials)
+            {
+                capePiece.material.SetFloat("_ScriptOn", 1);
+            }
         }
 
         //if (heldBehavior != null)
